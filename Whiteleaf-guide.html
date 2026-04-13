@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>White Leaf — Asian Snack & Drink Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--cream:#F5F0E8;--cream-dark:#EDE6D6;--green-deep:#1C3A2B;--green-mid:#2E5940;--green-light:#4A7C5F;--green-pale:#C8DDD0;--text-dark:#1A1A1A;--text-mid:#4A4A4A;--text-light:#888}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--cream);font-family:'DM Sans',sans-serif;font-weight:300;color:var(--text-dark)}
+.lang-bar{background:var(--cream);border-bottom:1px solid rgba(107,143,113,0.15);padding:10px 20px;display:flex;justify-content:center;gap:8px;position:sticky;top:0;z-index:100}
+.lang-btn{background:transparent;border:1px solid rgba(107,143,113,0.3);color:var(--text-light);padding:5px 18px;border-radius:20px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;transition:all .25s}
+.lang-btn:hover:not(.active){border-color:var(--green-light);color:var(--green-deep)}
+.lang-btn.active{background:var(--green-deep);color:var(--cream);border-color:var(--green-deep)}
+.hero{background:var(--cream);padding:36px 20px;text-align:center;position:relative;border-bottom:1px solid rgba(107,143,113,0.2)}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 20% 20%,rgba(107,143,113,0.06) 0%,transparent 50%),radial-gradient(circle at 80% 80%,rgba(45,74,62,0.05) 0%,transparent 50%);pointer-events:none}
+.hero-logo{position:relative;margin-bottom:14px}
+.hero h1{font-family:'Playfair Display',serif;font-size:clamp(28px,7vw,40px);color:#1a1a1a;letter-spacing:0.1em;position:relative;font-weight:400}
+.hero-sub{font-size:11px;color:#555;letter-spacing:0.25em;text-transform:uppercase;margin-top:8px;position:relative}
+.hero-tagline{font-family:'Playfair Display',serif;font-size:14px;font-style:italic;color:var(--text-light);margin-top:10px;position:relative}
+.cat-nav{background:var(--cream-dark);border-bottom:1px solid rgba(28,58,43,0.12);padding:0 16px;display:flex;overflow-x:auto;scrollbar-width:none;position:sticky;top:41px;z-index:90}
+.cat-nav::-webkit-scrollbar{display:none}
+.cat-tab{background:none;border:none;border-bottom:2px solid transparent;padding:14px 16px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:400;color:var(--text-mid);cursor:pointer;white-space:nowrap;transition:all .2s;letter-spacing:0.04em}
+.cat-tab:hover{color:var(--green-deep)}
+.cat-tab.active{color:var(--green-deep);border-bottom-color:var(--green-deep);font-weight:500}
+.section{display:none;padding:28px 16px 60px;max-width:700px;margin:0 auto;animation:fadeIn .3s ease}
+.section.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.section-title{font-family:'Playfair Display',serif;font-size:26px;color:var(--green-deep);margin-bottom:6px;display:flex;align-items:center;gap:10px;font-weight:400}
+.cat-intro{background:var(--green-mid);color:rgba(255,255,255,0.88);border-radius:14px;padding:18px 20px;margin:14px 0 22px;font-size:13.5px;line-height:1.7}
+.cat-intro strong{color:var(--green-pale);font-weight:500}
+.cat-intro em{font-style:italic;color:rgba(255,255,255,0.7)}
+.cat-intro.small{padding:14px 18px;font-size:13px;margin-bottom:16px}
+.vegan-note{background:linear-gradient(135deg,#E8F5E9,#F1F8F2);border:1px solid #C8E6C9;border-radius:10px;padding:12px 16px;margin-bottom:18px;font-size:13px;color:#2E7D32;line-height:1.5}
+.subsection-header{font-size:10px;text-transform:uppercase;letter-spacing:0.16em;color:var(--text-light);margin:24px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--cream-dark);font-weight:500}
+.product-card{background:#fff;border-radius:14px;padding:18px 18px 16px;margin-bottom:12px;border:1px solid rgba(28,58,43,0.07);box-shadow:0 2px 10px rgba(0,0,0,0.04);transition:box-shadow .2s,transform .2s;position:relative;overflow:hidden}
+.product-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:3px 0 0 3px}
+.product-card.beginner::before{background:#4CAF50}
+.product-card.medium::before{background:#FF8C00}
+.product-card.hot::before{background:#E53935}
+.product-card.extreme::before{background:#6A0000}
+.product-card.blue-l::before{background:#2980B9}
+.product-card.purple-l::before{background:#8E44AD}
+.product-card.teal-l::before{background:#16A085}
+.product-card.red-l::before{background:#C0392B}
+.product-card:hover{box-shadow:0 4px 18px rgba(28,58,43,0.10);transform:translateY(-1px)}
+.product-header{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:8px}
+.product-name{font-family:'Playfair Display',serif;font-size:16px;color:var(--green-deep);font-weight:700;line-height:1.25}
+.product-brand{font-size:10px;color:var(--text-light);text-transform:uppercase;letter-spacing:0.08em;margin-top:3px}
+.badges{display:flex;flex-wrap:wrap;gap:4px;flex-shrink:0}
+.badge{font-size:10px;padding:3px 8px;border-radius:20px;font-weight:500;letter-spacing:0.04em;white-space:nowrap}
+.badge-vegan{background:#E8F5E9;color:#2E7D32}
+.badge-s1{background:#FFF3E0;color:#E65100}
+.badge-s2{background:#FFE0B2;color:#BF360C}
+.badge-s3{background:#FFCCBC;color:#870000}
+.badge-s4{background:#b71c1c;color:#fff}
+.badge-mild{background:#E3F2FD;color:#1565C0}
+.badge-sweet{background:#FCE4EC;color:#880E4F}
+.badge-new{background:#FFF8E1;color:#F57F17;border:1px solid #FFE082}
+.badge-unique{background:#FBE9E7;color:#BF360C}
+.badge-herbal{background:#F1F8E9;color:#558B2F}
+.badge-prob{background:#EDE7F6;color:#4527A0}
+.badge-sour{background:#F3E5F5;color:#6A1B9A}
+.badge-china{background:#FFEBEE;color:#C62828}
+.badge-japan{background:#FFF3E0;color:#E65100}
+.badge-taiwan{background:#FCE4EC;color:#880E4F}
+.badge-numbing{background:#EDE7F6;color:#4527A0}
+.desc-en,.desc-hu{font-size:13px;color:var(--text-mid);line-height:1.65}
+.heat-bar{display:flex;align-items:center;gap:8px;margin-top:10px}
+.heat-label{font-size:10px;color:var(--text-light);text-transform:uppercase;letter-spacing:0.08em;width:36px;flex-shrink:0}
+.heat-dots{display:flex;gap:4px}
+.heat-dot{width:10px;height:10px;border-radius:50%;background:#E0E0E0}
+.heat-dot.g{background:#4CAF50}
+.heat-dot.o{background:#FF6D00}
+.heat-dot.r{background:#E53935}
+.heat-dot.d{background:#6A0000}
+.heat-text{font-size:11px;color:var(--text-light);font-style:italic}
+.product-card-photo{background:#fff;border-radius:14px;margin-bottom:12px;overflow:hidden;border:1px solid rgba(28,58,43,0.07);box-shadow:0 2px 10px rgba(0,0,0,0.04);display:flex;min-height:120px;transition:box-shadow .2s,transform .2s;position:relative}
+.product-card-photo::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px}
+.product-card-photo.blue-l::before{background:#2980B9}
+.product-card-photo.purple-l::before{background:#8E44AD}
+.product-card-photo.beginner::before{background:#4CAF50}
+.product-card-photo.medium::before{background:#FF8C00}
+.product-card-photo.hot::before{background:#E53935}
+.product-card-photo.extreme::before{background:#6A0000}
+.product-card-photo:hover{box-shadow:0 4px 18px rgba(28,58,43,0.10);transform:translateY(-1px)}
+.photo-img{width:100px;min-height:120px;flex-shrink:0;overflow:hidden;background:#f0ebe0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px}
+.photo-img img{width:100%;height:100%;object-fit:cover;object-position:center top;display:block}
+.ph-icon{font-size:24px;opacity:0.25}
+.ph-text{font-size:8px;color:var(--text-light);text-align:center;padding:0 4px}
+.photo-info{flex:1;padding:14px 14px 12px;display:flex;flex-direction:column;gap:5px}
+.intro-card{background:#fff;border-radius:14px;margin-bottom:12px;border:1px solid rgba(28,58,43,0.07);box-shadow:0 2px 10px rgba(0,0,0,0.04);position:relative;overflow:hidden}
+.intro-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px}
+.intro-card.red::before{background:#C0392B}
+.intro-card.teal::before{background:#16A085}
+.intro-body{padding:18px 18px 16px}
+.intro-title{font-family:'Playfair Display',serif;font-size:19px;color:var(--green-deep);font-weight:700;margin-bottom:10px}
+.intro-desc{font-size:13px;color:var(--text-mid);line-height:1.7}
+.intro-flavours{margin-top:10px;font-size:12px;color:var(--text-light)}
+.intro-flavours strong{color:var(--green-deep);font-weight:500}
+.lang-en .hu{display:none}
+.lang-hu .en{display:none}
+footer{background:var(--green-deep);color:rgba(255,255,255,0.45);text-align:center;padding:24px 20px;font-size:11px;letter-spacing:0.07em;margin-top:32px}
+footer strong{color:rgba(255,255,255,0.8)}
+</style>
+</head>
+<body class="lang-en">
+
+<div class="lang-bar">
+  <button class="lang-btn active" onclick="setLang('en',this)">English</button>
+  <button class="lang-btn" onclick="setLang('hu',this)">Magyar</button>
+</div>
+
+<div class="hero">
+  <div class="hero-logo">
+    <svg style="width:64px;height:64px;" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="50" cy="24" rx="9" ry="20" fill="#6b8f71"/>
+      <line x1="50" y1="4" x2="50" y2="44" stroke="#f5f2ec" stroke-width="1.2"/>
+      <ellipse cx="50" cy="76" rx="9" ry="20" fill="#6b8f71"/>
+      <line x1="50" y1="56" x2="50" y2="96" stroke="#f5f2ec" stroke-width="1.2"/>
+      <ellipse cx="24" cy="50" rx="20" ry="9" fill="#2d4a3e"/>
+      <line x1="4" y1="50" x2="44" y2="50" stroke="#f5f2ec" stroke-width="1.2"/>
+      <ellipse cx="76" cy="50" rx="20" ry="9" fill="#2d4a3e"/>
+      <line x1="56" y1="50" x2="96" y2="50" stroke="#f5f2ec" stroke-width="1.2"/>
+      <circle cx="50" cy="50" r="5" fill="#2d4a3e"/>
+    </svg>
+  </div>
+  <h1>White Leaf</h1>
+  <p class="hero-sub"><span class="en">Asian Snack &amp; Drink Guide · Eger</span><span class="hu">Ázsiai Snack &amp; Ital Útmutató · Eger</span></p>
+  <p class="hero-tagline"><span class="en">Discover Asia, one bite at a time</span><span class="hu">Fedezd fel Ázsiát, falatról falatra</span></p>
+</div>
+
+<nav class="cat-nav">
+  <button class="cat-tab active" onclick="showSection('spicy',this)">🌶️ <span class="en">Spicy Snacks</span><span class="hu">Csípős Snackek</span></button>
+  <button class="cat-tab" onclick="showSection('drinks',this)">🥤 <span class="en">Drinks</span><span class="hu">Italok</span></button>
+  <button class="cat-tab" onclick="showSection('mochi',this)">🍡 Mochi</button>
+  <button class="cat-tab" onclick="showSection('jelly',this)">🍮 <span class="en">Jelly</span><span class="hu">Zselé</span></button>
+  <button class="cat-tab" onclick="showSection('candy',this)">🍬 <span class="en">Candy</span><span class="hu">Cukorka</span></button>
+</nav>
+
+<!-- SPICY -->
+
+<section class="section active" id="spicy">
+  <h2 class="section-title">🌶️ <span class="en">Chinese Spicy Snacks</span><span class="hu">Kínai Csípős Snackek</span></h2>
+  <div class="cat-intro">
+    <p class="en"><strong>What are these?</strong> Chewy seasoned strips made from <strong>wheat gluten</strong> (like seitan) or <strong>konjac root</strong> — never from meat. Names like "pork strips" or "big knife meat" describe the <em>shape and texture</em>, not the ingredients. Every product here is 100% vegan. Sorted mildest to most extreme.</p>
+    <p class="hu"><strong>Mik ezek?</strong> Rágós fűszerezett csíkok <strong>búzaglútenből</strong> (mint a seitan) vagy <strong>konjac gyökérből</strong> — soha nem húsból. Az olyan nevek, mint "sertéshús csíkok" az <em>alakra és textúrára</em> utalnak, nem az összetevőkre. Minden termék 100% vegán. Az enyhétől az extrémig rendezve.</p>
+  </div>
+  <div class="vegan-note en">🌱 <strong>All spicy snacks are 100% vegan.</strong> No meat, no fish. Wheat gluten or konjac root.</div>
+  <div class="vegan-note hu">🌱 <strong>Minden csípős snack 100% vegán.</strong> Sem hús, sem hal. Búzaglúten vagy konjac gyökér.</div>
+
+  <div class="subsection-header en">🟢 Beginner — Mild heat · Sweet-spicy · Great first try</div>
+  <div class="subsection-header hu">🟢 Kezdőknek — Enyhe hő · Édes-csípős · Tökéletes első próbálkozásnak</div>
+
+  <div class="product-card-photo beginner">
+    <div class="photo-img"><img src="images/IMG_0067.jpeg" alt="Don't Fail My Exam" onerror="this.parentElement.innerHTML='&lt;div class=ph-icon&gt;🌶️&lt;/div&gt;&lt;div class=ph-text&gt;IMG_0067&lt;/div&gt;'"></div>
+    <div class="photo-info">
+      <div class="product-header"><div><div class="product-name en">"Don't Fail My Exam" Strips</div><div class="product-name hu">"Ne Bukhassak Meg" Csíkok</div><div class="product-brand">翻天娃 · 不想挂科辣条 · 113g</div></div><div class="badges"><span class="badge badge-vegan">Vegan</span><span class="badge badge-s1">🌶 Mild</span><span class="badge badge-new">Best first</span></div></div>
+      <p class="desc-en en">Sweet-spicy, very mild heat, slightly sticky. Addictive and approachable. The #1 recommendation for first-timers.</p>
+      <p class="desc-hu hu">Édes-csípős, nagyon enyhe hő, enyhén ragacsos. Addiktív és könnyen fogyasztható. Az első próbálkozók #1 ajánlása.</p>
+      <div class="heat-bar"><span class="heat-label en">Heat</span><span class="heat-label hu">Hő</span><div class="heat-dots"><div class="heat-dot g"></div><div class="heat-dot g"></div><div class="heat-dot"></div><div class="heat-dot"></div><div class="heat-dot"></div></div><span class="heat-text en">Mild-sweet</span><span class="heat-text hu">Enyhe-édes</span></div>
+    </div>
+  </div>
+
+  <div class="product-card-photo beginner">
+    <div class="photo-img"><img src="images/IMG_0069.jpeg" alt="Thai Lemongrass" onerror="this.parentElement.innerHTML='&lt;div class=ph-icon&gt;🌶️&lt;/div&gt;&lt;div class=ph-text&gt;IMG_0069&lt;/div&gt;'"></div>
+    <div class="photo-info">
+      <div class="product-header"><div><div class="product-name en">Thai Lemongrass Strips</div><div class="product-name hu">Thai Citromfű Csíkok</div><div class="product-brand">翻天娃 · 泰式柠檬草辣条 · 88g</div></div><div class="badges"><span class="badge badge-vegan">Vegan</span><span class="badge badge-s1">🌶 Mild</span></div></div>
+      <p class="desc-en en">Lemongrass gives a floral, citrusy brightness. Refreshing and gently spicy. The most unique flavour in the store.</p>
+      <p class="desc-hu hu">A citromfű virágos, citrusos frissességet ad. Frissítő és gyengéden csípős. Az üzlet legegyedibb íze.</p>
+      <div class="heat-bar"><span class="heat-label en">Heat</span><span class="heat-label hu">Hő</span><div class="heat-dots"><div class="heat-dot g"></div><div class="heat-dot g"></div><div class="heat-dot"></div><div class="heat-dot"></div><div class="heat-dot"></div></div><span class="heat-text en">Mild citrusy</span><span class="heat-text hu">Enyhe citrusos</span></div>
+    </div>
+  </div>
+
+  <div class="product-card-photo beginner">
+    <div class="photo-img"><img src="images/IMG_0065.jpeg" alt="Spicy Chips" onerror="this.parentElement.innerHTML='&lt;div class=ph-icon&gt;🌶️&lt;/div&gt;&lt;div class=ph-text&gt;IMG_0065&lt;/div&gt;'"></div>
+    <div class="photo-info">
+      <div class="product-header"><div><div class="product-name en">Spicy Chips — Sweet Chili</div><div class="product-name hu">Csípős Chips — Édes Chili</div><div class="product-brand">翻天娃 · 独宠辣片 甜辣味 · 88g</div></div><div class="badges"><span class="badge badge-vegan">Vegan</span><span class="badge badge-s1">🌶 Mild</span></div></div>
+      <p class="desc-en en">Wide flat wheat gluten chips — crispier than strips, almost cracker-like. Sweet chili flavour, mild heat.</p>
+      <p class="desc-hu hu">Széles lapos búzagluten chipek — ropogósabb a csíkoknál, majdnem keksz szerű. Édes chili íz, enyhe hő.</p>
+      <div class="heat-bar"><span class="heat-label en">Heat</span><span class="heat-label hu">Hő</span><div class="heat-dots"><div class="heat-dot g"></div><div class="heat-dot g"></div><div class="heat-dot"></div><div class="heat-dot"></div><div class="heat-dot"></div></div><span class="heat-text en">Sweet-spicy, crunchy</span><span class="heat-text hu">Édes-csípős, ropogós</span></div>
+    </div>
+  </div>
+
+  <div class="subsection-header en">🟠 Medium — Classic chili · Bold savoury · No numbing</div>
+  <div class="subsection-header hu">🟠 Közepes — Klasszikus chili · Határozott sós · Nincs zsibadás</div>
+
+  <div class="product-card-photo medium">
+    <div class="photo-img"><img src="images/IMG_0073.jpeg" alt="Weilong Big Strips" onerror="this.parentElement.innerHTML='&lt;div class=ph-icon&gt;🌶️&lt;/div&gt;&lt;div class=ph-text&gt;IMG_0073&lt;/div&gt;'"></div>
+    <div class="photo-info">
+      <div class="product-header"><div><div class="product-name en">Weilong Big Strips — Classic Chili</div><div class="product-name hu">Weilong Nagy Csíkok — Klasszikus Chili</div><div class="product-brand">卫龙 · 大面筋辣条 经典香辣 · 65g</div></div><div class="badges"><span class="badge badge-vegan">Vegan</span><span class="badge badge-s2">🌶🌶 Medium</span><span class="badge badge-new">🏆 Most Famous</span></div></div>
+      <p class="desc-en en">China's most iconic spicy snack. Thick wheat gluten strips in chili oil. Bold, savoury, chewy. Hotter than paprika chips but not overwhelming.</p>
+      <p class="desc-hu hu">Kína legikonikusabb csípős snackje. Vastag búzagluten csíkok chili olajban. Határozott, sós, rágós. Erősebb a paprikás chipsnél, de nem megterhelő.</p>
+      <div class="heat-bar"><span class="heat-label en">Heat</span><span class="heat-label hu">Hő</span><div class="heat-dots"><div class="heat-dot o"></div><div class="heat-dot o"></div><div class="heat-dot o"></div><div class="heat-dot"></div><div class="heat-dot"></div></div><span class="heat-text en">Medium bold chili</span><span class="heat-text hu">Közepes határozott chili</span></div>
+    </div>
+  </div>
+
+  <div class="product-card-photo medium">
+    <div class="photo-img"><img src="images/IMG_0064.jpeg" alt="Tendon Strips" onerror="this.parentElement.innerHTML='&lt;div class=ph-icon&gt;🌶️&lt;/div&gt;&lt;div class=ph-text&gt;IMG_0064&lt;/div&gt;'"></div>
+    <div class="photo-info">
+      <div class="product-header"><div><div class="product-name en">Veg "Tendon" Strips</div><div class="product-name hu">Vegán "Ín" Csíkok</div><div class="product-brand">翻天娃 · 素香辣蹄筋 · 101g</div></div><div class="badges"><span class="badge badge-vegan">Vegan</span><span class="badge badge-s2">🌶🌶 Medium</span></div></div>
+      <p class="desc-en en">"Tendon" describes the elastic, pull-apart texture. Tender strips with fragrant chili coating. No actual tendon inside.</p>
+      <p class="desc-hu hu">Az "ín" a rugalmas, szétszakítható állagot írja le. Puha csíkok illatos chili bevonattal. Nincs valódi ín benne.</p>
+      <div class="heat-bar"><span class="heat-label en">Heat</span><span class="heat-label hu">Hő</span><div class="heat-dots"><div class="heat-dot o"></div><div class="heat-dot o"></div><div class="heat-dot o"></div><div class="heat-dot"></div><div class="heat-dot"></div></div><span class="heat-text en">Medium aromatic</span><span class="heat-text hu">Közepes aromás</span></div>
+    </div>
+  </div>
+
+  <div class="product-card-photo medium">
+    <div class="photo-img"><img src="images/IMG_0068.jpeg" alt="Big Knife Squares" onerror="this.parentElement.innerHTML='&lt;div class=ph-icon&gt;🌶️&lt;/div&gt;&lt;div class=ph-text&gt;IMG_0068&lt;/div&gt;'"></div>
+    <div class="photo-info">
+      <div class="product-header"><div><div class="product-name en">Veg "Big Knife" Squares</div><div class="product-name hu">Vegán "Nagy Kés" Kockák</div><div class="product-brand">翻天娃 · 素大刀肉 甜辣味 · 101g</div></div><div class="badges"><span class="badge badge-vegan">Vegan</span><span class="badge badge-s2">🌶🌶 Medium</span></div></div>
+      <p class="desc-en en">Chunky wheat gluten squares — "big knife meat" refers to thick cuts, not the ingredient. Sweet-spicy coating.</p>
+      <p class="desc-hu hu">Darabos búzagluten kockák — "nagy késes hús" a vastag vágásokra utal, nem az összetevőre. Édes-csípős bevonat.</p>
+      <div class="heat-bar"><span class="heat-label en">Heat</span><span class="heat-label hu">Hő</span><div class="heat-dots"><div class="heat-dot o"></div><div class="heat-dot o"></div><div class="heat-dot o"></div><div class="heat-dot"></div><div class="heat-dot"></div></div><span class="heat-text en">Sweet-spicy chunky</span><span class="heat-text hu">Édes-csípős darabos</span></div>
+    </div>
+  </div>
+
+  <div class="product-card-photo medium">
+    <div class="photo-img"><img src="images/IMG_0066.jpeg" alt="Sesame Sticks" onerror="this.parentElement.innerHTML='&lt;div class=ph-icon&gt;🌶️&lt;/div&gt;&lt;div class=ph-text&gt;IMG_0066&lt;/div&gt;'"></div>
+    <div class="photo-info">
+      <div class="product-header"><div><div class="product-name en">Sesame Spicy Sticks</div><div class="product-name hu">Szezámos Csípős Rudak</div><div class="product-brand">翻天娃 · 芝麻小辣棒 香辣味 · 101g</div></div><div class="badges"><span class="badge badge-vegan">Vegan</span><span class="badge badge-s2">🌶🌶 Medium</span></div></div>
+      <p class="desc-en en">Toasted sesame softens the chili edge — nutty roasted depth with medium heat. Good for people who find pure chili too sharp.</p>
+      <p class="desc-hu hu">A pirított szezám tompítja a chili élességét — diós, pirított mélység közepes hővel. Jó azoknak, akik a tiszta chilit túl élesnek találják.</p>
+      <div class="heat-bar"><span class="heat-label en">Heat</span><span class="heat-label hu">Hő</span><div class="heat-dots"><div class="heat-dot o"></div><div class="heat-dot o"></div><div class="heat-dot o"></div><div class="heat-dot"></div><div class="heat-dot"></div></div><span class="heat-text en">Nutty medium</span><span class="heat-text hu">Diós közepes</span></div>
+    </div>
+  </div>
+
+  <div class="product-card-photo medium">
+    <div class="photo-img"><img src="images/IMG_0077.jpeg" alt="Yinkouchan Small Strips" onerror="this.parentElement.innerHTML='&lt;div class=ph-icon&gt;🌶️&lt;/div&gt;&lt;div class=ph-text&gt;IMG_0077&lt;/div&gt;'"></div>
+    <div class="photo-info">
+      <div class="product-header"><div><div class="product-name en">Classic Small Strips</div><div class="product-name hu">Klasszikus Kis Csíkok</div><div class="product-brand">引口馋 Yinkouchan · 小面筋 经典 · 72g</div></div><div class="badges"><span class="badge badge-vegan">Vegan</span><span class="badge badge-s2">🌶🌶 Medium</span></div></div>
+      <p class="desc-en en">Thin, concentrated sweet-spicy strips with sesame. Old-school recipe — slightly drier, more chili-forward than modern brands. Nostalgic for Chinese people, novel for Europeans.</p>
+      <p class="desc-hu hu">Vékony, koncentrált édes-csípős csíkok szezámmal. Régi stílusú recept — enyhén szárazabb, chili-előtérbe helyezettebb a modern márkáknál. Nosztalgikus a kínaiak számára, újszerű az európaiak számára.</p>
+      <div class="heat-bar"><span class="heat-label en">Heat</span><span class="heat-label hu">Hő</span><div class="heat-dots"><div class="heat-dot o"></div><div class="heat-dot o"></div><div class="heat-dot o"></div><div class="heat-dot"></div><div class="heat-dot"></div></div><span class="heat-text en">Medium classic</span><span class="heat-text hu">Közepes klasszikus</span></div>
+    </div>
+  </div>
+
+  <div class="subsection-header en">卫龙 魔芋爽 Konjac Strips — Completely different texture from wheat</div>
+  <div class="subsection-header hu">卫龙 魔芋爽 Konjac Csíkok — Teljesen eltérő állag a búzától</div>
+
+  <div class="cat-intro small">
+    <p class="en"><strong>What is konjac?</strong> A root vegetable processed into firm, springy, gelatinous strips — slippery outside, bouncy when you bite. Almost zero calories. The chew is more like firm jelly than wheat strips.</p>
+    <p class="hu"><strong>Mi az a konjac?</strong> Egy gyökérzöldség, kemény, rugalmas, zselészerű csíkokká feldolgozva — kívül csúszós, harapásra pattanó. Szinte nulla kalória. A rágósság inkább kemény zseléhez hasonlít.</p>
+  </div>
+
+  <div class="product-card-photo medium">
+    <div class="photo-img"><img src="images/IMG_0074.jpeg" alt="Konjac Fragrant Spicy" onerror="this.parentElement.innerHTML='&lt;div class=ph-icon&gt;🌀&lt;/div&gt;&lt;div class=ph-text&gt;IMG_0074&lt;/div&gt;'"></div>
+    <div class="photo-info">
+      <div class="product-header"><div><div class="product-name en">Konjac — Fragrant Spicy 🔴</div><div class="product-name hu">Konjac — Illatos Csípős 🔴</div><div class="product-brand">卫龙 魔芋爽 · 香辣素毛肚</div></div><div class="badges"><span class="badge badge-vegan">Vegan</span><span class="badge badge-s2">🌶🌶 Medium</span><span class="badge badge-new">Try first</span></div></div>
+      <p class="desc-en en">Most beginner-friendly konjac. Aromatic spices with gentle chili warmth. Best entry point if you've never tried konjac before.</p>
+      <p class="desc-hu hu">A legkezdőbarátabb konjac. Aromás fűszerek enyhe chili meleggel. Legjobb belépési pont, ha még sosem próbáltál konjacot.</p>
+      <div class="heat-bar"><span class="heat-label en">Heat</span><span class="heat-label hu">Hő</span><div class="heat-dots"><div class="heat-dot o"></div><div class="heat-dot o"></div><div class="heat-dot o"></div><div class="heat-dot"></div><div class="heat-dot"></div></div><span class="heat-text en">Medium aromatic</span><span class="heat-text hu">Közepes aromás</span></div>
+    </div>
+  </div>
+
+  <div class="product-card-photo medium">
+    <div class="photo-img"><img src="images/IMG_0076.jpeg" alt="Konjac Sour Spicy" onerror="this.parentElement.innerHTML='&lt;div class=ph-icon&gt;🌀&lt;/div&gt;&lt;div class=ph-text&gt;IMG_0076&lt;/div&gt;'"></div>
+    <div class="photo-info">
+      <div class="product-header"><div><div class="product-name en">Konjac — Sour &amp; Spicy 🟢</div><div class="product-name hu">Konjac — Savanyú &amp; Csípős 🟢</div><div class="product-brand">卫龙 魔芋爽 · 酸辣素毛肚</div></div><div class="badges"><span class="badge badge-vegan">Vegan</span><span class="badge badge-sour">Sour + Spicy</span></div></div>
+      <p class="desc-en en">Vinegar tang first, then gentle chili warmth builds. Like a sour candy but savoury. Great for sour gummy fans.</p>
+      <p class="desc-hu hu">Először ecetes savanykás íz, majd enyhe chili meleg. Mint egy savanyú cukorka, de sós. Remek a savanyú gumicukor rajongóknak.</p>
+      <div class="heat-bar"><span class="heat-label en">Heat</span><span class="heat-label hu">Hő</span><div class="heat-dots"><div class="heat-dot o"></div><div class="heat-dot o"></div><div class="heat-dot o"></div><div class="heat-dot"></div><div class="heat-dot"></div></div><span class="heat-text en">Sour leads</span><span class="heat-text hu">Savanyú vezet</span></div>
+    </div>
+  </div>
+
+  <div class="subsection-header en">🔴 Hot — Serious chili · Sichuan pepper begins</div>
+  <div class="subsection-header hu">🔴 Erősen Csípős — Komoly chili · Szecsuáni bors kezdődik</div>
+
+  <div class="product-card-photo hot">
+    <div class="photo-img"><img src="images/IMG_0079.jpeg" alt="Coriander Strips" onerror="this.parentElement.innerHTML='&lt;div class=ph-icon&gt;🌶️&lt;/div&gt;&lt;div class=ph-text&gt;IMG_0079&lt;/div&gt;'"></div>
+    <div class="photo-info">
+      <div class="product-header"><div><div class="product-name en">Coriander Spicy Strips</div><div class="product-name hu">Korianderes Csípős Csíkok</div><div class="product-brand">震惊世界 · 香菜辣条 · 70g</div></div><div class="badges"><span class="badge badge-vegan">Vegan</span><span class="badge badge-s3">🌶🌶🌶 Hot</span></div></div>
+      <p class="desc-en en">Coriander (cilantro) is polarising — love it or hate it. Fresh, herbal, with solid chili. China's classic "love it or hate it" challenge snack.</p>
+      <p class="desc-hu hu">A koriander megosztó — vagy imádod, vagy utálod. Friss, gyógynövényes, erős chilivel. Kína klasszikus "imádom vagy utálom" kihívás snackje.</p>
+      <div class="heat-bar"><span class="heat-label en">Heat</span><span class="heat-label hu">Hő</span><div class="heat-dots"><div class="heat-dot r"></div><div class="heat-dot r"></div><div class="heat-dot r"></div><div class="heat-dot"></div><div class="heat-dot"></div></div><span class="heat-text en">Hot herbal</span><span class="heat-text hu">Forró gyógynövényes</span></div>
+    </div>
+  </div>
+
+  <div class="product-card-photo hot">
+    <div class="photo-img"><img src="images/IMG_0070.jpeg" alt="Weilong Crayfish" onerror="this.parentElement.innerHTML='&lt;div class=ph-icon&gt;🌶️&lt;/div&gt;&lt;div class=ph-text&gt;IMG_0070&lt;/div&gt;'"></div>
+    <div class="photo-info">
+      <div class="product-header"><div><div class="product-name en">Weilong — Spicy Crayfish Flavour</div><div class="product-name hu">Weilong — Csípős Rák Íz</div><div class="product-brand">卫龙 · 大面筋 麻辣小龙虾味 · 100g</div></div><div class="badges"><span class="badge badge-vegan">Vegan</span><span class="badge badge-s3">🌶🌶🌶 Hot</span><span class="badge badge-numbing">Tingle begins</span></div></div>
+      <p class="desc-en en">No actual crayfish — 100% vegan. "Crayfish" is the flavour: smoky, spiced, with the start of Sichuan pepper numbness.</p>
+      <p class="desc-hu hu">Nincs valódi rák — 100% vegán. A "rák" az íz: füstös, fűszeres, a szecsuáni borsos zsibadás kezdetével.</p>
+      <div class="heat-bar"><span class="heat-label en">Heat</span><span class="heat-label hu">Hő</span><div class="heat-dots"><div class="heat-dot r"></div><div class="heat-dot r"></div><div class="heat-dot r"></div><div class="heat-dot r"></div><div class="heat-dot"></div></div><span class="heat-text en">Hot + Sichuan tingle</span><span class="heat-text hu">Forró + szecsuáni bizsergés</span></div>
+    </div>
+  </div>
+
+  <div class="product-card-photo hot">
+    <div class="photo-img"><img src="images/IMG_0075.jpeg" alt="Konjac Mala" onerror="this.parentElement.innerHTML='&lt;div class=ph-icon&gt;🌀&lt;/div&gt;&lt;div class=ph-text&gt;IMG_0075&lt;/div&gt;'"></div>
+    <div class="photo-info">
+      <div class="product-header"><div><div class="product-name en">Konjac — Mala 🟠</div><div class="product-name hu">Konjac — Mala 🟠</div><div class="product-brand">卫龙 魔芋爽 · 麻辣素毛肚</div></div><div class="badges"><span class="badge badge-vegan">Vegan</span><span class="badge badge-s3">🌶🌶🌶 Hot</span><span class="badge badge-numbing">🌀 Numbing</span></div></div>
+      <p class="desc-en en">Konjac jelly strips with full mala spicing — Sichuan pepper tingle and chili heat together. Intense flavour, near-zero calories.</p>
+      <p class="desc-hu hu">Konjac zselé csíkok teljes mala fűszerezéssel — szecsuáni borsos bizsergés és chili hő egyszerre. Intenzív íz, szinte nulla kalória.</p>
+      <div class="heat-bar"><span class="heat-label en">Heat</span><span class="heat-label hu">Hő</span><div class="heat-dots"><div class="heat-dot r"></div><div class="heat-dot r"></div><div class="heat-dot r"></div><div class="heat-dot r"></div><div class="heat-dot"></div></div><span class="heat-text en">Hot + numbing</span><span class="heat-text hu">Forró + zsibasztó</span></div>
+    </div>
+  </div>
+
+  <div class="product-card-photo hot">
+    <div class="photo-img"><img src="images/IMG_0081.jpeg" alt="Old Style Small Strips" onerror="this.parentElement.innerHTML='&lt;div class=ph-icon&gt;🌶️&lt;/div&gt;&lt;div class=ph-text&gt;IMG_0081&lt;/div&gt;'"></div>
+    <div class="photo-info">
+      <div class="product-header"><div><div class="product-name en">Old-Style Strips — Classic Small</div><div class="product-name hu">Régi Stílusú Csíkok — Klasszikus Kis</div><div class="product-brand">引口馋 · 老式辣条 经典小面筋 · 162g</div></div><div class="badges"><span class="badge badge-vegan">Vegan</span><span class="badge badge-s3">🌶🌶🌶 Hot</span></div></div>
+      <p class="desc-en en">Traditional 1990s recipe before brands modernized. Drier texture, concentrated chili. Nostalgic for Chinese people. Big sharing bag.</p>
+      <p class="desc-hu hu">Hagyományos 1990-es évekbeli recept. Szárazabb állag, koncentrált chili. Nosztalgikus kínaiak számára. Nagy megosztó zacskó.</p>
+      <div class="heat-bar"><span class="heat-label en">Heat</span><span class="heat-label hu">Hő</span><div class="heat-dots"><div class="heat-dot r"></div><div class="heat-dot r"></div><div class="heat-dot r"></div><div class="heat-dot"></div><div class="heat-dot"></div></div><span class="heat-text en">Hot old-school</span><span class="heat-text hu">Forró régi stílusú</span></div>
+    </div>
+  </div>
+
+  <div class="product-card-photo hot">
+    <div class="photo-img"><img src="images/IMG_0082.jpeg" alt="Old Style Big Strips" onerror="this.parentElement.innerHTML='&lt;div class=ph-icon&gt;🌶️&lt;/div&gt;&lt;div class=ph-text&gt;IMG_0082&lt;/div&gt;'"></div>
+    <div class="photo-info">
+      <div class="product-header"><div><div class="product-name en">Old-Style Strips — Classic Big</div><div class="product-name hu">Régi Stílusú Csíkok — Klasszikus Nagy</div><div class="product-brand">引口馋 · 老式辣条 经典大辣棒 · 162g</div></div><div class="badges"><span class="badge badge-vegan">Vegan</span><span class="badge badge-s3">🌶🌶🌶 Hot</span></div></div>
+      <p class="desc-en en">Thicker, chewier big version of the old-style recipe. More substantial chew. Very satisfying for experienced spice eaters. Big sharing bag.</p>
+      <p class="desc-hu hu">Vastagabb, rágósabb nagy verzió a régi stílusú receptből. Kielégítőbb rágósság. Nagyon kielégítő tapasztalt fűszerevőknek. Nagy megosztó zacskó.</p>
+      <div class="heat-bar"><span class="heat-label en">Heat</span><span class="heat-label hu">Hő</span><div class="heat-dots"><div class="heat-dot r"></div><div class="heat-dot r"></div><div class="heat-dot r"></div><div class="heat-dot r"></div><div class="heat-dot"></div></div><span class="heat-text en">Hot bold</span><span class="heat-text hu">Forró határozott</span></div>
+    </div>
+  </div>
+
+  <div class="subsection-header en">⚫ Extreme — Maximum Sichuan numbing · You've been warned</div>
+  <div class="subsection-header hu">⚫ Extrém — Maximum szecsuáni zsibadás · Figyelmeztettünk</div>
+
+  <div class="product-card-photo extreme">
+    <div class="photo-img"><img src="images/IMG_0080.jpeg" alt="Sichuan Pepper Strips" onerror="this.parentElement.innerHTML='&lt;div class=ph-icon&gt;⚡&lt;/div&gt;&lt;div class=ph-text&gt;IMG_0080&lt;/div&gt;'"></div>
+    <div class="photo-info">
+      <div class="product-header"><div><div class="product-name en">Sichuan Pepper Strips</div><div class="product-name hu">Szecsuáni Borsos Csíkok</div><div class="product-brand">震惊世界 · 花椒辣条 · 70g</div></div><div class="badges"><span class="badge badge-vegan">Vegan</span><span class="badge badge-s4">🌶🌶🌶🌶🌶 Extreme</span></div></div>
+      <p class="desc-en en">Sichuan pepper creates electric tingling and numbing of lips and tongue — not just hot, a completely different sensation. An experience snack.</p>
+      <p class="desc-hu hu">A szecsuáni bors elektromos bizsergést és zsibadást okoz az ajkakon és a nyelven — nem csak forró, teljesen eltérő érzés. Élmény snack.</p>
+      <div class="heat-bar"><span class="heat-label en">Heat</span><span class="heat-label hu">Hő</span><div class="heat-dots"><div class="heat-dot d"></div><div class="heat-dot d"></div><div class="heat-dot d"></div><div class="heat-dot d"></div><div class="heat-dot d"></div></div><span class="heat-text en">⚡ Numb + burn</span><span class="heat-text hu">⚡ Zsibbad + ég</span></div>
+    </div>
+  </div>
+
+  <div class="product-card-photo extreme">
+    <div class="photo-img"><img src="images/IMG_0071.jpeg" alt="Weilong Mala Mala" onerror="this.parentElement.innerHTML='&lt;div class=ph-icon&gt;⚡&lt;/div&gt;&lt;div class=ph-text&gt;IMG_0071&lt;/div&gt;'"></div>
+    <div class="photo-info">
+      <div class="product-header"><div><div class="product-name en">Weilong Mala² — Double Numbing</div><div class="product-name hu">Weilong Mala² — Dupla Zsibadás</div><div class="product-brand">卫龙 · 麻辣麻辣 很麻很辣 · 72g</div></div><div class="badges"><span class="badge badge-vegan">Vegan</span><span class="badge badge-s4">⚡💀 Max</span></div></div>
+      <p class="desc-en en">"Numbing-spicy numbing-spicy" — doubled for emphasis. Maximum Sichuan pepper + maximum chili. Your mouth goes numb, then burns.</p>
+      <p class="desc-hu hu">"Zsibasztó-csípős zsibasztó-csípős" — duplán hangsúlyos. Maximum szecsuáni bors + maximum chili. A szád elzsibbad, majd ég.</p>
+      <div class="heat-bar"><span class="heat-label en">Heat</span><span class="heat-label hu">Hő</span><div class="heat-dots"><div class="heat-dot d"></div><div class="heat-dot d"></div><div class="heat-dot d"></div><div class="heat-dot d"></div><div class="heat-dot d"></div></div><span class="heat-text en">⚡💀 Max numb + burn</span><span class="heat-text hu">⚡💀 Max zsibadás + égés</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- DRINKS -->
+
+<section class="section" id="drinks">
+  <h2 class="section-title">🥤 <span class="en">Drinks</span><span class="hu">Italok</span></h2>
+  <div class="cat-intro">
+    <p class="en"><strong>Chinese teas, Japanese marble sodas, fruit drinks and more.</strong> Most of what you see here isn't sold anywhere else in Eger. Everything is explained below.</p>
+    <p class="hu"><strong>Kínai teák, japán golyós szódák, gyümölcsitalok és más.</strong> A legtöbb, amit itt látsz, máshol nem kapható Egerben. Minden alább el van magyarázva.</p>
+  </div>
+
+  <div class="subsection-header en">🇯🇵 Japan — Marble Soda</div>
+  <div class="subsection-header hu">🇯🇵 Japán — Golyós Szóda</div>
+
+  <div class="product-card-photo blue-l">
+    <div class="photo-img"><img src="images/IMG_0153.jpeg" alt="HATA Ramune" onerror="this.parentElement.innerHTML='&lt;div class=ph-icon&gt;🍶&lt;/div&gt;&lt;div class=ph-text&gt;IMG_0153&lt;/div&gt;'"></div>
+    <div class="photo-info">
+      <div class="product-header"><div><div class="product-name en">HATA Ramune — Muscat Grape</div><div class="product-name hu">HATA Ramune — Muskotály Szőlő</div><div class="product-brand">HATA Kosen · 200ml</div></div><div class="badges"><span class="badge badge-japan">Japan</span><span class="badge badge-new">Must try</span></div></div>
+      <p class="desc-en en">Sealed with a glass marble — push it down to open, it stays inside while you drink. Crisp muscat grape flavour. The bottle itself is the experience.</p>
+      <p class="desc-hu hu">Üveggolyóval lezárva — nyomja le a kinyitáshoz, bent marad ivás közben. Friss muskotály szőlő íz. Az üveg maga az élmény.</p>
+    </div>
+  </div>
+
+  <div class="subsection-header en">🇨🇳 China — MeCo Fruit Tea (cup, 400ml)</div>
+  <div class="subsection-header hu">🇨🇳 Kína — MeCo Gyümölcstea (pohár, 400ml)</div>
+
+  <div class="product-card-photo blue-l">
+    <div class="photo-img"><img src="images/IMG_0150.jpeg" alt="MeCo Peach Pomelo" onerror="this.parentElement.innerHTML='&lt;div class=ph-icon&gt;🍵&lt;/div&gt;&lt;div class=ph-text&gt;IMG_0150&lt;/div&gt;'"></div>
+    <div class="photo-info">
+      <div class="product-header"><div><div class="product-name en">MeCo — Peach &amp; Red Pomelo</div><div class="product-name hu">MeCo — Barack &amp; Piros Pomelo</div><div class="product-brand">香飘飘 · 桃桃红柚 · 0 fat</div></div><div class="badges"><span class="badge badge-china">China</span></div></div>
+      <p class="desc-en en">Fruit tea in a to-go cup. Red grapefruit + apple + peach with tea. Citrusy, bright, zero fat. Ready to drink with straw.</p>
+      <p class="desc-hu hu">Gyümölcstea elvitelre pohárban. Piros grapefruit + alma + barack teával. Citrusos, élénk, nulla zsír.</p>
+    </div>
+  </div>
+
+  <div class="product-card-photo blue-l">
+    <div class="photo-img"><img src="images/IMG_0151.jpeg" alt="MeCo Lychee Passion" onerror="this.parentElement.innerHTML='&lt;div class=ph-icon&gt;🍵&lt;/div&gt;&lt;div class=ph-text&gt;IMG_0151&lt;/div&gt;'"></div>
+    <div class="photo-info">
+      <div class="product-header"><div><div class="product-name en">MeCo — Lychee &amp; Passion Fruit</div><div class="product-name hu">MeCo — Licsi &amp; Maracuja</div><div class="product-brand">香飘飘 · 荔枝百香 · 0 fat</div></div><div class="badges"><span class="badge badge-china">China</span></div></div>
+      <p class="desc-en en">Lychee + passion fruit + peach with tea. Tropical and floral. Lychee is almost unknown in Hungary — a great way to taste it.</p>
+      <p class="desc-hu hu">Licsi + maracuja + barack teával. Trópusi és virágos. A licsi Magyarországon szinte ismeretlen — remek módja a megkóstolásnak.</p>
+    </div>
+  </div>
+
+  <div class="subsection-header en">🇨🇳 China — Master Kong Bottled Teas (500ml)</div>
+  <div class="subsection-header hu">🇨🇳 Kína — Master Kong Palackos Teák (500ml)</div>
+
+  <div class="product-card-photo blue-l">
+    <div class="photo-img"><img src="images/IMG_0154.jpeg" alt="Jasmine no sugar" onerror="this.parentElement.innerHTML='&lt;div class=ph-icon&gt;🍵&lt;/div&gt;&lt;div class=ph-text&gt;IMG_0154&lt;/div&gt;'"></div>
+    <div class="photo-info">
+      <div class="product-header"><div><div class="product-name en">Jasmine Flower Tea — No Sugar</div><div class="product-name hu">Jázmin Virágos Tea — Cukormentes</div><div class="product-brand">康师傅 · 茉莉花茶无糖</div></div><div class="badges"><span class="badge badge-mild">No sugar</span></div></div>
+      <p class="desc-en en">Green tea brewed with real jasmine flowers. Light, floral, clean. One of the most popular daily drinks in China.</p>
+      <p class="desc-hu hu">Valódi jázmin virágokkal főzött zöld tea. Könnyű, virágos, tiszta. Kína egyik legnépszerűbb mindennapos itala.</p>
+    </div>
+  </div>
+
+  <div class="product-card-photo blue-l">
+    <div class="photo-img"><img src="images/IMG_0155.jpeg" alt="Peach Oolong" onerror="this.parentElement.innerHTML='&lt;div class=ph-icon&gt;🍵&lt;/div&gt;&lt;div class=ph-text&gt;IMG_0155&lt;/div&gt;'"></div>
+    <div class="photo-info">
+      <div class="product-header"><div><div class="product-name en">Peach Oolong Tea</div><div class="product-name hu">Barack Oolong Tea</div><div class="product-brand">康师傅 · 蜜桃乌龙茶</div></div><div class="badges"><span class="badge badge-new">Trending</span></div></div>
+      <p class="desc-en en">White peach with oolong — semi-fermented tea, naturally smooth and slightly floral. Light pink colour.</p>
+      <p class="desc-hu hu">Fehér barack oolong teával — félig fermentált tea, természetesen sima és enyhén virágos. Halvány rózsaszín.</p>
+    </div>
+  </div>
+
+  <div class="product-card-photo blue-l">
+    <div class="photo-img"><img src="images/IMG_0156.jpeg" alt="Jasmine Green Low Sugar" onerror="this.parentElement.innerHTML='&lt;div class=ph-icon&gt;🍵&lt;/div&gt;&lt;div class=ph-text&gt;IMG_0156&lt;/div&gt;'"></div>
+    <div class="photo-info">
+      <div class="product-header"><div><div class="product-name en">Jasmine Green Tea — Low Sugar</div><div class="product-name hu">Jázmin Zöld Tea — Alacsony Cukor</div><div class="product-brand">康师傅 · 茉莉清茶</div></div><div class="badges"><span class="badge badge-china">China #1</span></div></div>
+      <p class="desc-en en">China's best-selling bottled tea. Lightly sweetened jasmine green tea — floral, clean, endlessly refreshing.</p>
+      <p class="desc-hu hu">Kína legjobban fogyó palackos teája. Enyhén édesített jázmin zöld tea — virágos, tiszta, végtelenül frissítő.</p>
+    </div>
+  </div>
+
+  <div class="product-card-photo blue-l">
+    <div class="photo-img"><img src="images/IMG_0157.jpeg" alt="Jasmine Honey Tea" onerror="this.parentElement.innerHTML='&lt;div class=ph-icon&gt;🍵&lt;/div&gt;&lt;div class=ph-text&gt;IMG_0157&lt;/div&gt;'"></div>
+    <div class="photo-info">
+      <div class="product-header"><div><div class="product-name en">Jasmine Honey Tea</div><div class="product-name hu">Jázmin Mézes Tea</div><div class="product-brand">康师傅 · 茉莉蜜茶</div></div><div class="badges"><span class="badge badge-sweet">Sweeter</span></div></div>
+      <p class="desc-en en">Jasmine tea with honey. Warm, floral, gently sweet. Very comforting.</p>
+      <p class="desc-hu hu">Jázmin tea mézzel. Meleg, virágos, enyhén édes. Nagyon megnyugtató.</p>
+    </div>
+  </div>
+
+  <div class="product-card-photo blue-l">
+    <div class="photo-img"><img src="images/IMG_0158.jpeg" alt="Honey Pomelo" onerror="this.parentElement.innerHTML='&lt;div class=ph-icon&gt;🍋&lt;/div&gt;&lt;div class=ph-text&gt;IMG_0158&lt;/div&gt;'"></div>
+    <div class="photo-info">
+      <div class="product-header"><div><div class="product-name en">Honey Pomelo</div><div class="product-name hu">Mézes Pomelo</div><div class="product-brand">康师傅 · 蜂蜜柚子</div></div><div class="badges"><span class="badge badge-mild">No tea</span></div></div>
+      <p class="desc-en en">Pomelo is like grapefruit but sweeter, less bitter. Blended with honey — bright and citrusy. No tea inside, just fruit and honey.</p>
+      <p class="desc-hu hu">A pomelo olyan, mint a grapefruit, de édesebb, kevésbé keserű. Mézzel keverve — élénk és citrusos. Nincs tea, csak gyümölcs és méz.</p>
+    </div>
+  </div>
+
+  <div class="product-card-photo blue-l">
+    <div class="photo-img"><img src="images/IMG_0159.jpeg" alt="Iced Lemon Black Tea" onerror="this.parentElement.innerHTML='&lt;div class=ph-icon&gt;🍵&lt;/div&gt;&lt;div class=ph-text&gt;IMG_0159&lt;/div&gt;'"></div>
+    <div class="photo-info">
+      <div class="product-header"><div><div class="product-name en">Iced Lemon Black Tea</div><div class="product-name hu">Jeges Citromos Fekete Tea</div><div class="product-brand">康师傅 · 冰红茶</div></div><div class="badges"><span class="badge badge-china">Since 1993</span></div></div>
+      <p class="desc-en en">China's best-selling iced tea since 1993. Bold black tea with bright lemon. Sweeter and stronger than European iced teas.</p>
+      <p class="desc-hu hu">Kína legjobban fogyó jeges teája 1993 óta. Karakteres fekete tea élénk citrommal. Édesebb és erősebb az európai jeges teáknál.</p>
+    </div>
+  </div>
+
+  <div class="subsection-header en">🇨🇳 China — Classic Drinks</div>
+  <div class="subsection-header hu">🇨🇳 Kína — Klasszikus Italok</div>
+
+  <div class="product-card-photo blue-l">
+    <div class="photo-img"><img src="images/IMG_0160.jpeg" alt="NFC Mango" onerror="this.parentElement.innerHTML='&lt;div class=ph-icon&gt;🥭&lt;/div&gt;&lt;div class=ph-text&gt;IMG_0160&lt;/div&gt;'"></div>
+    <div class="photo-info">
+      <div class="product-header"><div><div class="product-name en">NFC Mango Juice — "8 Mangoes"</div><div class="product-name hu">NFC Mangólé — "8 Mangó"</div><div class="product-brand">众口妙 · 330ml · 60% mango</div></div><div class="badges"><span class="badge badge-new">Cold pressed</span></div></div>
+      <p class="desc-en en">Not from concentrate — pressed straight from real mangoes. 60% mango content with probiotics. Pulpy, thick and genuinely fruity.</p>
+      <p class="desc-hu hu">Nem töményítményből — közvetlenül valódi mangókból sajtolva. 60% mangó tartalom probiotikumokkal. Rostos, sűrű és valóban gyümölcsös.</p>
+    </div>
+  </div>
+
+  <div class="product-card-photo blue-l">
+    <div class="photo-img"><img src="images/IMG_0143.jpeg" alt="Wangzai Milk" onerror="this.parentElement.innerHTML='&lt;div class=ph-icon&gt;🥛&lt;/div&gt;&lt;div class=ph-text&gt;IMG_0143&lt;/div&gt;'"></div>
+    <div class="photo-info">
+      <div class="product-header"><div><div class="product-name en">Wangzai Milk</div><div class="product-name hu">Wangzai Tej</div><div class="product-brand">旺旺 · 245ml</div></div><div class="badges"><span class="badge badge-sweet">Asian icon</span></div></div>
+      <p class="desc-en en">The iconic red can. Sterilised creamy milk — sweeter and richer than regular milk. A childhood icon across all of Asia.</p>
+      <p class="desc-hu hu">Az ikonikus piros doboz. Sterilizált krémes tej — édesebb és gazdagabb a normál tejnél. Gyermekkori ikon egész Ázsiában.</p>
+    </div>
+  </div>
+
+  <div class="product-card-photo blue-l">
+    <div class="photo-img"><img src="images/IMG_0145.jpeg" alt="Wong Lo Kat" onerror="this.parentElement.innerHTML='&lt;div class=ph-icon&gt;🌿&lt;/div&gt;&lt;div class=ph-text&gt;IMG_0145&lt;/div&gt;'"></div>
+    <div class="photo-info">
+      <div class="product-header"><div><div class="product-name en">Wong Lo Kat — Herbal Tea</div><div class="product-name hu">Wang Lao Ji — Gyógynövény Tea</div><div class="product-brand">王老吉 · 310ml · Since 1828</div></div><div class="badges"><span class="badge badge-herbal">Herbal</span><span class="badge badge-unique">Very unique</span></div></div>
+      <p class="desc-en en">China's most famous herbal tea since 1828. Chrysanthemum, honeysuckle and other herbs. Slightly bitter, lightly sweet. Nothing like European herbal teas.</p>
+      <p class="desc-hu hu">Kína leghíresebb gyógynövény teája 1828 óta. Krizantém, lonc és más gyógynövények. Enyhén keserű, könnyedén édes. Semmi sem hasonlít az európai gyógynövény teákhoz.</p>
+    </div>
+  </div>
+
+  <div class="product-card-photo blue-l">
+    <div class="photo-img"><img src="images/IMG_0147.jpeg" alt="AD Calcium Milk" onerror="this.parentElement.innerHTML='&lt;div class=ph-icon&gt;🥛&lt;/div&gt;&lt;div class=ph-text&gt;IMG_0147&lt;/div&gt;'"></div>
+    <div class="photo-info">
+      <div class="product-header"><div><div class="product-name en">Wahaha AD Calcium Milk</div><div class="product-name hu">Wahaha AD Kalciumos Tej</div><div class="product-brand">娃哈哈 · 220ml · Vitamins A+D</div></div><div class="badges"><span class="badge badge-mild">A+D vitamins</span></div></div>
+      <p class="desc-en en">China's most famous children's milk drink. Iconic white bottle. Lightly sweet, creamy, with vitamins A and D. Adults love it too.</p>
+      <p class="desc-hu hu">Kína leghíresebb gyermekes tejitala. Ikonikus fehér üveg. Enyhén édes, krémes, A és D vitaminokkal. A felnőttek is imádják.</p>
+    </div>
+  </div>
+
+  <div class="product-card-photo blue-l">
+    <div class="photo-img"><img src="images/IMG_0148.jpeg" alt="Wahaha Probiotic" onerror="this.parentElement.innerHTML='&lt;div class=ph-icon&gt;🥛&lt;/div&gt;&lt;div class=ph-text&gt;IMG_0148&lt;/div&gt;'"></div>
+    <div class="photo-info">
+      <div class="product-header"><div><div class="product-name en">Wahaha Probiotic Drink</div><div class="product-name hu">Wahaha Probiotikus Ital</div><div class="product-brand">娃哈哈 · 乳酸菌 · Zero fat</div></div><div class="badges"><span class="badge badge-prob">Live probiotics</span></div></div>
+      <p class="desc-en en">Drinkable yoghurt in Wahaha's hourglass bottle. Zero fat, live bacteria. Gently tangy and smooth. Like Yakult, but Chinese.</p>
+      <p class="desc-hu hu">Iható joghurt Wahaha homokóra üvegében. Nulla zsír, élő baktériumok. Enyhén savanykás és sima. Mint a Yakult, de kínai.</p>
+    </div>
+  </div>
+
+  <div class="product-card-photo blue-l">
+    <div class="photo-img"><img src="images/IMG_0149.jpeg" alt="Dosti Basil Seed" onerror="this.parentElement.innerHTML='&lt;div class=ph-icon&gt;🌱&lt;/div&gt;&lt;div class=ph-text&gt;IMG_0149&lt;/div&gt;'"></div>
+    <div class="photo-info">
+      <div class="product-header"><div><div class="product-name en">Dosti Basil Seed — Strawberry</div><div class="product-name hu">Dosti Bazsalikom Mag — Eper</div><div class="product-brand">Dosti · 290ml</div></div><div class="badges"><span class="badge badge-unique">Totally unique</span></div></div>
+      <p class="desc-en en">Strawberry juice with basil seeds inside. Seeds swell into tiny jelly pearls — you drink and eat at the same time. Nothing like this in Europe.</p>
+      <p class="desc-hu hu">Eper lé bazsalikom magokkal. A magok apró zselés gyöngyökké duzzadnak — egyszerre iszol és eszel. Ilyen Európában nem létezik.</p>
+    </div>
+  </div>
+
+  <div class="product-card-photo blue-l">
+    <div class="photo-img"><img src="images/IMG_0144.jpeg" alt="Eight Treasure Congee" onerror="this.parentElement.innerHTML='&lt;div class=ph-icon&gt;🍚&lt;/div&gt;&lt;div class=ph-text&gt;IMG_0144&lt;/div&gt;'"></div>
+    <div class="photo-info">
+      <div class="product-header"><div><div class="product-name en">Eight Treasure Congee</div><div class="product-name hu">Nyolc Kincses Kása</div><div class="product-brand">娃哈哈 · 桂圆莲子八宝粥 · 360g</div></div><div class="badges"><span class="badge badge-unique">Eat from can</span></div></div>
+      <p class="desc-en en">Not a drink — a ready-to-eat sweet rice porridge in a can. Longan fruit, lotus seeds, red beans and glutinous rice in sweet syrup. Open and eat directly.</p>
+      <p class="desc-hu hu">Nem ital — dobozban lévő édes rizskása. Longán gyümölcs, lótuszmagok, vörös bab és ragadós rizs édes szirupban. Nyisd ki és edd egyenesen.</p>
+    </div>
+  </div>
+</section>
+
+<!-- MOCHI -->
+
+<section class="section" id="mochi">
+  <h2 class="section-title">🍡 Mochi</h2>
+  <div class="cat-intro">
+    <p class="en"><strong>What is mochi?</strong> A Japanese rice cake made from glutinous rice — pounded into a soft, stretchy, chewy dough. The outside is neutral and pillowy; inside is a creamy filling. The texture is unlike anything in European confectionery: elastic, slightly bouncy, smooth. Not bread, not cake, not gummy candy. Most people are addicted within two pieces. We carry multiple flavours — ask at the counter.</p>
+    <p class="hu"><strong>Mi az a mochi?</strong> Japán rizssütemény ragadós rizsből — puha, nyújtható, rágós tésztává feldolgozva. A külső semleges és puha; belül krémes töltelék. Az állag semmire sem hasonlít az európai cukrászatban: rugalmas, enyhén pattanó, sima. Nem kenyér, nem sütemény, nem gumicukor. A legtöbb ember két darab után addiktív. Több ízben áruljuk — kérdezzen a pultnál.</p>
+  </div>
+  <div class="intro-card red">
+    <div class="intro-body">
+      <div class="intro-title en">🇹🇼 Made in Taiwan · Glutinous Rice</div>
+      <div class="intro-title hu">🇹🇼 Tajvanban készült · Ragadós Rizs</div>
+      <p class="intro-desc en">Bite in and the soft rice exterior gives way to the creamy filling. Keep cool — not frozen. The outside is dusted with starch so it doesn't stick to your fingers. Eat in one or two bites.</p>
+      <p class="intro-desc hu">Harapáskor a puha rizs külső enged a krémes tölteléknek. Hűvösen tartsd — ne fagyasszon. A külső keményítővel van porozva. Egy vagy két harapásban edd.</p>
+      <div class="badges" style="margin-top:12px;"><span class="badge badge-taiwan">🇹🇼 Taiwan</span><span class="badge badge-unique">⚠️ Contains gluten</span><span class="badge badge-mild">Keep cool</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- JELLY -->
+
+<section class="section" id="jelly">
+  <h2 class="section-title">🍮 <span class="en">Fruit Jelly</span><span class="hu">Gyümölcs Zselé</span></h2>
+  <div class="cat-intro">
+    <p class="en"><strong>Not like European jelly.</strong> Made from konjac or agar-agar (seaweed), not animal gelatin — firmer, more elastic, springy even at room temperature. Often has real fruit pieces inside. Lightly sweet, clean fruity taste. Very refreshing cold. Sold in cups (peel the lid, eat with a spoon), squeeze tubes, or sharing tubs.</p>
+    <p class="hu"><strong>Nem olyan, mint az európai zselé.</strong> Konjacból vagy agar-agarból (tengeri moszat) készül, nem állati zselatinból — keményebb, rugalmasabb, szobahőmérsékleten is rugalmas. Gyakran valódi gyümölcsdarabok vannak benne. Enyhén édes, tiszta gyümölcsös íz. Nagyon frissítő hidegen. Poharakban, szorítócsövekben és megosztó tálakban kapható.</p>
+  </div>
+  <div class="intro-card teal">
+    <div class="intro-body">
+      <div class="intro-title en">Asian Fruit Jelly</div>
+      <div class="intro-title hu">Ázsiai Gyümölcs Zselé</div>
+      <p class="intro-desc en">The texture sits between a firm gummy and a cool pudding — bouncy when you press it, smooth when you eat it. Real fruit pieces float inside. Best served cold.</p>
+      <p class="intro-desc hu">Az állag egy szilárd gumicukor és egy hűs puding között van — pattanó ha megnyomja, sima amikor eszik. Valódi gyümölcsdarabok lebegnek benne. Hidegen a legjobb.</p>
+      <div class="intro-flavours en"><strong>Famous flavours:</strong> Lychee · Mango · Grape · Mixed fruit · Peach</div>
+      <div class="intro-flavours hu"><strong>Híres ízek:</strong> Licsi · Mangó · Szőlő · Vegyes gyümölcs · Barack</div>
+      <div class="badges" style="margin-top:12px;"><span class="badge badge-vegan">Vegan-friendly</span><span class="badge badge-mild">Best served cold</span><span class="badge badge-unique">⚠️ Not for under 3 yrs</span></div>
+    </div>
+  </div>
+  <div class="product-card teal-l">
+    <div class="product-header"><div><div class="product-name en">Xizhilang Mixed Fruit Jelly — Cup</div><div class="product-name hu">Xizhilang Vegyes Gyümölcs Zselé — Pohár</div><div class="product-brand">喜之郎 · 200g · China</div></div><div class="badges"><span class="badge badge-china">China #1</span></div></div>
+    <p class="desc-en en">Real pieces of mandarin, peach, pear and grape in clear lightly-sweetened jelly. Peel the lid, eat with a spoon.</p>
+    <p class="desc-hu hu">Valódi mandarin, barack, körte és szőlő darabok átlátszó, enyhén édesített zselében. Húzd le a fedelét, edd kanállal.</p>
+  </div>
+</section>
+
+<!-- CANDY -->
+
+<section class="section" id="candy">
+  <h2 class="section-title">🍬 <span class="en">Candy &amp; Gummies</span><span class="hu">Cukorka &amp; Gumicukor</span></h2>
+  <div class="cat-intro">
+    <p class="en"><strong>Asian candy plays with texture in ways European candy doesn't.</strong> Air candy that melts like a cloud. Gummies you peel apart. Novelty shapes. Most flavours — lychee, peach, muscat grape — are almost impossible to find in Hungarian sweets.</p>
+    <p class="hu"><strong>Az ázsiai cukorka olyan textúrákkal játszik, ahogy az európai nem.</strong> Levegős cukorka, amely felhőként olvad. Gumicukor, amelyet lehúzol. Egyedi formák. A legtöbb íz — licsi, barack, muskotály szőlő — szinte lehetetlen megtalálni a magyar édességekben.</p>
+  </div>
+
+  <div class="subsection-header en">创好佳 Air Taffy — Aerated Milk Candy · NZ milk powder (60g)</div>
+  <div class="subsection-header hu">创好佳 Levegős Taffy — Habosított Tejcukorka · Új-Zélandi tejpor (60g)</div>
+
+  <div class="product-card-photo purple-l">
+    <div class="photo-img"><img src="images/IMG_0134.jpeg" alt="Air Taffy Matcha" onerror="this.parentElement.innerHTML='&lt;div class=ph-icon&gt;🍬&lt;/div&gt;&lt;div class=ph-text&gt;IMG_0134&lt;/div&gt;'"></div>
+    <div class="photo-info">
+      <div class="product-header"><div><div class="product-name en">Air Taffy — Matcha Milk</div><div class="product-name hu">Levegős Taffy — Matcha Tej</div><div class="product-brand">创好佳 · NZ Milk · 60g</div></div><div class="badges"><span class="badge badge-new">★ Try first</span></div></div>
+      <p class="desc-en en">Dissolves almost instantly on the tongue — intense matcha cream flavour. So light it feels like eating nothing, but the taste is full.</p>
+      <p class="desc-hu hu">Szinte azonnal feloldódik a nyelven — intenzív matcha tejszín íz. Olyan könnyű, hogy semmit sem érzel, de az íze teljes.</p>
+    </div>
+  </div>
+
+  <div class="product-card-photo purple-l">
+    <div class="photo-img"><img src="images/IMG_0135.jpeg" alt="Air Taffy Chocolate" onerror="this.parentElement.innerHTML='&lt;div class=ph-icon&gt;🍬&lt;/div&gt;&lt;div class=ph-text&gt;IMG_0135&lt;/div&gt;'"></div>
+    <div class="photo-info">
+      <div class="product-header"><div><div class="product-name en">Air Taffy — Chocolate Milk</div><div class="product-name hu">Levegős Taffy — Csokoládé Tej</div><div class="product-brand">创好佳 · NZ Milk · 60g</div></div></div>
+      <p class="desc-en en">Same cloud-like texture, rich chocolate and cream flavour. The most universally loved flavour in the range.</p>
+      <p class="desc-hu hu">Ugyanolyan felhőszerű textúra, gazdag csokoládé és tejszín ízzel. A termékcsalád legjobban szeretett íze.</p>
+    </div>
+  </div>
+
+  <div class="product-card-photo purple-l">
+    <div class="photo-img"><img src="images/IMG_0136.jpeg" alt="Air Taffy Original" onerror="this.parentElement.innerHTML='&lt;div class=ph-icon&gt;🍬&lt;/div&gt;&lt;div class=ph-text&gt;IMG_0136&lt;/div&gt;'"></div>
+    <div class="photo-info">
+      <div class="product-header"><div><div class="product-name en">Air Taffy — Original Milk</div><div class="product-name hu">Levegős Taffy — Eredeti Tej</div><div class="product-brand">创好佳 · NZ Milk · 60g</div></div></div>
+      <p class="desc-en en">Pure milk flavour. The most elegant version — if you've never tried air candy, start here.</p>
+      <p class="desc-hu hu">Tiszta tej íz. A legelegánsabb verzió — ha még sosem próbáltál levegős cukorkát, kezdj itt.</p>
+    </div>
+  </div>
+
+  <div class="subsection-header en">乐潮 Lechao Jam Gummies — Peel-apart · 50% real fruit juice (80g)</div>
+  <div class="subsection-header hu">乐潮 Lechao Dzsemes Gumicukor — Lehúzható · 50% valódi gyümölcslé (80g)</div>
+
+  <div class="product-card-photo purple-l">
+    <div class="photo-img"><img src="images/IMG_0141.jpeg" alt="Jam Gummy Grape" onerror="this.parentElement.innerHTML='&lt;div class=ph-icon&gt;🍇&lt;/div&gt;&lt;div class=ph-text&gt;IMG_0141&lt;/div&gt;'"></div>
+    <div class="photo-info">
+      <div class="product-header"><div><div class="product-name en">Jam Gummy — Dark Grape</div><div class="product-name hu">Dzsemes Gumicukor — Szőlő</div><div class="product-brand">乐潮 · 紫葡萄 · 80g</div></div><div class="badges"><span class="badge badge-new">Peel apart</span></div></div>
+      <p class="desc-en en">Peel the outer layer to reveal a soft jam centre. 50% real grape juice. More chew and more juice than standard European gummies.</p>
+      <p class="desc-hu hu">Húzd le a külső réteget a puha dzsem középső rész felfedéséhez. 50% valódi szőlőlé. Több rágósság és lé a standard európai gumicukroknál.</p>
+    </div>
+  </div>
+
+  <div class="product-card-photo purple-l">
+    <div class="photo-img"><img src="images/IMG_0142.jpeg" alt="Jam Gummy Lychee" onerror="this.parentElement.innerHTML='&lt;div class=ph-icon&gt;🍈&lt;/div&gt;&lt;div class=ph-text&gt;IMG_0142&lt;/div&gt;'"></div>
+    <div class="photo-info">
+      <div class="product-header"><div><div class="product-name en">Jam Gummy — Lychee</div><div class="product-name hu">Dzsemes Gumicukor — Licsi</div><div class="product-brand">乐潮 · 荔枝 · 80g</div></div><div class="badges"><span class="badge badge-new">Peel apart</span></div></div>
+      <p class="desc-en en">50% lychee juice. Floral, lightly sweet, uniquely tropical — almost absent from Hungarian confectionery.</p>
+      <p class="desc-hu hu">50% licsi lé. Virágos, enyhén édes, egyedülállóan trópusi — szinte hiányzik a magyar édességiparból.</p>
+    </div>
+  </div>
+
+  <div class="product-card-photo purple-l">
+    <div class="photo-img"><img src="images/IMG_0143.jpeg" alt="Jam Gummy Peach" onerror="this.parentElement.innerHTML='&lt;div class=ph-icon&gt;🍑&lt;/div&gt;&lt;div class=ph-text&gt;IMG_0143&lt;/div&gt;'"></div>
+    <div class="photo-info">
+      <div class="product-header"><div><div class="product-name en">Jam Gummy — Peach</div><div class="product-name hu">Dzsemes Gumicukor — Barack</div><div class="product-brand">乐潮 · 水蜜桃 · 80g</div></div><div class="badges"><span class="badge badge-new">Peel apart</span><span class="badge badge-sweet">Most popular</span></div></div>
+      <p class="desc-en en">50% white peach juice. Bright, sweet, very approachable. The most popular flavour in the range.</p>
+      <p class="desc-hu hu">50% fehér barack lé. Élénk, édes, nagyon könnyen fogyasztható. A termékcsalád legnépszerűbb íze.</p>
+    </div>
+  </div>
+
+  <div class="subsection-header en">More candy</div>
+  <div class="subsection-header hu">További édességek</div>
+
+  <div class="product-card-photo purple-l">
+    <div class="photo-img"><img src="images/IMG_0140.jpeg" alt="Game Block Gummies" onerror="this.parentElement.innerHTML='&lt;div class=ph-icon&gt;🎮&lt;/div&gt;&lt;div class=ph-text&gt;IMG_0140&lt;/div&gt;'"></div>
+    <div class="photo-info">
+      <div class="product-header"><div><div class="product-name en">Lechao Game Block Gummies</div><div class="product-name hu">Lechao Játék Kocka Gumicukor</div><div class="product-brand">乐潮 · 游戏方块 · 120g</div></div><div class="badges"><span class="badge badge-new">🎮 Tetris shaped</span></div></div>
+      <p class="desc-en en">Tetris-shaped fruity gummies in bright colours. Stack them, make pixel art, take a photo — then eat them.</p>
+      <p class="desc-hu hu">Tetris alakú gyümölcsös gumicukrok élénk színekben. Rakd össze, csinálj pixel art mintát, fényképezd le — majd edd meg.</p>
+    </div>
+  </div>
+
+  <div class="product-card-photo purple-l">
+    <div class="photo-img"><img src="images/IMG_0139.jpeg" alt="Wangzai QQ Gummy" onerror="this.parentElement.innerHTML='&lt;div class=ph-icon&gt;🍬&lt;/div&gt;&lt;div class=ph-text&gt;IMG_0139&lt;/div&gt;'"></div>
+    <div class="photo-info">
+      <div class="product-header"><div><div class="product-name en">Wangzai QQ Gummy</div><div class="product-name hu">Wangzai QQ Gumicukor</div><div class="product-brand">旺旺 旺仔 · QQ糖 · 70g · Multiple flavours</div></div><div class="badges"><span class="badge badge-china">China classic</span></div></div>
+      <p class="desc-en en">China's most iconic gummy — chewy, intensely fruity, real fruit juice and Vitamin C. Multiple flavours available — pick your favourite.</p>
+      <p class="desc-hu hu">Kína legikonikusabb gumicukra — rágós, intenzíven gyümölcsös, valódi gyümölcslével és C-vitaminnal. Több ízben kapható — válassza a kedvencét.</p>
+    </div>
+  </div>
+
+  <div class="product-card-photo purple-l">
+    <div class="photo-img"><img src="images/IMG_0137.jpeg" alt="Egg Party Probiotic Gummy" onerror="this.parentElement.innerHTML='&lt;div class=ph-icon&gt;🥚&lt;/div&gt;&lt;div class=ph-text&gt;IMG_0137&lt;/div&gt;'"></div>
+    <div class="photo-info">
+      <div class="product-header"><div><div class="product-name en">Egg Party Probiotic Gummy — Black Currant</div><div class="product-name hu">Tojás Parti Probiotikus Gumicukor — Fekete Ribizli</div><div class="product-brand">蛋仔派对 · 益生菌乳球软糖 · 40g</div></div><div class="badges"><span class="badge badge-prob">Live probiotics</span></div></div>
+      <p class="desc-en en">Round milk gummies with 38% real black currant juice and live probiotics. The viral Egg Party game characters on the packaging.</p>
+      <p class="desc-hu hu">Kerek tej gumicukrok 38% valódi fekete ribizli lével és élő probiotikumokkal. A virális Tojás Parti játék karakterei a csomagoláson.</p>
+    </div>
+  </div>
+
+  <div class="product-card-photo purple-l">
+    <div class="photo-img"><img src="images/IMG_0138.jpeg" alt="Hello Kitty Star Candy" onerror="this.parentElement.innerHTML='&lt;div class=ph-icon&gt;🎀&lt;/div&gt;&lt;div class=ph-text&gt;IMG_0138&lt;/div&gt;'"></div>
+    <div class="photo-info">
+      <div class="product-header"><div><div class="product-name en">Hello Kitty Star Candy</div><div class="product-name hu">Hello Kitty Csillag Cukorka</div><div class="product-brand">Hello Kitty × Sanrio · 星星糖 · 40g</div></div><div class="badges"><span class="badge badge-sweet">Official license</span><span class="badge badge-new">🎁 Gift pick</span></div></div>
+      <p class="desc-en en">Officially licensed Hello Kitty candy in Kitty's own shaped bag. Milk ice cream flavoured star-shaped sweets. The packaging is collectible.</p>
+      <p class="desc-hu hu">Hivatalosan engedélyezett Hello Kitty cukorka Kitty saját alakú zacskójában. Tej fagylalt ízű csillag alakú édességek. A csomagolás gyűjthető.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <strong>White Leaf · Eger</strong><br>
+  <span style="margin-top:4px;display:block">
+    <span class="en">🌱 All spicy snacks are 100% vegan · Prices on shelf labels · Ask at the counter</span>
+    <span class="hu">🌱 Minden csípős snack 100% vegán · Árak a polccímkéken · Kérdezzen a pultnál</span>
+  </span>
+</footer>
+
+<script>
+function setLang(lang,btn){document.body.className='lang-'+lang;document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active')}
+function showSection(id,btn){document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));document.querySelectorAll('.cat-tab').forEach(t=>t.classList.remove('active'));document.getElementById(id).classList.add('active');btn.classList.add('active');window.scrollTo({top:document.querySelector('.cat-nav').offsetTop-41,behavior:'smooth'})}
+</script>
+
+</body>
+</html>
