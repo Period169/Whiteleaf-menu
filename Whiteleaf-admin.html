@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>White Leaf 接单</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #f5f2ec;
+    --green-dark: #2d4a3e;
+    --green-mid: #6b8f71;
+    --green-light: #a8c5a0;
+    --charcoal: #1a1a1a;
+    --warm-gray: #8a8680;
+    --accent: #c4a882;
+    --red: #c0392b;
+    --card-bg: #ffffff;
+  }
+
+- { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+background: #edeae3;
+font-family: ‘Noto Sans SC’, sans-serif;
+font-weight: 300;
+min-height: 100vh;
+overflow-x: hidden;
+}
+
+/* TOP BAR */
+.topbar {
+background: var(–green-dark);
+padding: 0 20px;
+height: 64px;
+display: flex;
+align-items: center;
+justify-content: space-between;
+position: sticky;
+top: 0;
+z-index: 100;
+box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+}
+
+.topbar-left {
+display: flex;
+align-items: center;
+gap: 12px;
+}
+
+.topbar-logo {
+font-family: ‘Cormorant Garamond’, serif;
+font-size: 22px;
+font-weight: 300;
+color: var(–cream);
+letter-spacing: 0.08em;
+}
+
+.topbar-sub {
+font-size: 11px;
+color: var(–green-light);
+letter-spacing: 0.15em;
+text-transform: uppercase;
+}
+
+.status-dot {
+width: 8px; height: 8px;
+border-radius: 50%;
+background: #2ecc71;
+box-shadow: 0 0 8px #2ecc71;
+animation: pulse 2s infinite;
+}
+
+.status-dot.offline { background: #e74c3c; box-shadow: 0 0 8px #e74c3c; animation: none; }
+
+@keyframes pulse {
+0%, 100% { opacity: 1; }
+50% { opacity: 0.4; }
+}
+
+.topbar-right {
+display: flex;
+align-items: center;
+gap: 10px;
+}
+
+.pending-badge {
+background: var(–accent);
+color: var(–green-dark);
+font-size: 13px;
+font-weight: 500;
+padding: 4px 12px;
+border-radius: 20px;
+display: none;
+}
+
+.pending-badge.show { display: block; }
+
+/* MAIN */
+.main {
+padding: 20px 16px 100px;
+max-width: 700px;
+margin: 0 auto;
+}
+
+/* SECTION LABEL */
+.section-label {
+font-size: 10px;
+letter-spacing: 0.25em;
+text-transform: uppercase;
+color: var(–warm-gray);
+margin-bottom: 12px;
+margin-top: 24px;
+padding-left: 4px;
+}
+
+/* ORDER CARD */
+.order-card {
+background: var(–card-bg);
+border-radius: 16px;
+padding: 20px;
+margin-bottom: 14px;
+box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+border-left: 5px solid var(–green-dark);
+animation: slideIn 0.35s ease both;
+position: relative;
+overflow: hidden;
+}
+
+.order-card.new {
+border-left-color: var(–accent);
+box-shadow: 0 4px 24px rgba(196,168,130,0.25);
+}
+
+.order-card.done {
+border-left-color: var(–green-light);
+opacity: 0.6;
+}
+
+.order-card.cancelled {
+border-left-color: #ddd;
+opacity: 0.4;
+}
+
+@keyframes slideIn {
+from { opacity: 0; transform: translateY(-12px); }
+to { opacity: 1; transform: translateY(0); }
+}
+
+/* NEW FLASH */
+.order-card.new::before {
+content: ‘’;
+position: absolute;
+top: 0; left: 0; right: 0;
+height: 3px;
+background: linear-gradient(90deg, var(–accent), var(–green-mid), var(–accent));
+background-size: 200%;
+animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+0% { background-position: 200% 0; }
+100% { background-position: -200% 0; }
+}
+
+.card-header {
+display: flex;
+justify-content: space-between;
+align-items: flex-start;
+margin-bottom: 14px;
+}
+
+.order-num {
+font-family: ‘Cormorant Garamond’, serif;
+font-size: 32px;
+color: var(–green-dark);
+line-height: 1;
+letter-spacing: 0.05em;
+}
+
+.order-time {
+font-size: 11px;
+color: var(–warm-gray);
+margin-top: 3px;
+}
+
+.order-total {
+font-family: ‘Cormorant Garamond’, serif;
+font-size: 22px;
+color: var(–green-dark);
+text-align: right;
+}
+
+.new-tag {
+font-size: 9px;
+letter-spacing: 0.15em;
+text-transform: uppercase;
+color: var(–accent);
+background: rgba(196,168,130,0.12);
+padding: 2px 8px;
+border-radius: 10px;
+border: 1px solid rgba(196,168,130,0.3);
+margin-top: 4px;
+display: inline-block;
+}
+
+/* ITEMS */
+.items-block {
+background: #f8f7f4;
+border-radius: 10px;
+padding: 14px 16px;
+margin-bottom: 14px;
+}
+
+.item-row {
+font-size: 15px;
+color: var(–charcoal);
+padding: 5px 0;
+border-bottom: 1px solid rgba(0,0,0,0.05);
+line-height: 1.4;
+}
+
+.item-row:last-child { border-bottom: none; }
+
+/* CUSTOMISE ROW */
+.custom-row {
+display: flex;
+gap: 10px;
+margin-bottom: 12px;
+flex-wrap: wrap;
+}
+
+.custom-chip {
+font-size: 12px;
+color: var(–green-dark);
+background: rgba(45,74,62,0.07);
+padding: 4px 12px;
+border-radius: 20px;
+letter-spacing: 0.03em;
+}
+
+.notes-row {
+font-size: 12px;
+color: var(–warm-gray);
+background: #fff8f0;
+border: 1px solid rgba(196,168,130,0.3);
+border-radius: 8px;
+padding: 8px 12px;
+margin-bottom: 12px;
+font-style: italic;
+}
+
+/* BUTTONS */
+.btn-row {
+display: flex;
+gap: 10px;
+}
+
+.btn-confirm {
+flex: 2;
+background: var(–green-dark);
+color: var(–cream);
+border: none;
+border-radius: 10px;
+padding: 14px;
+font-family: ‘Noto Sans SC’, sans-serif;
+font-size: 15px;
+font-weight: 400;
+letter-spacing: 0.05em;
+cursor: pointer;
+transition: all 0.2s;
+-webkit-tap-highlight-color: transparent;
+}
+
+.btn-confirm:active { background: #1e3329; transform: scale(0.98); }
+
+.btn-cancel {
+flex: 1;
+background: transparent;
+color: var(–warm-gray);
+border: 1px solid #ddd;
+border-radius: 10px;
+padding: 14px;
+font-family: ‘Noto Sans SC’, sans-serif;
+font-size: 15px;
+cursor: pointer;
+transition: all 0.2s;
+}
+
+.btn-cancel:active { background: #f5f5f5; }
+
+/* EMPTY STATE */
+.empty-state {
+text-align: center;
+padding: 60px 20px;
+color: var(–warm-gray);
+}
+
+.empty-icon {
+font-size: 48px;
+margin-bottom: 16px;
+opacity: 0.4;
+}
+
+.empty-text {
+font-size: 14px;
+letter-spacing: 0.05em;
+}
+
+/* BOTTOM NAV */
+.bottom-nav {
+position: fixed;
+bottom: 0; left: 0; right: 0;
+background: var(–green-dark);
+display: flex;
+padding: 12px 20px 28px;
+gap: 12px;
+z-index: 100;
+}
+
+.nav-btn {
+flex: 1;
+background: rgba(255,255,255,0.1);
+color: var(–cream);
+border: none;
+border-radius: 10px;
+padding: 10px;
+font-family: ‘Noto Sans SC’, sans-serif;
+font-size: 12px;
+letter-spacing: 0.05em;
+cursor: pointer;
+transition: all 0.2s;
+opacity: 0.6;
+}
+
+.nav-btn.active { background: rgba(255,255,255,0.18); opacity: 1; }
+
+/* ALERT OVERLAY */
+.alert-overlay {
+display: none;
+position: fixed;
+inset: 0;
+background: rgba(0,0,0,0.5);
+z-index: 200;
+align-items: flex-start;
+justify-content: center;
+padding-top: 60px;
+}
+
+.alert-overlay.show { display: flex; animation: fadeIn 0.2s ease; }
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.alert-card {
+background: white;
+border-radius: 20px;
+width: calc(100% - 40px);
+max-width: 500px;
+overflow: hidden;
+animation: popIn 0.3s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+
+@keyframes popIn {
+from { opacity: 0; transform: scale(0.85) translateY(-20px); }
+to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.alert-header {
+background: var(–green-dark);
+padding: 20px 24px 16px;
+display: flex;
+justify-content: space-between;
+align-items: center;
+}
+
+.alert-title {
+font-family: ‘Cormorant Garamond’, serif;
+font-size: 28px;
+color: var(–cream);
+letter-spacing: 0.08em;
+}
+
+.alert-num {
+font-family: ‘Cormorant Garamond’, serif;
+font-size: 42px;
+color: var(–accent);
+letter-spacing: 0.1em;
+}
+
+.alert-body { padding: 20px 24px; }
+
+.alert-items {
+font-size: 16px;
+color: var(–charcoal);
+line-height: 1.8;
+margin-bottom: 16px;
+}
+
+.alert-chips {
+display: flex;
+gap: 8px;
+flex-wrap: wrap;
+margin-bottom: 16px;
+}
+
+.alert-chip {
+font-size: 13px;
+color: var(–green-dark);
+background: rgba(45,74,62,0.08);
+padding: 5px 14px;
+border-radius: 20px;
+}
+
+.alert-notes {
+font-size: 13px;
+color: var(–warm-gray);
+background: #fff8f0;
+border: 1px solid rgba(196,168,130,0.3);
+border-radius: 8px;
+padding: 10px 14px;
+margin-bottom: 16px;
+font-style: italic;
+}
+
+.alert-total {
+font-family: ‘Cormorant Garamond’, serif;
+font-size: 24px;
+color: var(–green-dark);
+margin-bottom: 20px;
+text-align: right;
+}
+
+.alert-btns {
+display: flex;
+gap: 10px;
+}
+
+.alert-confirm {
+flex: 2;
+background: var(–green-dark);
+color: var(–cream);
+border: none;
+border-radius: 12px;
+padding: 16px;
+font-family: ‘Noto Sans SC’, sans-serif;
+font-size: 16px;
+font-weight: 400;
+cursor: pointer;
+transition: all 0.2s;
+}
+
+.alert-confirm:active { background: #1e3329; }
+
+.alert-cancel {
+flex: 1;
+background: transparent;
+color: var(–warm-gray);
+border: 1px solid #ddd;
+border-radius: 12px;
+padding: 16px;
+font-family: ‘Noto Sans SC’, sans-serif;
+font-size: 16px;
+cursor: pointer;
+}
+
+/* VIEW TOGGLE */
+.view-pending { display: block; }
+.view-history { display: none; }
+body.show-history .view-pending { display: none; }
+body.show-history .view-history { display: block; }
+</style>
+
+</head>
+<body>
+
+<!-- TOP BAR -->
+
+<div class="topbar">
+  <div class="topbar-left">
+    <div>
+      <div class="topbar-logo">White Leaf</div>
+      <div class="topbar-sub">接单后台</div>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div class="pending-badge" id="pending-badge"></div>
+    <div class="status-dot" id="status-dot"></div>
+  </div>
+</div>
+
+<!-- MAIN -->
+
+<div class="main">
+  <!-- PENDING ORDERS -->
+  <div class="view-pending">
+    <div class="section-label">待处理订单</div>
+    <div id="pending-list">
+      <div class="empty-state">
+        <div class="empty-icon">&#9749;</div>
+        <div class="empty-text">暂无新订单</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HISTORY -->
+
+  <div class="view-history">
+    <div class="section-label">已处理记录</div>
+    <div id="history-list">
+      <div class="empty-state">
+        <div class="empty-icon">&#128203;</div>
+        <div class="empty-text">暂无记录</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+
+<div class="bottom-nav">
+  <button class="nav-btn active" id="nav-pending" onclick="showView('pending')">&#128226; 待处理</button>
+  <button class="nav-btn" id="nav-history" onclick="showView('history')">&#128203; 历史记录</button>
+</div>
+
+<!-- ALERT OVERLAY -->
+
+<div class="alert-overlay" id="alert-overlay">
+  <div class="alert-card">
+    <div class="alert-header">
+      <div class="alert-title">新订单</div>
+      <div class="alert-num" id="alert-num"></div>
+    </div>
+    <div class="alert-body">
+      <div class="alert-items" id="alert-items"></div>
+      <div class="alert-chips" id="alert-chips"></div>
+      <div class="alert-notes" id="alert-notes" style="display:none"></div>
+      <div class="alert-total" id="alert-total"></div>
+      <div class="alert-btns">
+        <button class="alert-confirm" onclick="confirmOrder()">&#10003; 确认接单</button>
+        <button class="alert-cancel" onclick="cancelOrder()">取消</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────────
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwk_JEpLKyaiOUbfs3SxvxiTfjyu779JSrQmBKP_-HomiSwjlJaOxMFFYppccZ5UWHl/exec';
+const POLL_INTERVAL = 8000; // check every 8 seconds
+// ────────────────────────────────────────────────────────
+
+let pendingOrders = [];
+let historyOrders = [];
+let seenIds = new Set();
+let currentAlert = null;
+let audioCtx = null;
+let isOnline = false;
+
+// ── SOUND ────────────────────────────────────────────────
+function initAudio() {
+  if (audioCtx) return;
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+}
+
+function playAlert() {
+  try {
+    initAudio();
+    var notes = [523, 659, 784, 1047];
+    notes.forEach(function(freq, i) {
+      var osc = audioCtx.createOscillator();
+      var gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.frequency.value = freq;
+      osc.type = 'sine';
+      var t = audioCtx.currentTime + i * 0.15;
+      gain.gain.setValueAtTime(0, t);
+      gain.gain.linearRampToValueAtTime(0.3, t + 0.05);
+      gain.gain.linearRampToValueAtTime(0, t + 0.25);
+      osc.start(t);
+      osc.stop(t + 0.3);
+    });
+  } catch(e) {}
+}
+
+// ── FETCH ORDERS ─────────────────────────────────────────
+async function fetchOrders() {
+  try {
+    var res = await fetch(GOOGLE_SCRIPT_URL + '?action=get&t=' + Date.now());
+    var data = await res.json();
+    if (data && data.orders) {
+      processNewOrders(data.orders);
+      setOnline(true);
+    }
+  } catch(e) {
+    setOnline(false);
+  }
+}
+
+function setOnline(on) {
+  isOnline = on;
+  var dot = document.getElementById('status-dot');
+  if (on) dot.classList.remove('offline');
+  else dot.classList.add('offline');
+}
+
+function processNewOrders(orders) {
+  var newOnes = [];
+  orders.forEach(function(o) {
+    if (!seenIds.has(o.id) && o.status === 'Pending') {
+      seenIds.add(o.id);
+      newOnes.push(o);
+      pendingOrders.unshift(o);
+    }
+  });
+  if (newOnes.length > 0) {
+    playAlert();
+    showAlertFor(newOnes[0]);
+    renderPending();
+    updateBadge();
+  }
+}
+
+// ── ALERT ────────────────────────────────────────────────
+function showAlertFor(order) {
+  currentAlert = order;
+  document.getElementById('alert-num').textContent = '#' + order.orderNum;
+  
+  var itemsEl = document.getElementById('alert-items');
+  itemsEl.innerHTML = '';
+  (order.items || '').split('\n').forEach(function(line) {
+    if (line.trim()) {
+      var d = document.createElement('div');
+      d.textContent = line.trim();
+      itemsEl.appendChild(d);
+    }
+  });
+
+  var chips = document.getElementById('alert-chips');
+  chips.innerHTML = '';
+  if (order.sweetness) chips.innerHTML += '<span class="alert-chip">&#127852; ' + order.sweetness + '</span>';
+  if (order.ice) chips.innerHTML += '<span class="alert-chip">&#10052; ' + order.ice + '</span>';
+
+  var notesEl = document.getElementById('alert-notes');
+  if (order.notes && order.notes.trim()) {
+    notesEl.textContent = '备注：' + order.notes;
+    notesEl.style.display = 'block';
+  } else {
+    notesEl.style.display = 'none';
+  }
+
+  document.getElementById('alert-total').textContent = '合计 ' + order.total;
+  document.getElementById('alert-overlay').classList.add('show');
+}
+
+function confirmOrder() {
+  if (!currentAlert) return;
+  currentAlert.status = 'Confirmed';
+  historyOrders.unshift(currentAlert);
+  pendingOrders = pendingOrders.filter(function(o) { return o.id !== currentAlert.id; });
+  updateSheetStatus(currentAlert.rowIndex, 'Confirmed');
+  document.getElementById('alert-overlay').classList.remove('show');
+  currentAlert = null;
+  renderPending();
+  renderHistory();
+  updateBadge();
+}
+
+function cancelOrder() {
+  if (!currentAlert) return;
+  currentAlert.status = 'Cancelled';
+  historyOrders.unshift(currentAlert);
+  pendingOrders = pendingOrders.filter(function(o) { return o.id !== currentAlert.id; });
+  updateSheetStatus(currentAlert.rowIndex, 'Cancelled');
+  document.getElementById('alert-overlay').classList.remove('show');
+  currentAlert = null;
+  renderPending();
+  renderHistory();
+  updateBadge();
+}
+
+async function updateSheetStatus(rowIndex, status) {
+  try {
+    await fetch(GOOGLE_SCRIPT_URL + '?action=update&row=' + rowIndex + '&status=' + status + '&t=' + Date.now());
+  } catch(e) {}
+}
+
+// ── RENDER ───────────────────────────────────────────────
+function renderPending() {
+  var el = document.getElementById('pending-list');
+  if (pendingOrders.length === 0) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon">&#9749;</div><div class="empty-text">暂无新订单</div></div>';
+    return;
+  }
+  el.innerHTML = '';
+  pendingOrders.forEach(function(o) {
+    el.appendChild(makeCard(o, true));
+  });
+}
+
+function renderHistory() {
+  var el = document.getElementById('history-list');
+  if (historyOrders.length === 0) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon">&#128203;</div><div class="empty-text">暂无记录</div></div>';
+    return;
+  }
+  el.innerHTML = '';
+  historyOrders.forEach(function(o) {
+    el.appendChild(makeCard(o, false));
+  });
+}
+
+function makeCard(o, isPending) {
+  var card = document.createElement('div');
+  card.className = 'order-card' + (isPending ? ' new' : (o.status === 'Cancelled' ? ' cancelled' : ' done'));
+
+  var itemLines = (o.items || '').split('\n').filter(function(l) { return l.trim(); });
+  var itemsHtml = itemLines.map(function(l) { return '<div class="item-row">' + l + '</div>'; }).join('');
+
+  var notesHtml = (o.notes && o.notes.trim()) ? '<div class="notes-row">备注：' + o.notes + '</div>' : '';
+  var statusLabel = isPending ? '<span class="new-tag">待处理</span>' : (o.status === 'Cancelled' ? '<span class="new-tag" style="color:#999">已取消</span>' : '<span class="new-tag" style="color:var(--green-mid)">已确认</span>');
+
+  var btnsHtml = isPending ? '<div class="btn-row"><button class="btn-confirm" onclick="confirmFromCard(\'' + o.id + '\')">&#10003; 确认接单</button><button class="btn-cancel" onclick="cancelFromCard(\'' + o.id + '\')">取消</button></div>' : '';
+
+  card.innerHTML =
+    '<div class="card-header">' +
+      '<div><div class="order-num">#' + o.orderNum + '</div><div class="order-time">' + o.time + '</div>' + statusLabel + '</div>' +
+      '<div class="order-total">' + o.total + '</div>' +
+    '</div>' +
+    '<div class="items-block">' + itemsHtml + '</div>' +
+    '<div class="custom-row">' +
+      (o.sweetness ? '<span class="custom-chip">&#127852; ' + o.sweetness + '</span>' : '') +
+      (o.ice ? '<span class="custom-chip">&#10052; ' + o.ice + '</span>' : '') +
+    '</div>' +
+    notesHtml +
+    btnsHtml;
+
+  return card;
+}
+
+function confirmFromCard(id) {
+  var o = pendingOrders.find(function(x) { return x.id === id; });
+  if (o) { currentAlert = o; confirmOrder(); }
+}
+
+function cancelFromCard(id) {
+  var o = pendingOrders.find(function(x) { return x.id === id; });
+  if (o) { currentAlert = o; cancelOrder(); }
+}
+
+function updateBadge() {
+  var badge = document.getElementById('pending-badge');
+  if (pendingOrders.length > 0) {
+    badge.textContent = pendingOrders.length + ' 待处理';
+    badge.classList.add('show');
+  } else {
+    badge.classList.remove('show');
+  }
+}
+
+function showView(v) {
+  document.getElementById('nav-pending').classList.toggle('active', v === 'pending');
+  document.getElementById('nav-history').classList.toggle('active', v === 'history');
+  if (v === 'history') document.body.classList.add('show-history');
+  else document.body.classList.remove('show-history');
+}
+
+// Touch to init audio
+document.addEventListener('touchstart', initAudio, { once: true });
+document.addEventListener('click', initAudio, { once: true });
+
+// Start polling
+fetchOrders();
+setInterval(fetchOrders, POLL_INTERVAL);
+</script>
+
+</body>
+</html>
