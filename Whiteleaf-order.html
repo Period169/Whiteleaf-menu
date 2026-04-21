@@ -1,737 +1,870 @@
 <!DOCTYPE html>
 
-<html lang="zh">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>White Leaf 接单</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>White Leaf — Order</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@200;300;400&display=swap" rel="stylesheet">
 <style>
   :root {
     --cream: #f5f2ec;
     --green-dark: #2d4a3e;
     --green-mid: #6b8f71;
     --green-light: #a8c5a0;
-    --charcoal: #1a1a1a;
+    --charcoal: #2a2a2a;
     --warm-gray: #8a8680;
     --accent: #c4a882;
-    --red: #c0392b;
-    --card-bg: #ffffff;
   }
-
-- { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-html, body {
-background: #edeae3;
-font-family: ‘Noto Sans SC’, sans-serif;
-font-weight: 300;
-min-height: 100vh;
-overflow-x: hidden;
-}
-
-/* TOP BAR */
-.topbar {
-background: var(–green-dark);
-padding: 0 20px;
-height: 64px;
-display: flex;
-align-items: center;
-justify-content: space-between;
-position: sticky;
-top: 0;
-z-index: 100;
-box-shadow: 0 2px 12px rgba(0,0,0,0.2);
-}
-
-.topbar-left {
-display: flex;
-align-items: center;
-gap: 12px;
-}
-
-.topbar-logo {
-font-family: ‘Cormorant Garamond’, serif;
-font-size: 22px;
-font-weight: 300;
-color: var(–cream);
-letter-spacing: 0.08em;
-}
-
-.topbar-sub {
-font-size: 11px;
-color: var(–green-light);
-letter-spacing: 0.15em;
-text-transform: uppercase;
-}
-
-.status-dot {
-width: 8px; height: 8px;
-border-radius: 50%;
-background: #2ecc71;
-box-shadow: 0 0 8px #2ecc71;
-animation: pulse 2s infinite;
-}
-
-.status-dot.offline { background: #e74c3c; box-shadow: 0 0 8px #e74c3c; animation: none; }
-
-@keyframes pulse {
-0%, 100% { opacity: 1; }
-50% { opacity: 0.4; }
-}
-
-.topbar-right {
-display: flex;
-align-items: center;
-gap: 10px;
-}
-
-.pending-badge {
-background: var(–accent);
-color: var(–green-dark);
-font-size: 13px;
-font-weight: 500;
-padding: 4px 12px;
-border-radius: 20px;
-display: none;
-}
-
-.pending-badge.show { display: block; }
-
-/* MAIN */
-.main {
-padding: 20px 16px 100px;
-max-width: 700px;
-margin: 0 auto;
-}
-
-/* SECTION LABEL */
-.section-label {
-font-size: 10px;
-letter-spacing: 0.25em;
-text-transform: uppercase;
-color: var(–warm-gray);
-margin-bottom: 12px;
-margin-top: 24px;
-padding-left: 4px;
-}
-
-/* ORDER CARD */
-.order-card {
-background: var(–card-bg);
-border-radius: 16px;
-padding: 20px;
-margin-bottom: 14px;
-box-shadow: 0 2px 16px rgba(0,0,0,0.07);
-border-left: 5px solid var(–green-dark);
-animation: slideIn 0.35s ease both;
-position: relative;
-overflow: hidden;
-}
-
-.order-card.new {
-border-left-color: var(–accent);
-box-shadow: 0 4px 24px rgba(196,168,130,0.25);
-}
-
-.order-card.done {
-border-left-color: var(–green-light);
-opacity: 0.6;
-}
-
-.order-card.cancelled {
-border-left-color: #ddd;
-opacity: 0.4;
-}
-
-@keyframes slideIn {
-from { opacity: 0; transform: translateY(-12px); }
-to { opacity: 1; transform: translateY(0); }
-}
-
-/* NEW FLASH */
-.order-card.new::before {
-content: ‘’;
-position: absolute;
-top: 0; left: 0; right: 0;
-height: 3px;
-background: linear-gradient(90deg, var(–accent), var(–green-mid), var(–accent));
-background-size: 200%;
-animation: shimmer 1.5s infinite;
-}
-
-@keyframes shimmer {
-0% { background-position: 200% 0; }
-100% { background-position: -200% 0; }
-}
-
-.card-header {
-display: flex;
-justify-content: space-between;
-align-items: flex-start;
-margin-bottom: 14px;
-}
-
-.order-num {
-font-family: ‘Cormorant Garamond’, serif;
-font-size: 32px;
-color: var(–green-dark);
-line-height: 1;
-letter-spacing: 0.05em;
-}
-
-.order-time {
-font-size: 11px;
-color: var(–warm-gray);
-margin-top: 3px;
-}
-
-.order-total {
-font-family: ‘Cormorant Garamond’, serif;
-font-size: 22px;
-color: var(–green-dark);
-text-align: right;
-}
-
-.new-tag {
-font-size: 9px;
-letter-spacing: 0.15em;
-text-transform: uppercase;
-color: var(–accent);
-background: rgba(196,168,130,0.12);
-padding: 2px 8px;
-border-radius: 10px;
-border: 1px solid rgba(196,168,130,0.3);
-margin-top: 4px;
-display: inline-block;
-}
-
-/* ITEMS */
-.items-block {
-background: #f8f7f4;
-border-radius: 10px;
-padding: 14px 16px;
-margin-bottom: 14px;
-}
-
-.item-row {
-font-size: 15px;
-color: var(–charcoal);
-padding: 5px 0;
-border-bottom: 1px solid rgba(0,0,0,0.05);
-line-height: 1.4;
-}
-
-.item-row:last-child { border-bottom: none; }
-
-/* CUSTOMISE ROW */
-.custom-row {
-display: flex;
-gap: 10px;
-margin-bottom: 12px;
-flex-wrap: wrap;
-}
-
-.custom-chip {
-font-size: 12px;
-color: var(–green-dark);
-background: rgba(45,74,62,0.07);
-padding: 4px 12px;
-border-radius: 20px;
-letter-spacing: 0.03em;
-}
-
-.notes-row {
-font-size: 12px;
-color: var(–warm-gray);
-background: #fff8f0;
-border: 1px solid rgba(196,168,130,0.3);
-border-radius: 8px;
-padding: 8px 12px;
-margin-bottom: 12px;
-font-style: italic;
-}
-
-/* BUTTONS */
-.btn-row {
-display: flex;
-gap: 10px;
-}
-
-.btn-confirm {
-flex: 2;
-background: var(–green-dark);
-color: var(–cream);
-border: none;
-border-radius: 10px;
-padding: 14px;
-font-family: ‘Noto Sans SC’, sans-serif;
-font-size: 15px;
-font-weight: 400;
-letter-spacing: 0.05em;
-cursor: pointer;
-transition: all 0.2s;
--webkit-tap-highlight-color: transparent;
-}
-
-.btn-confirm:active { background: #1e3329; transform: scale(0.98); }
-
-.btn-cancel {
-flex: 1;
-background: transparent;
-color: var(–warm-gray);
-border: 1px solid #ddd;
-border-radius: 10px;
-padding: 14px;
-font-family: ‘Noto Sans SC’, sans-serif;
-font-size: 15px;
-cursor: pointer;
-transition: all 0.2s;
-}
-
-.btn-cancel:active { background: #f5f5f5; }
-
-/* EMPTY STATE */
-.empty-state {
-text-align: center;
-padding: 60px 20px;
-color: var(–warm-gray);
-}
-
-.empty-icon {
-font-size: 48px;
-margin-bottom: 16px;
-opacity: 0.4;
-}
-
-.empty-text {
-font-size: 14px;
-letter-spacing: 0.05em;
-}
-
-/* BOTTOM NAV */
-.bottom-nav {
-position: fixed;
-bottom: 0; left: 0; right: 0;
-background: var(–green-dark);
-display: flex;
-padding: 12px 20px 28px;
-gap: 12px;
-z-index: 100;
-}
-
-.nav-btn {
-flex: 1;
-background: rgba(255,255,255,0.1);
-color: var(–cream);
-border: none;
-border-radius: 10px;
-padding: 10px;
-font-family: ‘Noto Sans SC’, sans-serif;
-font-size: 12px;
-letter-spacing: 0.05em;
-cursor: pointer;
-transition: all 0.2s;
-opacity: 0.6;
-}
-
-.nav-btn.active { background: rgba(255,255,255,0.18); opacity: 1; }
-
-/* ALERT OVERLAY */
-.alert-overlay {
-display: none;
-position: fixed;
-inset: 0;
-background: rgba(0,0,0,0.5);
-z-index: 200;
-align-items: flex-start;
-justify-content: center;
-padding-top: 60px;
-}
-
-.alert-overlay.show { display: flex; animation: fadeIn 0.2s ease; }
-
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-.alert-card {
-background: white;
-border-radius: 20px;
-width: calc(100% - 40px);
-max-width: 500px;
-overflow: hidden;
-animation: popIn 0.3s cubic-bezier(0.34,1.56,0.64,1) both;
-}
-
-@keyframes popIn {
-from { opacity: 0; transform: scale(0.85) translateY(-20px); }
-to { opacity: 1; transform: scale(1) translateY(0); }
-}
-
-.alert-header {
-background: var(–green-dark);
-padding: 20px 24px 16px;
-display: flex;
-justify-content: space-between;
-align-items: center;
-}
-
-.alert-title {
-font-family: ‘Cormorant Garamond’, serif;
-font-size: 28px;
-color: var(–cream);
-letter-spacing: 0.08em;
-}
-
-.alert-num {
-font-family: ‘Cormorant Garamond’, serif;
-font-size: 42px;
-color: var(–accent);
-letter-spacing: 0.1em;
-}
-
-.alert-body { padding: 20px 24px; }
-
-.alert-items {
-font-size: 16px;
-color: var(–charcoal);
-line-height: 1.8;
-margin-bottom: 16px;
-}
-
-.alert-chips {
-display: flex;
-gap: 8px;
-flex-wrap: wrap;
-margin-bottom: 16px;
-}
-
-.alert-chip {
-font-size: 13px;
-color: var(–green-dark);
-background: rgba(45,74,62,0.08);
-padding: 5px 14px;
-border-radius: 20px;
-}
-
-.alert-notes {
-font-size: 13px;
-color: var(–warm-gray);
-background: #fff8f0;
-border: 1px solid rgba(196,168,130,0.3);
-border-radius: 8px;
-padding: 10px 14px;
-margin-bottom: 16px;
-font-style: italic;
-}
-
-.alert-total {
-font-family: ‘Cormorant Garamond’, serif;
-font-size: 24px;
-color: var(–green-dark);
-margin-bottom: 20px;
-text-align: right;
-}
-
-.alert-btns {
-display: flex;
-gap: 10px;
-}
-
-.alert-confirm {
-flex: 2;
-background: var(–green-dark);
-color: var(–cream);
-border: none;
-border-radius: 12px;
-padding: 16px;
-font-family: ‘Noto Sans SC’, sans-serif;
-font-size: 16px;
-font-weight: 400;
-cursor: pointer;
-transition: all 0.2s;
-}
-
-.alert-confirm:active { background: #1e3329; }
-
-.alert-cancel {
-flex: 1;
-background: transparent;
-color: var(–warm-gray);
-border: 1px solid #ddd;
-border-radius: 12px;
-padding: 16px;
-font-family: ‘Noto Sans SC’, sans-serif;
-font-size: 16px;
-cursor: pointer;
-}
-
-/* VIEW TOGGLE */
-.view-pending { display: block; }
-.view-history { display: none; }
-body.show-history .view-pending { display: none; }
-body.show-history .view-history { display: block; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { background: var(--cream); color: var(--charcoal); font-family: 'Jost', sans-serif; font-weight: 300; min-height: 100vh; }
+  body::before { content: ''; position: fixed; inset: 0; background-image: radial-gradient(circle at 20% 20%, rgba(107,143,113,0.06) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(45,74,62,0.05) 0%, transparent 50%); pointer-events: none; z-index: 0; }
+  .lang-bar { position: sticky; top: 0; z-index: 100; background: var(--cream); border-bottom: 1px solid rgba(107,143,113,0.15); padding: 10px 20px; display: flex; justify-content: center; gap: 8px; }
+  .lang-btn { font-family: 'Jost', sans-serif; font-size: 11px; font-weight: 300; letter-spacing: 0.2em; text-transform: uppercase; padding: 6px 18px; border-radius: 20px; border: 1px solid rgba(107,143,113,0.3); background: transparent; color: var(--warm-gray); cursor: pointer; transition: all 0.25s ease; }
+  .lang-btn.active { background: var(--green-dark); color: var(--cream); border-color: var(--green-dark); }
+  .lang-btn:hover:not(.active) { border-color: var(--green-mid); color: var(--green-dark); }
+  .page { max-width: 680px; margin: 0 auto; padding: 48px 40px 120px; position: relative; z-index: 1; }
+  .header { text-align: center; margin-bottom: 40px; animation: fadeDown 0.7s ease both; }
+  .logo-mark { display: flex; justify-content: center; margin-bottom: 18px; }
+  .logo-svg { width: 60px; height: 60px; opacity: 0.9; }
+  .brand-name { font-family: 'Cormorant Garamond', serif; font-size: 40px; font-weight: 300; letter-spacing: 0.12em; color: var(--green-dark); line-height: 1; }
+  .brand-sub { font-size: 10px; letter-spacing: 0.35em; text-transform: uppercase; color: var(--warm-gray); margin-top: 7px; }
+  .header-divider { display: flex; align-items: center; gap: 16px; margin-top: 24px; justify-content: center; }
+  .header-divider::before, .header-divider::after { content: ''; width: 55px; height: 1px; background: var(--green-light); }
+  .header-divider span { font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--green-mid); }
+  .section { margin-bottom: 36px; }
+  .section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 5px; }
+  .section-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green-dark); flex-shrink: 0; }
+  .section-title { font-family: 'Cormorant Garamond', serif; font-size: 21px; font-weight: 400; letter-spacing: 0.06em; color: var(--green-dark); }
+  .section-line { flex: 1; height: 1px; background: linear-gradient(to right, var(--green-light), transparent); }
+  .section-desc { font-size: 11px; color: var(--warm-gray); letter-spacing: 0.04em; margin-bottom: 14px; padding-left: 19px; font-style: italic; }
+  .product-card { border: 1px solid rgba(107,143,113,0.2); border-radius: 10px; padding: 14px 16px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s ease; background: transparent; position: relative; user-select: none; }
+  .product-card:hover { border-color: var(--green-mid); background: rgba(107,143,113,0.04); }
+  .product-card.selected { border-color: var(--green-dark); background: rgba(45,74,62,0.06); }
+  .product-card.selected::after { content: '\2713'; position: absolute; right: 14px; top: 14px; color: var(--green-dark); font-size: 16px; }
+  .product-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+  .product-name { font-family: 'Cormorant Garamond', serif; font-size: 17px; font-weight: 400; color: var(--charcoal); letter-spacing: 0.02em; }
+  .product-name-zh { font-size: 10px; color: var(--green-mid); margin-top: 2px; letter-spacing: 0.05em; }
+  .product-price { font-family: 'Cormorant Garamond', serif; font-size: 14px; color: var(--warm-gray); white-space: nowrap; text-align: right; flex-shrink: 0; padding-right: 20px; }
+  .size-options { display: none; margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(107,143,113,0.15); gap: 8px; flex-wrap: wrap; align-items: center; }
+  .product-card.selected .size-options { display: flex; }
+  .size-btn { font-family: 'Jost', sans-serif; font-size: 11px; font-weight: 300; letter-spacing: 0.15em; text-transform: uppercase; padding: 6px 14px; border-radius: 20px; border: 1px solid rgba(107,143,113,0.35); background: transparent; color: var(--warm-gray); cursor: pointer; transition: all 0.2s; }
+  .size-btn.active { background: var(--green-dark); color: var(--cream); border-color: var(--green-dark); }
+  .qty-controls { display: none; align-items: center; gap: 10px; margin-top: 10px; }
+  .product-card.selected .qty-controls { display: flex; }
+  .qty-btn { width: 28px; height: 28px; border-radius: 50%; border: 1px solid rgba(107,143,113,0.4); background: transparent; color: var(--green-dark); font-size: 16px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
+  .qty-btn:hover { background: var(--green-dark); color: var(--cream); }
+  .qty-display { font-family: 'Cormorant Garamond', serif; font-size: 18px; color: var(--green-dark); min-width: 20px; text-align: center; }
+  .qty-label { font-size: 10px; color: var(--warm-gray); letter-spacing: 0.1em; }
+  /* TOPPINGS */
+  .toppings-section { margin-bottom: 36px; }
+  .toppings-title { font-family: 'Cormorant Garamond', serif; font-size: 17px; color: var(--green-dark); letter-spacing: 0.06em; margin-bottom: 6px; }
+  .toppings-desc { font-size: 11px; color: var(--warm-gray); font-style: italic; margin-bottom: 14px; }
+  .topping-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border: 1px solid rgba(107,143,113,0.2); border-radius: 10px; margin-bottom: 8px; cursor: pointer; transition: all 0.2s; }
+  .topping-item:hover { border-color: var(--green-mid); background: rgba(107,143,113,0.04); }
+  .topping-item.selected { border-color: var(--green-dark); background: rgba(45,74,62,0.06); }
+  .topping-name { font-family: 'Cormorant Garamond', serif; font-size: 16px; color: var(--charcoal); }
+  .topping-price { font-family: 'Cormorant Garamond', serif; font-size: 14px; color: var(--warm-gray); }
+  .topping-check { width: 22px; height: 22px; border-radius: 50%; border: 1px solid rgba(107,143,113,0.4); display: flex; align-items: center; justify-content: center; font-size: 12px; color: transparent; transition: all 0.2s; flex-shrink: 0; }
+  .topping-item.selected .topping-check { background: var(--green-dark); border-color: var(--green-dark); color: var(--cream); }
+  /* CUSTOMIZE */
+  .customize-section { background: rgba(45,74,62,0.04); border: 1px solid rgba(107,143,113,0.2); border-radius: 10px; padding: 20px 22px; margin-bottom: 36px; }
+  .customize-title { font-family: 'Cormorant Garamond', serif; font-size: 17px; color: var(--green-dark); letter-spacing: 0.06em; margin-bottom: 16px; }
+  .customize-row { margin-bottom: 14px; }
+  .customize-label { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--warm-gray); margin-bottom: 8px; }
+  .option-group { display: flex; gap: 7px; flex-wrap: wrap; }
+  .opt-btn { font-family: 'Jost', sans-serif; font-size: 11px; font-weight: 300; letter-spacing: 0.1em; padding: 5px 13px; border-radius: 20px; border: 1px solid rgba(107,143,113,0.3); background: transparent; color: var(--warm-gray); cursor: pointer; transition: all 0.2s; }
+  .opt-btn.active { background: var(--green-dark); color: var(--cream); border-color: var(--green-dark); }
+  .notes-section { margin-bottom: 36px; }
+  .notes-label { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--warm-gray); margin-bottom: 8px; }
+  .notes-input { width: 100%; background: transparent; border: 1px solid rgba(107,143,113,0.25); border-radius: 8px; padding: 12px 14px; font-family: 'Jost', sans-serif; font-size: 13px; font-weight: 300; color: var(--charcoal); resize: none; outline: none; transition: border-color 0.2s; }
+  .notes-input:focus { border-color: var(--green-mid); }
+  .notes-input::placeholder { color: rgba(138,134,128,0.5); }
+  .order-summary { background: rgba(45,74,62,0.05); border: 1px solid rgba(107,143,113,0.25); border-radius: 10px; padding: 20px 22px; margin-bottom: 24px; }
+  .summary-title { font-family: 'Cormorant Garamond', serif; font-size: 15px; color: var(--green-dark); letter-spacing: 0.06em; margin-bottom: 12px; }
+  .summary-empty { font-size: 12px; color: var(--warm-gray); font-style: italic; }
+  .summary-item { display: flex; justify-content: space-between; font-size: 12.5px; color: var(--charcoal); padding: 5px 0; border-bottom: 1px solid rgba(107,143,113,0.1); gap: 12px; }
+  .summary-item:last-child { border-bottom: none; }
+  .summary-item-name { flex: 1; }
+  .summary-item-price { color: var(--warm-gray); font-family: 'Cormorant Garamond', serif; font-size: 14px; white-space: nowrap; }
+  .summary-total { display: flex; justify-content: space-between; margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(107,143,113,0.2); font-family: 'Cormorant Garamond', serif; font-size: 18px; color: var(--green-dark); }
+  .submit-btn { width: 100%; background: var(--green-dark); color: var(--cream); border: none; border-radius: 10px; padding: 18px; font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 400; letter-spacing: 0.1em; cursor: pointer; transition: all 0.25s ease; margin-bottom: 12px; }
+  .submit-btn:hover { background: #1e3329; transform: translateY(-1px); }
+  .submit-btn:disabled { background: rgba(107,143,113,0.3); color: var(--warm-gray); cursor: not-allowed; transform: none; }
+  .submit-note { text-align: center; font-size: 10.5px; color: var(--warm-gray); letter-spacing: 0.05em; line-height: 1.6; }
+  .success-screen { display: none; text-align: center; padding: 60px 20px; animation: fadeIn 0.5s ease both; }
+  .success-screen.show { display: block; }
+  .success-icon { width: 64px; height: 64px; border: 2px solid var(--green-mid); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; font-size: 28px; }
+  .success-title { font-family: 'Cormorant Garamond', serif; font-size: 28px; color: var(--green-dark); letter-spacing: 0.08em; margin-bottom: 12px; }
+  .success-desc { font-size: 13px; color: var(--warm-gray); line-height: 1.8; margin-bottom: 32px; }
+  .order-number { font-family: 'Cormorant Garamond', serif; font-size: 36px; color: var(--green-dark); letter-spacing: 0.15em; margin-bottom: 8px; }
+  .order-number-label { font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--warm-gray); margin-bottom: 40px; }
+  .new-order-btn { font-family: 'Jost', sans-serif; font-size: 11px; font-weight: 300; letter-spacing: 0.2em; text-transform: uppercase; padding: 10px 28px; border-radius: 20px; border: 1px solid rgba(107,143,113,0.4); background: transparent; color: var(--green-dark); cursor: pointer; transition: all 0.2s; }
+  .new-order-btn:hover { background: var(--green-dark); color: var(--cream); border-color: var(--green-dark); }
+  @keyframes fadeDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  @media (max-width: 500px) { .page { padding: 36px 20px 100px; } .brand-name { font-size: 34px; } }
 </style>
-
 </head>
 <body>
 
-<!-- TOP BAR -->
+<div class="lang-bar">
+  <button class="lang-btn active" id="btn-en">English</button>
+  <button class="lang-btn" id="btn-hu">Magyar</button>
+</div>
 
-<div class="topbar">
-  <div class="topbar-left">
-    <div>
-      <div class="topbar-logo">White Leaf</div>
-      <div class="topbar-sub">接单后台</div>
+<div class="page">
+  <div id="order-form">
+    <div class="header">
+      <div class="logo-mark">
+        <svg class="logo-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="50" cy="24" rx="9" ry="20" fill="#6b8f71"/>
+          <line x1="50" y1="4" x2="50" y2="44" stroke="#f5f2ec" stroke-width="1.2"/>
+          <ellipse cx="50" cy="76" rx="9" ry="20" fill="#6b8f71"/>
+          <line x1="50" y1="56" x2="50" y2="96" stroke="#f5f2ec" stroke-width="1.2"/>
+          <ellipse cx="24" cy="50" rx="20" ry="9" fill="#2d4a3e"/>
+          <line x1="4" y1="50" x2="44" y2="50" stroke="#f5f2ec" stroke-width="1.2"/>
+          <ellipse cx="76" cy="50" rx="20" ry="9" fill="#2d4a3e"/>
+          <line x1="56" y1="50" x2="96" y2="50" stroke="#f5f2ec" stroke-width="1.2"/>
+          <circle cx="50" cy="50" r="5" fill="#2d4a3e"/>
+        </svg>
+      </div>
+      <div class="brand-name">White Leaf</div>
+      <div class="brand-sub" id="sub-text"></div>
+      <div class="header-divider"><span id="divider-text"></span></div>
     </div>
+
+```
+<div id="products-container"></div>
+
+<!-- TOPPINGS -->
+<div class="toppings-section" id="toppings-section">
+  <div class="toppings-title" id="toppings-title"></div>
+  <div class="toppings-desc" id="toppings-desc"></div>
+  <div id="toppings-list"></div>
+</div>
+
+<div class="customize-section" id="customize-section">
+  <div class="customize-title" id="custom-title"></div>
+  <div class="customize-row">
+    <div class="customize-label" id="sweet-label"></div>
+    <div class="option-group" id="sweetness-group"></div>
   </div>
-  <div class="topbar-right">
-    <div class="pending-badge" id="pending-badge"></div>
-    <div class="status-dot" id="status-dot"></div>
+  <div class="customize-row">
+    <div class="customize-label" id="ice-label"></div>
+    <div class="option-group" id="ice-group"></div>
   </div>
 </div>
 
-<!-- MAIN -->
+<div class="notes-section">
+  <div class="notes-label" id="notes-label"></div>
+  <textarea class="notes-input" id="notes-input" rows="2"></textarea>
+</div>
 
-<div class="main">
-  <!-- PENDING ORDERS -->
-  <div class="view-pending">
-    <div class="section-label">待处理订单</div>
-    <div id="pending-list">
-      <div class="empty-state">
-        <div class="empty-icon">&#9749;</div>
-        <div class="empty-text">暂无新订单</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- HISTORY -->
-
-  <div class="view-history">
-    <div class="section-label">已处理记录</div>
-    <div id="history-list">
-      <div class="empty-state">
-        <div class="empty-icon">&#128203;</div>
-        <div class="empty-text">暂无记录</div>
-      </div>
-    </div>
+<div class="order-summary">
+  <div class="summary-title" id="summary-title"></div>
+  <div id="summary-content"></div>
+  <div class="summary-total" id="summary-total" style="display:none">
+    <span id="total-label"></span>
+    <span id="total-amount">0 Ft</span>
   </div>
 </div>
 
-<!-- BOTTOM NAV -->
+<button class="submit-btn" id="submit-btn" disabled>
+  <span id="submit-text"></span>
+</button>
+<div class="submit-note" id="submit-note"></div>
+```
 
-<div class="bottom-nav">
-  <button class="nav-btn active" id="nav-pending" onclick="showView('pending')">&#128226; 待处理</button>
-  <button class="nav-btn" id="nav-history" onclick="showView('history')">&#128203; 历史记录</button>
+  </div>
+
+  <div class="success-screen" id="success-screen">
+    <div class="success-icon">&#10003;</div>
+    <div class="success-title" id="success-title"></div>
+    <div class="success-desc" id="success-desc"></div>
+    <div class="order-number" id="order-number"></div>
+    <div class="order-number-label" id="order-num-label"></div>
+    <button class="new-order-btn" id="new-order-btn"></button>
+  </div>
 </div>
 
 <script>
-// ── CONFIG ──────────────────────────────────────────────
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwk_JEpLKyaiOUbfs3SxvxiTfjyu779JSrQmBKP_-HomiSwjlPaOxMFFYppccZ5UWHl/exec';
-const POLL_INTERVAL = 8000; // check every 8 seconds
-// ────────────────────────────────────────────────────────
 
-let pendingOrders = [];
-let historyOrders = [];
-let seenIds = new Set();
-let currentAlert = null;
-let audioCtx = null;
-let isOnline = false;
+const toppings = {
+  en: [
+    { id:'tp-pearl',   name:'Tapioca Pearls', zh:'\u73cd\u73e0',       price:300, hasFlavour:false },
+    { id:'tp-coconut', name:'Coconut Jelly',  zh:'\u6e38\u88c2',       price:300, hasFlavour:false },
+    { id:'tp-boba',    name:'Popping Boba',   zh:'\u7206\u7206\u73e0', price:300, hasFlavour:true  },
+  ],
+  hu: [
+    { id:'tp-pearl',   name:'T\u00e1pi\u00f3ka gy\u00f6ngy', zh:'\u73cd\u73e0',       price:300, hasFlavour:false },
+    { id:'tp-coconut', name:'K\u00f3kuszzsele',              zh:'\u6e38\u88c2',       price:300, hasFlavour:false },
+    { id:'tp-boba',    name:'Pukkan\u00f3s boba',            zh:'\u7206\u7206\u73e0', price:300, hasFlavour:true  },
+  ]
+};
 
-// ── SOUND ────────────────────────────────────────────────
-function initAudio() {
-  if (audioCtx) return;
-  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+const bobaFlavours = {
+  en: [
+    { id:'bf-straw', name:'Strawberry' },
+    { id:'bf-pass',  name:'Passion Fruit' },
+    { id:'bf-mango', name:'Mango' },
+    { id:'bf-lych',  name:'Lychee' },
+    { id:'bf-peach', name:'Peach' },
+    { id:'bf-grape', name:'Grape' },
+  ],
+  hu: [
+    { id:'bf-straw', name:'Epres' },
+    { id:'bf-pass',  name:'Maracuj\u00e1s' },
+    { id:'bf-mango', name:'Mang\u00f3s' },
+    { id:'bf-lych',  name:'Licsis' },
+    { id:'bf-peach', name:'Barackos' },
+    { id:'bf-grape', name:'Sz\u0151l\u0151s' },
+  ]
+};
+
+const products = {
+  en: [
+    {
+      section: 'Pearl Milk Tea',
+      desc: 'Served with black sugar tapioca pearls \u00b7 Small or Large',
+      items: [
+        { id:'pmt-green', name:'Brown Sugar Pearl Milk Tea \u2014 Green Tea', zh:'\u9ed1\u7cd6\u73cd\u73e0\u5976\u8336 \u00b7 \u7eff\u8336', prices:{Small:2199,Large:2499}, sizes:['Small','Large'] },
+        { id:'pmt-black', name:'Brown Sugar Pearl Milk Tea \u2014 Black Tea', zh:'\u9ed1\u7cd6\u73cd\u73e0\u5976\u8336 \u00b7 \u7ea2\u8336', prices:{Small:2199,Large:2499}, sizes:['Small','Large'] },
+        { id:'cmt-green', base:'coconut-fixed', name:'Coconut Milk Tea — Green Tea', zh:'椰果奶茶 · 绿茶', prices:{Small:2199,Large:2499}, sizes:['Small','Large'] },
+        { id:'cmt-black', base:'coconut-fixed', name:'Coconut Milk Tea — Black Tea', zh:'椰果奶茶 · 红茶', prices:{Small:2199,Large:2499}, sizes:['Small','Large'] },
+      ]
+    },
+    {
+      section: 'Fruit Tea',
+      desc: 'Jasmine green tea with real fruit jam \u00b7 Served with popping boba \u00b7 Small or Large',
+      items: [
+        { id:'ft-straw', base:'fruittea', bobaFl:'bf-straw', name:'Strawberry Fruit Tea',    zh:'\u8349\u8393\u679c\u8336', prices:{Small:2199,Large:2499}, sizes:['Small','Large'] },
+        { id:'ft-pass',  base:'fruittea', bobaFl:'bf-pass',  name:'Passion Fruit Tea',       zh:'\u767e\u9999\u679c\u8336', prices:{Small:2199,Large:2499}, sizes:['Small','Large'] },
+        { id:'ft-mango', base:'fruittea', bobaFl:'bf-mango', name:'Mango Fruit Tea',         zh:'\u8292\u679c\u679c\u8336', prices:{Small:2199,Large:2499}, sizes:['Small','Large'] },
+        { id:'ft-lych',  base:'fruittea', bobaFl:'bf-lych',  name:'Lychee Fruit Tea',        zh:'\u8354\u679d\u679c\u8336', prices:{Small:2199,Large:2499}, sizes:['Small','Large'] },
+        { id:'ft-peach', base:'fruittea', bobaFl:'bf-peach', name:'Peach Fruit Tea',         zh:'\u6843\u5b50\u679c\u8336', prices:{Small:2199,Large:2499}, sizes:['Small','Large'] },
+        { id:'ft-grape', base:'fruittea', bobaFl:'bf-grape', name:'Grape Fruit Tea',         zh:'\u8461\u8404\u679c\u8336', prices:{Small:2199,Large:2499}, sizes:['Small','Large'] },
+      ]
+    },
+    {
+      section: 'Fruit Milk Tea',
+      desc: 'Fruit jam blended with creamy milk \u00b7 Served with popping boba',
+      items: [
+        { id:'fmt-straw', base:'milk', name:'Strawberry Milk Tea',    zh:'\u8349\u8393\u5976\u8336',   prices:{Small:2399,Large:2699}, sizes:['Small','Large'] },
+        { id:'fmt-mango', base:'milk', name:'Mango Milk Tea',         zh:'\u8292\u679c\u5976\u8336',   prices:{Small:2399,Large:2699}, sizes:['Small','Large'] },
+        { id:'fmt-pass',  base:'milk', name:'Passion Fruit Milk Tea', zh:'\u767e\u9999\u679c\u5976\u8336', prices:{Small:2399,Large:2699}, sizes:['Small','Large'] },
+      ]
+    },
+    {
+      section: 'Fruit Slush',
+      desc: 'Blended iced slush \u00b7 Large only \u00b7 2 599 Ft',
+      items: [
+        { id:'sl-straw', base:'slush', name:'Strawberry Slush',    zh:'\u8349\u8393\u51b0\u6c99',   prices:{Large:2599}, sizes:['Large'] },
+        { id:'sl-pass',  base:'slush', name:'Passion Fruit Slush', zh:'\u767e\u9999\u679c\u51b0\u6c99', prices:{Large:2599}, sizes:['Large'] },
+        { id:'sl-mango', base:'slush', name:'Mango Slush',         zh:'\u8292\u679c\u51b0\u6c99',   prices:{Large:2599}, sizes:['Large'] },
+        { id:'sl-lych',  base:'slush', name:'Lychee Slush',        zh:'\u8354\u679d\u51b0\u6c99',   prices:{Large:2599}, sizes:['Large'] },
+        { id:'sl-peach', base:'slush', name:'Peach Slush',         zh:'\u6843\u5b50\u51b0\u6c99',   prices:{Large:2599}, sizes:['Large'] },
+      ]
+    }
+  ],
+  hu: [
+    {
+      section: 'T\u00e1pi\u00f3ka tejes tea',
+      desc: 'Barnacukros t\u00e1pi\u00f3ka gy\u00f6ngy\u00f6kkel t\u00e1lalva \u00b7 Kicsi vagy nagy m\u00e9retben',
+      items: [
+        { id:'pmt-green', base:'milk', name:'Barnacukros t\u00e1pi\u00f3ka tejes tea \u2013 Z\u00f6ld tea', zh:'\u9ed1\u7cd6\u73cd\u73e0\u5976\u8336 \u00b7 \u7eff\u8336', prices:{Kicsi:2199,Nagy:2499}, sizes:['Kicsi','Nagy'] },
+        { id:'pmt-black', base:'milk', name:'Barnacukros t\u00e1pi\u00f3ka tejes tea \u2013 Fekete tea',   zh:'\u9ed1\u7cd6\u73cd\u73e0\u5976\u8336 \u00b7 \u7ea2\u8336', prices:{Kicsi:2199,Nagy:2499}, sizes:['Kicsi','Nagy'] },
+        { id:'cmt-green', base:'coconut-fixed', name:'Kókuszzsele tejes tea – Zöld tea', zh:'椰果奶茶 · 绿茶', prices:{Kicsi:2199,Nagy:2499}, sizes:['Kicsi','Nagy'] },
+        { id:'cmt-black', base:'coconut-fixed', name:'Kókuszzsele tejes tea – Fekete tea', zh:'椰果奶茶 · 红茶', prices:{Kicsi:2199,Nagy:2499}, sizes:['Kicsi','Nagy'] },
+      ]
+    },
+    {
+      section: 'Gy\u00fcm\u00f6lcs\u00f6s tea',
+      desc: 'J\u00e1zmin z\u00f6ld tea val\u00f3di gy\u00fcm\u00f6lcsdzsemmel \u00b7 Pukkan\u00f3s bob\u00e1val \u00b7 Kicsi vagy nagy',
+      items: [
+        { id:'ft-straw', base:'fruittea', bobaFl:'bf-straw', name:'Epres gy\u00fcm\u00f6lcstea',         zh:'\u8349\u8393\u679c\u8336', prices:{Kicsi:2199,Nagy:2499}, sizes:['Kicsi','Nagy'] },
+        { id:'ft-pass',  base:'fruittea', bobaFl:'bf-pass',  name:'Maracuj\u00e1s gy\u00fcm\u00f6lcstea', zh:'\u767e\u9999\u679c\u8336', prices:{Kicsi:2199,Nagy:2499}, sizes:['Kicsi','Nagy'] },
+        { id:'ft-mango', name:'Mang\u00f3s gy\u00fcm\u00f6lcstea',    zh:'\u8292\u679c\u679c\u8336', prices:{Kicsi:2199,Nagy:2499}, sizes:['Kicsi','Nagy'] },
+        { id:'ft-lych',  base:'fruittea', bobaFl:'bf-lych',  name:'Licsis gy\u00fcm\u00f6lcstea',        zh:'\u8354\u679d\u679c\u8336', prices:{Kicsi:2199,Nagy:2499}, sizes:['Kicsi','Nagy'] },
+        { id:'ft-peach', base:'fruittea', bobaFl:'bf-peach', name:'Barackos gy\u00fcm\u00f6lcstea',      zh:'\u6843\u5b50\u679c\u8336', prices:{Kicsi:2199,Nagy:2499}, sizes:['Kicsi','Nagy'] },
+        { id:'ft-grape', base:'fruittea', bobaFl:'bf-grape', name:'Sz\u0151l\u0151s gy\u00fcm\u00f6lcstea', zh:'\u8461\u8404\u679c\u8336', prices:{Kicsi:2199,Nagy:2499}, sizes:['Kicsi','Nagy'] },
+      ]
+    },
+    {
+      section: 'Gy\u00fcm\u00f6lcs\u00f6s tejes tea',
+      desc: 'Gy\u00fcm\u00f6lcsdzsem kr\u00e9mes tejjel keverve \u00b7 Pukkan\u00f3s bob\u00e1val',
+      items: [
+        { id:'fmt-straw', base:'milk', name:'Epres tejes tea',      zh:'\u8349\u8393\u5976\u8336',       prices:{Kicsi:2399,Nagy:2699}, sizes:['Kicsi','Nagy'] },
+        { id:'fmt-mango', base:'milk', name:'Mang\u00f3s tejes tea',     zh:'\u8292\u679c\u5976\u8336',       prices:{Kicsi:2399,Nagy:2699}, sizes:['Kicsi','Nagy'] },
+        { id:'fmt-pass',  base:'milk', name:'Maracuj\u00e1s tejes tea',  zh:'\u767e\u9999\u679c\u5976\u8336', prices:{Kicsi:2399,Nagy:2699}, sizes:['Kicsi','Nagy'] },
+      ]
+    },
+    {
+      section: 'Gy\u00fcm\u00f6lcs\u00f6s j\u00e9gk\u00e1sa',
+      desc: 'Turmixolt jeges j\u00e9gk\u00e1sa \u00b7 Csak nagy m\u00e9retben \u00b7 2 599 Ft',
+      items: [
+        { id:'sl-straw', name:'Epres j\u00e9gk\u00e1sa',        zh:'\u8349\u8393\u51b0\u6c99',       prices:{Nagy:2599}, sizes:['Nagy'] },
+        { id:'sl-pass',  name:'Maracuj\u00e1s j\u00e9gk\u00e1sa', zh:'\u767e\u9999\u679c\u51b0\u6c99', prices:{Nagy:2599}, sizes:['Nagy'] },
+        { id:'sl-mango', name:'Mang\u00f3s j\u00e9gk\u00e1sa',   zh:'\u8292\u679c\u51b0\u6c99',       prices:{Nagy:2599}, sizes:['Nagy'] },
+        { id:'sl-lych',  name:'Licsis j\u00e9gk\u00e1sa',        zh:'\u8354\u679d\u51b0\u6c99',       prices:{Nagy:2599}, sizes:['Nagy'] },
+        { id:'sl-peach', name:'Barackos j\u00e9gk\u00e1sa',      zh:'\u6843\u5b50\u51b0\u6c99',       prices:{Nagy:2599}, sizes:['Nagy'] },
+      ]
+    }
+  ]
+};
+
+const i18n = {
+  en: {
+    sub: 'Place Your Order', divider: 'Order',
+    customTitle: 'Customise Your Drink',
+    sweetLabel: 'Sweetness', iceLabel: 'Ice',
+    sweetOpts: ['0%','30%','50%','70%','100%'],
+    iceOpts: ['No ice','Less','Normal','Extra'],
+    defaultSweetness: '50%', defaultIce: 'Normal',
+    notesLabel: 'Special Requests', notesPlaceholder: 'Allergies, special requests...',
+    summaryTitle: 'Your Order', summaryEmpty: 'No items selected yet.',
+    totalLabel: 'Total', submitText: 'Place Order',
+    submitNote: 'Pay at the counter after placing your order.',
+    successTitle: 'Order Received',
+    successDesc: 'Please proceed to the counter to pay. We will start preparing your drink shortly.',
+    orderNumLabel: 'Order Number', newOrderBtn: 'New Order',
+    sizeLabel: 'Size', qtyLabel: 'Qty',
+    customTitleSlush: 'Slush is fixed \u2014 no customisation needed',
+    toppingsTitle: 'Add Toppings (Slush)',
+    toppingsDesc: 'Each topping +300 Ft',
+    bobaFlavourLabel: 'Choose Boba Flavour',
+    baseLabel: 'Choose your base',
+    basePearl: 'Tapioca Pearls',
+    baseCoconut: 'Coconut Jelly',
+    baseBoba: 'Popping Boba',
+    baseCoconutAlt: 'Coconut Jelly',
+  },
+  hu: {
+    sub: 'Rendel\u00e9s lead\u00e1sa', divider: 'Rendel\u00e9s',
+    customTitle: 'Alak\u00edtsd kedvedre!',
+    sweetLabel: '\u00c9dess\u00e9g', iceLabel: 'J\u00e9g',
+    sweetOpts: ['0%','30%','50%','70%','100%'],
+    iceOpts: ['J\u00e9g n\u00e9lk\u00fcl','Kevesebb','Norm\u00e1l','Extra'],
+    defaultSweetness: '50%', defaultIce: 'Norm\u00e1l',
+    notesLabel: 'K\u00fcl\u00f6nleges k\u00e9r\u00e9s', notesPlaceholder: 'Allergia, k\u00fcl\u00f6nleges k\u00e9r\u00e9sek...',
+    summaryTitle: 'Rendel\u00e9sed', summaryEmpty: 'M\u00e9g nem v\u00e1lasztott\u00e1l term\u00e9ket.',
+    totalLabel: '\u00d6sszesen', submitText: 'Rendel\u00e9s lead\u00e1sa',
+    submitNote: 'Fizet\u00e9s a pultban a rendel\u00e9s lead\u00e1sa ut\u00e1n.',
+    successTitle: 'Rendel\u00e9s fogadva!',
+    successDesc: 'K\u00e9rj\u00fck menj a pulthoz fizetni. Nemsok\u00e1ra elk\u00e9sz\u00edtj\u00fck italodat.',
+    orderNumLabel: 'Rendel\u00e9ssz\u00e1m', newOrderBtn: '\u00daj rendel\u00e9s',
+    sizeLabel: 'M\u00e9ret', qtyLabel: 'Db',
+    customTitleSlush: 'A j\u00e9gk\u00e1sa r\u00f6gz\u00edtett \u2014 nem szab\u00e1lyozhat\u00f3',
+    toppingsTitle: 'Felt\u00e9tek hozz\u00e1ad\u00e1sa (J\u00e9gk\u00e1sa)',
+    toppingsDesc: 'Minden felt\u00e9t +300 Ft',
+    bobaFlavourLabel: '\u00cdz v\u00e1laszt\u00e1sa',
+    baseLabel: 'Alap felt\u00e9t v\u00e1laszt\u00e1sa',
+    basePearl: 'T\u00e1pi\u00f3ka gy\u00f6ngy',
+    baseCoconut: 'K\u00f3kuszzsele',
+    baseBoba: 'Pukkan\u00f3s boba',
+    baseCoconutAlt: 'K\u00f3kuszzsele',
+  }
+};
+
+let currentLang = 'en';
+let cart = {};
+let selectedToppings = {};
+let selectedBobaFlavour = null;
+let selectedBases = {}; // { itemId: 'pearl'|'coconut'|'boba' }
+let sweetness = '50%';
+let ice = 'Normal';
+
+document.getElementById('btn-en').addEventListener('click', function() { setLang('en'); });
+document.getElementById('btn-hu').addEventListener('click', function() { setLang('hu'); });
+document.getElementById('submit-btn').addEventListener('click', submitOrder);
+document.getElementById('new-order-btn').addEventListener('click', resetOrder);
+
+function setLang(lang) {
+  currentLang = lang;
+  document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+  document.getElementById('btn-hu').classList.toggle('active', lang === 'hu');
+  cart = {};
+  selectedToppings = {};
+  selectedBobaFlavour = null;
+  selectedBases = {};
+  sweetness = i18n[lang].defaultSweetness;
+  ice = i18n[lang].defaultIce;
+  renderAll();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function playAlert() {
+function renderAll() {
+  var t = i18n[currentLang];
+  document.getElementById('sub-text').textContent = t.sub;
+  document.getElementById('divider-text').textContent = t.divider;
+  document.getElementById('custom-title').textContent = t.customTitle;
+  document.getElementById('sweet-label').textContent = t.sweetLabel;
+  document.getElementById('ice-label').textContent = t.iceLabel;
+  document.getElementById('notes-label').textContent = t.notesLabel;
+  document.getElementById('notes-input').placeholder = t.notesPlaceholder;
+  document.getElementById('summary-title').textContent = t.summaryTitle;
+  document.getElementById('total-label').textContent = t.totalLabel;
+  document.getElementById('submit-text').textContent = t.submitText;
+  document.getElementById('submit-note').textContent = t.submitNote;
+  document.getElementById('toppings-title').textContent = t.toppingsTitle;
+  document.getElementById('toppings-desc').textContent = t.toppingsDesc;
+  document.getElementById('toppings-desc').textContent = t.toppingsDesc;
+
+  var sg = document.getElementById('sweetness-group');
+  sg.innerHTML = '';
+  t.sweetOpts.forEach(function(v) {
+    var b = document.createElement('button');
+    b.className = 'opt-btn' + (v === sweetness ? ' active' : '');
+    b.textContent = v;
+    b.addEventListener('click', function() { selectOpt('sweetness', v, sg); });
+    sg.appendChild(b);
+  });
+
+  var ig = document.getElementById('ice-group');
+  ig.innerHTML = '';
+  t.iceOpts.forEach(function(v) {
+    var b = document.createElement('button');
+    b.className = 'opt-btn' + (v === ice ? ' active' : '');
+    b.textContent = v;
+    b.addEventListener('click', function() { selectOpt('ice', v, ig); });
+    ig.appendChild(b);
+  });
+
+  renderToppings();
+  renderProducts();
+  renderSummary();
+}
+
+function renderToppings() {
+  var t = i18n[currentLang];
+  var list = document.getElementById('toppings-list');
+  list.innerHTML = '';
+  toppings[currentLang].forEach(function(tp) {
+    var isSelected = !!selectedToppings[tp.id];
+
+    var wrapper = document.createElement('div');
+
+    var item = document.createElement('div');
+    item.className = 'topping-item' + (isSelected ? ' selected' : '');
+    var nameEl = document.createElement('div');
+    nameEl.className = 'topping-name';
+    nameEl.textContent = tp.name;
+    var priceEl = document.createElement('div');
+    priceEl.className = 'topping-price';
+    priceEl.textContent = '+300 Ft';
+    var checkEl = document.createElement('div');
+    checkEl.className = 'topping-check';
+    checkEl.textContent = '\u2713';
+    item.appendChild(nameEl);
+    item.appendChild(priceEl);
+    item.appendChild(checkEl);
+    item.addEventListener('click', (function(id, name, price) {
+      return function() { toggleTopping(id, name, price); };
+    })(tp.id, tp.name, tp.price));
+    wrapper.appendChild(item);
+
+    // Boba flavour picker
+    if (tp.hasFlavour && isSelected) {
+      var flavourBox = document.createElement('div');
+      flavourBox.style.cssText = 'padding:12px 14px;background:rgba(45,74,62,0.04);border:1px solid rgba(107,143,113,0.2);border-top:none;border-radius:0 0 10px 10px;margin-bottom:0;';
+      var flavourLabel = document.createElement('div');
+      flavourLabel.style.cssText = 'font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--warm-gray);margin-bottom:8px;';
+      flavourLabel.textContent = t.bobaFlavourLabel;
+      flavourBox.appendChild(flavourLabel);
+      var flavourGroup = document.createElement('div');
+      flavourGroup.style.cssText = 'display:flex;gap:7px;flex-wrap:wrap;';
+      bobaFlavours[currentLang].forEach(function(fl) {
+        var btn = document.createElement('button');
+        btn.className = 'opt-btn' + (selectedBobaFlavour === fl.id ? ' active' : '');
+        btn.textContent = fl.name;
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          selectedBobaFlavour = fl.id;
+          renderToppings();
+          renderSummary();
+        });
+        flavourGroup.appendChild(btn);
+      });
+      flavourBox.appendChild(flavourGroup);
+      item.style.borderRadius = '10px 10px 0 0';
+      wrapper.appendChild(flavourBox);
+    }
+
+    wrapper.style.marginBottom = '8px';
+    list.appendChild(wrapper);
+  });
+}
+
+function toggleTopping(id, name, price) {
+  if (selectedToppings[id]) {
+    delete selectedToppings[id];
+    if (id === 'tp-boba') selectedBobaFlavour = null;
+  } else {
+    selectedToppings[id] = { id: id, name: name, price: price };
+  }
+  renderToppings();
+  renderSummary();
+}
+
+function renderProducts() {
+  var container = document.getElementById('products-container');
+  container.innerHTML = '';
+  var data = products[currentLang];
+  var t = i18n[currentLang];
+
+  data.forEach(function(section) {
+    var secDiv = document.createElement('div');
+    secDiv.className = 'section';
+
+    var header = document.createElement('div');
+    header.className = 'section-header';
+    header.innerHTML = '<div class="section-dot"></div>';
+    var titleEl = document.createElement('div');
+    titleEl.className = 'section-title';
+    titleEl.textContent = section.section;
+    var lineEl = document.createElement('div');
+    lineEl.className = 'section-line';
+    header.appendChild(titleEl);
+    header.appendChild(lineEl);
+    secDiv.appendChild(header);
+
+    var descEl = document.createElement('div');
+    descEl.className = 'section-desc';
+    descEl.textContent = section.desc;
+    secDiv.appendChild(descEl);
+
+    section.items.forEach(function(item) {
+      var inCart = cart[item.id];
+      var isSelected = !!inCart;
+      var selectedSize = inCart ? inCart.size : item.sizes[0];
+      var qty = inCart ? inCart.qty : 1;
+
+      var priceStr = item.sizes.length > 1
+        ? item.sizes.map(function(s) { return s + ' ' + item.prices[s].toLocaleString() + ' Ft'; }).join(' / ')
+        : Object.values(item.prices)[0].toLocaleString() + ' Ft';
+
+      var card = document.createElement('div');
+      card.className = 'product-card' + (isSelected ? ' selected' : '');
+      card.id = 'card-' + item.id;
+
+      var productTop = document.createElement('div');
+      productTop.className = 'product-top';
+      var nameDiv = document.createElement('div');
+      var nameEl = document.createElement('div');
+      nameEl.className = 'product-name';
+      nameEl.textContent = item.name;
+      var zhEl = document.createElement('div');
+      zhEl.className = 'product-name-zh';
+      zhEl.textContent = item.zh;
+      nameDiv.appendChild(nameEl);
+      nameDiv.appendChild(zhEl);
+      var priceEl = document.createElement('div');
+      priceEl.className = 'product-price';
+      priceEl.textContent = priceStr;
+      productTop.appendChild(nameDiv);
+      productTop.appendChild(priceEl);
+      productTop.addEventListener('click', (function(id) {
+        return function() { toggleProduct(id); };
+      })(item.id));
+
+      var sizeDiv = document.createElement('div');
+      sizeDiv.className = 'size-options';
+      var sizeSpan = document.createElement('span');
+      sizeSpan.style.cssText = 'font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--warm-gray);margin-right:4px;';
+      sizeSpan.textContent = t.sizeLabel;
+      sizeDiv.appendChild(sizeSpan);
+      item.sizes.forEach(function(s) {
+        var btn = document.createElement('button');
+        btn.className = 'size-btn' + (s === selectedSize ? ' active' : '');
+        btn.textContent = s;
+        btn.addEventListener('click', (function(id, size) {
+          return function(e) { e.stopPropagation(); selectSize(id, size); };
+        })(item.id, s));
+        sizeDiv.appendChild(btn);
+      });
+
+      var qtyDiv = document.createElement('div');
+      qtyDiv.className = 'qty-controls';
+      var minusBtn = document.createElement('button');
+      minusBtn.className = 'qty-btn';
+      minusBtn.textContent = '-';
+      minusBtn.addEventListener('click', (function(id) {
+        return function(e) { e.stopPropagation(); changeQty(id, -1); };
+      })(item.id));
+      var qtyDisplay = document.createElement('span');
+      qtyDisplay.className = 'qty-display';
+      qtyDisplay.id = 'qty-display-' + item.id;
+      qtyDisplay.textContent = qty;
+      var plusBtn = document.createElement('button');
+      plusBtn.className = 'qty-btn';
+      plusBtn.textContent = '+';
+      plusBtn.addEventListener('click', (function(id) {
+        return function(e) { e.stopPropagation(); changeQty(id, 1); };
+      })(item.id));
+      var qtyLabel = document.createElement('span');
+      qtyLabel.className = 'qty-label';
+      qtyLabel.textContent = t.qtyLabel;
+      qtyDiv.appendChild(minusBtn);
+      qtyDiv.appendChild(qtyDisplay);
+      qtyDiv.appendChild(plusBtn);
+      qtyDiv.appendChild(qtyLabel);
+
+      card.appendChild(productTop);
+      card.appendChild(sizeDiv);
+      card.appendChild(qtyDiv);
+
+      // Base selector for milk and fruittea
+      if (isSelected && item.base && item.base !== 'slush') {
+        var baseDiv = document.createElement('div');
+        baseDiv.style.cssText = 'margin-top:12px;padding-top:12px;border-top:1px solid rgba(107,143,113,0.15);';
+        var baseLbl = document.createElement('div');
+        baseLbl.style.cssText = 'font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--warm-gray);margin-bottom:8px;';
+        baseLbl.textContent = t.baseLabel;
+        baseDiv.appendChild(baseLbl);
+        var baseGroup = document.createElement('div');
+        baseGroup.style.cssText = 'display:flex;gap:7px;flex-wrap:wrap;';
+
+        var baseOpts = [];
+        if (item.base === 'milk') {
+          baseOpts = [{val:'pearl', label:t.basePearl}, {val:'coconut', label:t.baseCoconut}];
+        } else if (item.base === 'fruittea') {
+          baseOpts = [{val:'boba', label:t.baseBoba}, {val:'coconut', label:t.baseCoconutAlt}];
+        }
+
+        baseOpts.forEach(function(opt) {
+          var btn = document.createElement('button');
+          btn.className = 'size-btn' + (selectedBases[item.id] === opt.val ? ' active' : '');
+          btn.textContent = opt.label;
+          btn.addEventListener('click', (function(iid, val) {
+            return function(e) { e.stopPropagation(); selectedBases[iid] = val; renderProducts(); renderSummary(); };
+          })(item.id, opt.val));
+          baseGroup.appendChild(btn);
+        });
+
+        baseDiv.appendChild(baseGroup);
+        card.appendChild(baseDiv);
+      }
+
+      secDiv.appendChild(card);
+    });
+
+    container.appendChild(secDiv);
+  });
+}
+
+function isSlushOnly() {
+  var keys = Object.keys(cart);
+  if (keys.length === 0) return false;
+  return keys.every(function(id) { return id.indexOf('sl-') === 0; });
+}
+
+function updateCustomizeVisibility() {
+  var section = document.getElementById('customize-section');
+  var titleEl = document.getElementById('custom-title');
+  if (isSlushOnly()) {
+    section.style.opacity = '0.35';
+    section.style.pointerEvents = 'none';
+    titleEl.textContent = i18n[currentLang].customTitleSlush;
+  } else {
+    section.style.opacity = '1';
+    section.style.pointerEvents = '';
+    titleEl.textContent = i18n[currentLang].customTitle;
+  }
+}
+
+function toggleProduct(id) {
+  if (cart[id]) {
+    delete cart[id];
+    delete selectedBases[id];
+  } else {
+    var item = findItem(id);
+    cart[id] = { name: item.name, zh: item.zh, size: item.sizes[0], qty: 1, prices: item.prices, base: item.base, bobaFl: item.bobaFl || null };
+    if (item.base === 'milk') selectedBases[id] = 'pearl';
+    if (item.base === 'fruittea') selectedBases[id] = 'boba';
+  }
+  renderProducts();
+  renderSummary();
+  updateCustomizeVisibility();
+}
+
+function selectSize(id, size) {
+  if (!cart[id]) return;
+  cart[id].size = size;
+  renderProducts();
+  renderSummary();
+}
+
+function changeQty(id, delta) {
+  if (!cart[id]) return;
+  cart[id].qty = Math.max(1, cart[id].qty + delta);
+  var el = document.getElementById('qty-display-' + id);
+  if (el) el.textContent = cart[id].qty;
+  renderSummary();
+}
+
+function findItem(id) {
+  var data = products[currentLang];
+  for (var i = 0; i < data.length; i++) {
+    for (var j = 0; j < data[i].items.length; j++) {
+      if (data[i].items[j].id === id) return data[i].items[j];
+    }
+  }
+  return null;
+}
+
+function selectOpt(type, val, group) {
+  group.querySelectorAll('.opt-btn').forEach(function(b) { b.classList.remove('active'); });
+  group.querySelectorAll('.opt-btn').forEach(function(b) {
+    if (b.textContent === val) b.classList.add('active');
+  });
+  if (type === 'sweetness') sweetness = val;
+  if (type === 'ice') ice = val;
+}
+
+function renderSummary() {
+  var t = i18n[currentLang];
+  var content = document.getElementById('summary-content');
+  var totalEl = document.getElementById('summary-total');
+  var totalAmt = document.getElementById('total-amount');
+  var submitBtn = document.getElementById('submit-btn');
+  var cartKeys = Object.keys(cart);
+  var toppingKeys = Object.keys(selectedToppings);
+
+  if (cartKeys.length === 0 && toppingKeys.length === 0) {
+    content.innerHTML = '';
+    var emptyEl = document.createElement('div');
+    emptyEl.className = 'summary-empty';
+    emptyEl.textContent = t.summaryEmpty;
+    content.appendChild(emptyEl);
+    totalEl.style.display = 'none';
+    submitBtn.disabled = true;
+    return;
+  }
+
+  content.innerHTML = '';
+  var total = 0;
+
+  cartKeys.forEach(function(id) {
+    var c = cart[id];
+    var price = c.prices[c.size] * c.qty;
+    total += price;
+    var row = document.createElement('div');
+    row.className = 'summary-item';
+    var nameSpan = document.createElement('span');
+    nameSpan.className = 'summary-item-name';
+    nameSpan.textContent = c.name + ' \u00b7 ' + c.size + (c.qty > 1 ? ' x' + c.qty : '');
+    var priceSpan = document.createElement('span');
+    priceSpan.className = 'summary-item-price';
+    priceSpan.textContent = price.toLocaleString() + ' Ft';
+    row.appendChild(nameSpan);
+    row.appendChild(priceSpan);
+    content.appendChild(row);
+  });
+
+  toppingKeys.forEach(function(id) {
+    var tp = selectedToppings[id];
+    total += tp.price;
+    var row = document.createElement('div');
+    row.className = 'summary-item';
+    var nameSpan = document.createElement('span');
+    nameSpan.className = 'summary-item-name';
+    var displayName = '+ ' + tp.name;
+    if (id === 'tp-boba' && selectedBobaFlavour) {
+      var fl = bobaFlavours[currentLang].find(function(f) { return f.id === selectedBobaFlavour; });
+      if (fl) displayName += ' (' + fl.name + ')';
+    }
+    nameSpan.textContent = displayName;
+    var priceSpan = document.createElement('span');
+    priceSpan.className = 'summary-item-price';
+    priceSpan.textContent = '+' + tp.price + ' Ft';
+    row.appendChild(nameSpan);
+    row.appendChild(priceSpan);
+    content.appendChild(row);
+  });
+
+  totalEl.style.display = 'flex';
+  totalAmt.textContent = total.toLocaleString() + ' Ft';
+  submitBtn.disabled = cartKeys.length === 0;
+}
+
+function generateOrderNum() {
+  return Math.floor(1000 + Math.random() * 9000).toString();
+}
+
+async function submitOrder() {
+  var t = i18n[currentLang];
+  var btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  document.getElementById('submit-text').textContent = '...';
+
+  var orderNum = generateOrderNum();
+  var timestamp = new Date().toLocaleString('hu-HU', { timeZone: 'Europe/Budapest' });
+
+  var lines = Object.values(cart).map(function(c) {
+    return c.name + ' (' + c.zh + ') \u00b7 ' + c.size + (c.qty > 1 ? ' x' + c.qty : '') + ' \u00b7 ' + (c.prices[c.size] * c.qty).toLocaleString() + ' Ft';
+  });
+
+  var toppingLines = Object.values(selectedToppings).map(function(tp) {
+    var name = tp.name;
+    if (tp.id === 'tp-boba' && selectedBobaFlavour) {
+      var fl = bobaFlavours[currentLang].find(function(f) { return f.id === selectedBobaFlavour; });
+      if (fl) name += ' (' + fl.name + ')';
+    }
+    return '+ ' + name + ' \u00b7 +' + tp.price + ' Ft';
+  });
+
+  var allLines = lines.concat(toppingLines);
+  var total = Object.values(cart).reduce(function(s, c) { return s + c.prices[c.size] * c.qty; }, 0)
+            + Object.values(selectedToppings).reduce(function(s, tp) { return s + tp.price; }, 0);
+
+  var notes = document.getElementById('notes-input').value.trim();
+
+  var payload = {
+    orderNum: orderNum,
+    timestamp: timestamp,
+    items: allLines.join('\n'),
+    sweetness: sweetness,
+    ice: ice,
+    notes: notes,
+    total: total.toLocaleString() + ' Ft',
+    lang: currentLang
+  };
+
   try {
-    initAudio();
-    var notes = [523, 659, 784, 1047];
-    notes.forEach(function(freq, i) {
-      var osc = audioCtx.createOscillator();
-      var gain = audioCtx.createGain();
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.frequency.value = freq;
-      osc.type = 'sine';
-      var t = audioCtx.currentTime + i * 0.15;
-      gain.gain.setValueAtTime(0, t);
-      gain.gain.linearRampToValueAtTime(0.3, t + 0.05);
-      gain.gain.linearRampToValueAtTime(0, t + 0.25);
-      osc.start(t);
-      osc.stop(t + 0.3);
+    await fetch(GOOGLE_SCRIPT_URL, {
+      method: 'POST', mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
     });
   } catch(e) {}
+
+  document.getElementById('order-form').style.display = 'none';
+  var s = document.getElementById('success-screen');
+  s.classList.add('show');
+  document.getElementById('success-title').textContent = t.successTitle;
+  document.getElementById('success-desc').textContent = t.successDesc;
+  document.getElementById('order-number').textContent = '#' + orderNum;
+  document.getElementById('order-num-label').textContent = t.orderNumLabel;
+  document.getElementById('new-order-btn').textContent = t.newOrderBtn;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// ── FETCH ORDERS ─────────────────────────────────────────
-async function fetchOrders() {
-  try {
-    var res = await fetch(GOOGLE_SCRIPT_URL + '?action=get&t=' + Date.now());
-    var data = await res.json();
-    if (data && data.orders) {
-      processNewOrders(data.orders);
-      setOnline(true);
-    }
-  } catch(e) {
-    setOnline(false);
-  }
+function resetOrder() {
+  cart = {};
+  selectedToppings = {};
+  selectedBobaFlavour = null;
+  selectedBases = {};
+  sweetness = i18n[currentLang].defaultSweetness;
+  ice = i18n[currentLang].defaultIce;
+  document.getElementById('notes-input').value = '';
+  document.getElementById('order-form').style.display = 'block';
+  document.getElementById('success-screen').classList.remove('show');
+  renderAll();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function setOnline(on) {
-  isOnline = on;
-  var dot = document.getElementById('status-dot');
-  if (on) dot.classList.remove('offline');
-  else dot.classList.add('offline');
-}
-
-function processNewOrders(orders) {
-  var newOnes = [];
-  orders.forEach(function(o) {
-    if (!seenIds.has(o.id) && o.status === 'Pending') {
-      seenIds.add(o.id);
-      newOnes.push(o);
-      pendingOrders.unshift(o);
-    }
-  });
-  if (newOnes.length > 0) {
-    playAlert();
-    showToast(newOnes.length + ' 新订单');
-    renderPending();
-    updateBadge();
-  }
-}
-
-function showToast(msg) {
-  var t = document.getElementById('toast');
-  if (!t) {
-    t = document.createElement('div');
-    t.id = 'toast';
-    t.style.cssText = 'position:fixed;top:72px;left:50%;transform:translateX(-50%);background:var(--green-dark);color:var(--cream);padding:10px 24px;border-radius:20px;font-size:14px;z-index:300;transition:opacity 0.4s;letter-spacing:0.05em;';
-    document.body.appendChild(t);
-  }
-  t.textContent = msg;
-  t.style.opacity = '1';
-  clearTimeout(t._timer);
-  t._timer = setTimeout(function() { t.style.opacity = '0'; }, 2500);
-}
-
-// ── CONFIRM / CANCEL ─────────────────────────────────────
-function confirmOrder(id) {
-  var o = pendingOrders.find(function(x) { return x.id === id; });
-  if (!o) return;
-  o.status = 'Confirmed';
-  historyOrders.unshift(o);
-  pendingOrders = pendingOrders.filter(function(x) { return x.id !== id; });
-  updateSheetStatus(o.rowIndex, 'Confirmed');
-  renderPending();
-  renderHistory();
-  updateBadge();
-}
-
-function cancelOrder(id) {
-  var o = pendingOrders.find(function(x) { return x.id === id; });
-  if (!o) return;
-  o.status = 'Cancelled';
-  historyOrders.unshift(o);
-  pendingOrders = pendingOrders.filter(function(x) { return x.id !== id; });
-  updateSheetStatus(o.rowIndex, 'Cancelled');
-  renderPending();
-  renderHistory();
-  updateBadge();
-}
-
-async function updateSheetStatus(rowIndex, status) {
-  try {
-    await fetch(GOOGLE_SCRIPT_URL + '?action=update&row=' + rowIndex + '&status=' + status + '&t=' + Date.now());
-  } catch(e) {}
-}
-
-// ── RENDER ───────────────────────────────────────────────
-function renderPending() {
-  var el = document.getElementById('pending-list');
-  if (pendingOrders.length === 0) {
-    el.innerHTML = '<div class="empty-state"><div class="empty-icon">&#9749;</div><div class="empty-text">暂无新订单</div></div>';
-    return;
-  }
-  el.innerHTML = '';
-  pendingOrders.forEach(function(o) {
-    el.appendChild(makeCard(o, true));
-  });
-}
-
-function renderHistory() {
-  var el = document.getElementById('history-list');
-  if (historyOrders.length === 0) {
-    el.innerHTML = '<div class="empty-state"><div class="empty-icon">&#128203;</div><div class="empty-text">暂无记录</div></div>';
-    return;
-  }
-  el.innerHTML = '';
-  historyOrders.forEach(function(o) {
-    el.appendChild(makeCard(o, false));
-  });
-}
-
-function formatSweetness(val) {
-  var n = parseFloat(val);
-  if (!isNaN(n) && n <= 1) return Math.round(n * 100) + '%';
-  return val;
-}
-
-function makeCard(o, isPending) {
-  var card = document.createElement('div');
-  card.className = 'order-card' + (isPending ? ' new' : (o.status === 'Cancelled' ? ' cancelled' : ' done'));
-
-  var itemLines = (o.items || '').split('\n').filter(function(l) { return l.trim(); });
-  var itemsHtml = itemLines.map(function(l) { return '<div class="item-row">' + l + '</div>'; }).join('');
-
-  var notesHtml = (o.notes && o.notes.trim()) ? '<div class="notes-row">备注：' + o.notes + '</div>' : '';
-  var statusLabel = isPending ? '<span class="new-tag">待处理</span>' : (o.status === 'Cancelled' ? '<span class="new-tag" style="color:#999">已取消</span>' : '<span class="new-tag" style="color:var(--green-mid)">已确认</span>');
-
-  var btnsHtml = isPending ? '<div class="btn-row"><button class="btn-confirm" onclick="confirmFromCard(\'' + o.id + '\')">&#10003; 确认接单</button><button class="btn-cancel" onclick="cancelFromCard(\'' + o.id + '\')">取消</button></div>' : '';
-
-  card.innerHTML =
-    '<div class="card-header">' +
-      '<div><div class="order-num">#' + o.orderNum + '</div><div class="order-time">' + o.time + '</div>' + statusLabel + '</div>' +
-      '<div class="order-total">' + o.total + '</div>' +
-    '</div>' +
-    '<div class="items-block">' + itemsHtml + '</div>' +
-    '<div class="custom-row">' +
-      (o.sweetness ? '<span class="custom-chip">&#127852; ' + formatSweetness(o.sweetness) + '</span>' : '') +
-      (o.ice ? '<span class="custom-chip">&#10052; ' + o.ice + '</span>' : '') +
-    '</div>' +
-    notesHtml +
-    btnsHtml;
-
-  return card;
-}
-
-function confirmFromCard(id) { confirmOrder(id); }
-function cancelFromCard(id) { cancelOrder(id); }
-
-function updateBadge() {
-  var badge = document.getElementById('pending-badge');
-  if (pendingOrders.length > 0) {
-    badge.textContent = pendingOrders.length + ' 待处理';
-    badge.classList.add('show');
-  } else {
-    badge.classList.remove('show');
-  }
-}
-
-function showView(v) {
-  document.getElementById('nav-pending').classList.toggle('active', v === 'pending');
-  document.getElementById('nav-history').classList.toggle('active', v === 'history');
-  if (v === 'history') document.body.classList.add('show-history');
-  else document.body.classList.remove('show-history');
-}
-
-// Touch to init audio
-document.addEventListener('touchstart', initAudio, { once: true });
-document.addEventListener('click', initAudio, { once: true });
-
-// Start polling
-fetchOrders();
-setInterval(fetchOrders, POLL_INTERVAL);
+renderAll();
 </script>
 
 </body>
