@@ -523,27 +523,6 @@ body.show-history .view-history { display: block; }
   <button class="nav-btn" id="nav-history" onclick="showView('history')">&#128203; 历史记录</button>
 </div>
 
-<!-- ALERT OVERLAY -->
-
-<div class="alert-overlay" id="alert-overlay">
-  <div class="alert-card">
-    <div class="alert-header">
-      <div class="alert-title">新订单</div>
-      <div class="alert-num" id="alert-num"></div>
-    </div>
-    <div class="alert-body">
-      <div class="alert-items" id="alert-items"></div>
-      <div class="alert-chips" id="alert-chips"></div>
-      <div class="alert-notes" id="alert-notes" style="display:none"></div>
-      <div class="alert-total" id="alert-total"></div>
-      <div class="alert-btns">
-        <button class="alert-confirm" onclick="confirmOrder()">&#10003; 确认接单</button>
-        <button class="alert-cancel" onclick="cancelOrder()">取消</button>
-      </div>
-    </div>
-  </div>
-</div>
-
 <script>
 // ── CONFIG ──────────────────────────────────────────────
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwk_JEpLKyaiOUbfs3SxvxiTfjyu779JSrQmBKP_-HomiSwjlPaOxMFFYppccZ5UWHl/exec';
@@ -616,65 +595,46 @@ function processNewOrders(orders) {
   });
   if (newOnes.length > 0) {
     playAlert();
-    showAlertFor(newOnes[0]);
+    showToast(newOnes.length + ' 新订单');
     renderPending();
     updateBadge();
   }
 }
 
-// ── ALERT ────────────────────────────────────────────────
-function showAlertFor(order) {
-  currentAlert = order;
-  document.getElementById('alert-num').textContent = '#' + order.orderNum;
-  
-  var itemsEl = document.getElementById('alert-items');
-  itemsEl.innerHTML = '';
-  (order.items || '').split('\n').forEach(function(line) {
-    if (line.trim()) {
-      var d = document.createElement('div');
-      d.textContent = line.trim();
-      itemsEl.appendChild(d);
-    }
-  });
-
-  var chips = document.getElementById('alert-chips');
-  chips.innerHTML = '';
-  if (order.sweetness) chips.innerHTML += '<span class="alert-chip">&#127852; ' + order.sweetness + '</span>';
-  if (order.ice) chips.innerHTML += '<span class="alert-chip">&#10052; ' + order.ice + '</span>';
-
-  var notesEl = document.getElementById('alert-notes');
-  if (order.notes && order.notes.trim()) {
-    notesEl.textContent = '备注：' + order.notes;
-    notesEl.style.display = 'block';
-  } else {
-    notesEl.style.display = 'none';
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'toast';
+    t.style.cssText = 'position:fixed;top:72px;left:50%;transform:translateX(-50%);background:var(--green-dark);color:var(--cream);padding:10px 24px;border-radius:20px;font-size:14px;z-index:300;transition:opacity 0.4s;letter-spacing:0.05em;';
+    document.body.appendChild(t);
   }
-
-  document.getElementById('alert-total').textContent = '合计 ' + order.total;
-  document.getElementById('alert-overlay').classList.add('show');
+  t.textContent = msg;
+  t.style.opacity = '1';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(function() { t.style.opacity = '0'; }, 2500);
 }
 
-function confirmOrder() {
-  if (!currentAlert) return;
-  currentAlert.status = 'Confirmed';
-  historyOrders.unshift(currentAlert);
-  pendingOrders = pendingOrders.filter(function(o) { return o.id !== currentAlert.id; });
-  updateSheetStatus(currentAlert.rowIndex, 'Confirmed');
-  document.getElementById('alert-overlay').classList.remove('show');
-  currentAlert = null;
+// ── CONFIRM / CANCEL ─────────────────────────────────────
+function confirmOrder(id) {
+  var o = pendingOrders.find(function(x) { return x.id === id; });
+  if (!o) return;
+  o.status = 'Confirmed';
+  historyOrders.unshift(o);
+  pendingOrders = pendingOrders.filter(function(x) { return x.id !== id; });
+  updateSheetStatus(o.rowIndex, 'Confirmed');
   renderPending();
   renderHistory();
   updateBadge();
 }
 
-function cancelOrder() {
-  if (!currentAlert) return;
-  currentAlert.status = 'Cancelled';
-  historyOrders.unshift(currentAlert);
-  pendingOrders = pendingOrders.filter(function(o) { return o.id !== currentAlert.id; });
-  updateSheetStatus(currentAlert.rowIndex, 'Cancelled');
-  document.getElementById('alert-overlay').classList.remove('show');
-  currentAlert = null;
+function cancelOrder(id) {
+  var o = pendingOrders.find(function(x) { return x.id === id; });
+  if (!o) return;
+  o.status = 'Cancelled';
+  historyOrders.unshift(o);
+  pendingOrders = pendingOrders.filter(function(x) { return x.id !== id; });
+  updateSheetStatus(o.rowIndex, 'Cancelled');
   renderPending();
   renderHistory();
   updateBadge();
@@ -711,6 +671,12 @@ function renderHistory() {
   });
 }
 
+function formatSweetness(val) {
+  var n = parseFloat(val);
+  if (!isNaN(n) && n <= 1) return Math.round(n * 100) + '%';
+  return val;
+}
+
 function makeCard(o, isPending) {
   var card = document.createElement('div');
   card.className = 'order-card' + (isPending ? ' new' : (o.status === 'Cancelled' ? ' cancelled' : ' done'));
@@ -730,7 +696,7 @@ function makeCard(o, isPending) {
     '</div>' +
     '<div class="items-block">' + itemsHtml + '</div>' +
     '<div class="custom-row">' +
-      (o.sweetness ? '<span class="custom-chip">&#127852; ' + o.sweetness + '</span>' : '') +
+      (o.sweetness ? '<span class="custom-chip">&#127852; ' + formatSweetness(o.sweetness) + '</span>' : '') +
       (o.ice ? '<span class="custom-chip">&#10052; ' + o.ice + '</span>' : '') +
     '</div>' +
     notesHtml +
@@ -739,15 +705,8 @@ function makeCard(o, isPending) {
   return card;
 }
 
-function confirmFromCard(id) {
-  var o = pendingOrders.find(function(x) { return x.id === id; });
-  if (o) { currentAlert = o; confirmOrder(); }
-}
-
-function cancelFromCard(id) {
-  var o = pendingOrders.find(function(x) { return x.id === id; });
-  if (o) { currentAlert = o; cancelOrder(); }
-}
+function confirmFromCard(id) { confirmOrder(id); }
+function cancelFromCard(id) { cancelOrder(id); }
 
 function updateBadge() {
   var badge = document.getElementById('pending-badge');
