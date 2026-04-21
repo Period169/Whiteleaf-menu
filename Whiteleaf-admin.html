@@ -564,17 +564,47 @@ function playAlert() {
 }
 
 // ── FETCH ORDERS ─────────────────────────────────────────
+var isFirstLoad = true;
+
 async function fetchOrders() {
   try {
     var res = await fetch(GOOGLE_SCRIPT_URL + '?action=get&t=' + Date.now());
     var data = await res.json();
     if (data && data.orders) {
-      processNewOrders(data.orders);
+      if (isFirstLoad) {
+        loadAllOrders(data.orders);
+        isFirstLoad = false;
+      } else {
+        processNewOrders(data.orders);
+      }
       setOnline(true);
     }
   } catch(e) {
     setOnline(false);
   }
+}
+
+function loadAllOrders(orders) {
+  // On first load, populate both pending and history from sheet
+  pendingOrders = [];
+  historyOrders = [];
+  seenIds = new Set();
+
+  // Sort by rowIndex ascending so oldest first, then we unshift for display
+  var sorted = orders.slice().sort(function(a, b) { return a.rowIndex - b.rowIndex; });
+
+  sorted.forEach(function(o) {
+    seenIds.add(o.id);
+    if (o.status === 'Pending') {
+      pendingOrders.unshift(o);
+    } else {
+      historyOrders.unshift(o);
+    }
+  });
+
+  renderPending();
+  renderHistory();
+  updateBadge();
 }
 
 function setOnline(on) {
@@ -595,7 +625,7 @@ function processNewOrders(orders) {
   });
   if (newOnes.length > 0) {
     playAlert();
-    showToast(newOnes.length + ' 新订单');
+    showToast(newOnes.length + ' \u65b0\u8ba2\u5355');
     renderPending();
     updateBadge();
   }
@@ -666,8 +696,34 @@ function renderHistory() {
     return;
   }
   el.innerHTML = '';
+
+  // Group by date
+  var groups = {};
+  var groupOrder = [];
   historyOrders.forEach(function(o) {
-    el.appendChild(makeCard(o, false));
+    // Time format: "2026. 04. 20. 16:07:54" → extract "2026. 04. 20."
+    var dateStr = '未知日期';
+    if (o.time) {
+      var m = o.time.match(/(\d{4}\.\s*\d{2}\.\s*\d{2}\.)/);
+      dateStr = m ? m[1].trim() : o.time.substring(0, 12).trim();
+    }
+    if (!groups[dateStr]) {
+      groups[dateStr] = [];
+      groupOrder.push(dateStr);
+    }
+    groups[dateStr].push(o);
+  });
+
+  groupOrder.forEach(function(dateStr) {
+    // Date header
+    var header = document.createElement('div');
+    header.style.cssText = 'font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:var(--warm-gray);margin:20px 0 10px 4px;';
+    header.textContent = dateStr;
+    el.appendChild(header);
+
+    groups[dateStr].forEach(function(o) {
+      el.appendChild(makeCard(o, false));
+    });
   });
 }
 
