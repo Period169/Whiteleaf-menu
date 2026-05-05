@@ -38,7 +38,6 @@ pointer-events: none;
 z-index: 0;
 }
 
-/* Language toggle */
 .lang-bar {
 position: sticky;
 top: 0;
@@ -77,7 +76,6 @@ border-color: var(–green-mid);
 color: var(–green-dark);
 }
 
-/* Content */
 .page {
 max-width: 680px;
 margin: 0 auto;
@@ -86,19 +84,24 @@ position: relative;
 z-index: 1;
 }
 
-/* Language content visibility */
 .lang-content { display: none; }
-.lang-content.active { display: block; }
+.lang-content.active { display: block; animation: fadeIn 0.3s ease both; }
 
-/* Header */
 .header {
 text-align: center;
 margin-bottom: 48px;
-animation: fadeDown 0.7s ease both;
 }
 
-.logo-mark { display: flex; justify-content: center; margin-bottom: 18px; }
-.logo-svg { width: 60px; height: 60px; opacity: 0.9; }
+.logo-wrap {
+display: flex;
+justify-content: center;
+margin-bottom: 18px;
+cursor: pointer;
+user-select: none;
+}
+
+.logo-svg { width: 60px; height: 60px; opacity: 0.9; transition: opacity 0.2s; }
+.logo-wrap:active .logo-svg { opacity: 0.6; }
 
 .brand-name {
 font-family: ‘Cormorant Garamond’, serif;
@@ -126,9 +129,7 @@ justify-content: center;
 }
 .header-divider::before,
 .header-divider::after {
-content: ‘’;
-width: 55px;
-height: 1px;
+content: ‘’; width: 55px; height: 1px;
 background: var(–green-light);
 }
 .header-divider span {
@@ -138,95 +139,58 @@ text-transform: uppercase;
 color: var(–green-mid);
 }
 
-/* Pricing bar */
-.pricing-bar {
-display: flex;
-justify-content: center;
-gap: 28px;
-background: rgba(45,74,62,0.05);
-border: 1px solid rgba(107,143,113,0.2);
-border-radius: 8px;
-padding: 14px 24px;
-margin-bottom: 44px;
-}
-
-.pricing-item { text-align: center; }
-.pricing-label {
-font-size: 8.5px;
-letter-spacing: 0.25em;
-text-transform: uppercase;
-color: var(–warm-gray);
-margin-bottom: 3px;
-}
-.pricing-value {
-font-family: ‘Cormorant Garamond’, serif;
-font-size: 17px;
-color: var(–green-dark);
-}
-.pricing-ml { font-size: 8.5px; color: var(–warm-gray); margin-top: 1px; }
-.pricing-divider {
-width: 1px;
-background: rgba(107,143,113,0.25);
-align-self: stretch;
-}
-
 /* Section */
-.section { margin-bottom: 40px; }
+.section { margin-bottom: 44px; }
 
 .section-header {
-display: flex;
-align-items: center;
-gap: 12px;
-margin-bottom: 5px;
+display: flex; align-items: center; gap: 12px; margin-bottom: 5px;
 }
 .section-dot {
-width: 7px; height: 7px;
-border-radius: 50%;
-background: var(–green-dark);
-flex-shrink: 0;
+width: 7px; height: 7px; border-radius: 50%;
+background: var(–green-dark); flex-shrink: 0;
 }
 .section-title {
 font-family: ‘Cormorant Garamond’, serif;
-font-size: 21px;
-font-weight: 400;
-letter-spacing: 0.06em;
-color: var(–green-dark);
+font-size: 21px; font-weight: 400;
+letter-spacing: 0.06em; color: var(–green-dark);
 }
 .section-line {
 flex: 1; height: 1px;
 background: linear-gradient(to right, var(–green-light), transparent);
 }
+
 .section-desc {
-font-size: 11px;
-color: var(–warm-gray);
-letter-spacing: 0.04em;
-margin-bottom: 16px;
-padding-left: 19px;
-font-style: italic;
+font-size: 11px; color: var(–warm-gray);
+margin-bottom: 10px; padding-left: 19px; font-style: italic;
 }
 
-/* Fruit milk price badges */
-.fmp-badges {
+/* Per-section price badges */
+.section-prices {
 display: flex;
-gap: 7px;
-margin-bottom: 14px;
+gap: 8px;
+margin-bottom: 16px;
 padding-left: 19px;
+flex-wrap: wrap;
+align-items: center;
 }
-.fmp-box {
+
+.price-badge {
 border: 1px solid rgba(107,143,113,0.3);
 border-radius: 4px;
 padding: 3px 10px;
 text-align: center;
 }
-.fmp-label {
+
+.price-badge-label {
 font-size: 7.5px;
 letter-spacing: 0.12em;
 text-transform: uppercase;
 color: var(–warm-gray);
 }
-.fmp-value {
+
+.price-badge-value {
 font-family: ‘Cormorant Garamond’, serif;
-font-size: 13px;
+font-size: 14px;
 color: var(–green-dark);
 }
 
@@ -247,37 +211,16 @@ border-radius: 4px;
 
 .item-name {
 font-family: ‘Cormorant Garamond’, serif;
-font-size: 17px;
-font-weight: 400;
-color: var(–charcoal);
-letter-spacing: 0.02em;
+font-size: 17px; font-weight: 400;
+color: var(–charcoal); letter-spacing: 0.02em;
 }
-.item-name-zh {
-font-size: 10.5px;
-color: var(–green-mid);
-margin-top: 1px;
-letter-spacing: 0.05em;
-}
-.item-desc {
-font-size: 11px;
-color: var(–warm-gray);
-margin-top: 4px;
-line-height: 1.5;
-max-width: 420px;
-}
-.item-tags {
-display: flex;
-gap: 5px;
-margin-top: 6px;
-flex-wrap: wrap;
-}
+.item-name-zh { font-size: 10.5px; color: var(–green-mid); margin-top: 1px; }
+.item-desc { font-size: 11px; color: var(–warm-gray); margin-top: 4px; line-height: 1.5; max-width: 420px; }
+.item-tags { display: flex; gap: 5px; margin-top: 6px; flex-wrap: wrap; }
+
 .tag {
-font-size: 9px;
-letter-spacing: 0.12em;
-text-transform: uppercase;
-padding: 2px 7px;
-border-radius: 20px;
-border: 1px solid;
+font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase;
+padding: 2px 7px; border-radius: 20px; border: 1px solid;
 }
 .tag-star  { border-color: var(–accent);      color: var(–accent); }
 .tag-new   { border-color: var(–green-mid);   color: var(–green-mid); }
@@ -285,97 +228,64 @@ border: 1px solid;
 .tag-bold  { border-color: var(–green-dark);   color: var(–green-dark); }
 .tag-fruit { border-color: #b5836a;             color: #b5836a; }
 
-/* Customise box */
 .customize-box {
 background: rgba(45,74,62,0.04);
 border: 1px solid rgba(107,143,113,0.2);
-border-radius: 8px;
-padding: 18px 22px;
-margin: 32px 0;
+border-radius: 8px; padding: 18px 22px; margin: 32px 0;
 }
 .customize-title {
 font-family: ‘Cormorant Garamond’, serif;
-font-size: 15px;
-color: var(–green-dark);
-letter-spacing: 0.06em;
-margin-bottom: 10px;
+font-size: 15px; color: var(–green-dark);
+letter-spacing: 0.06em; margin-bottom: 10px;
 }
 .customize-row {
-display: flex;
-justify-content: space-between;
-font-size: 11.5px;
-color: var(–warm-gray);
-margin-bottom: 6px;
-gap: 16px;
+display: flex; justify-content: space-between;
+font-size: 11.5px; color: var(–warm-gray);
+margin-bottom: 6px; gap: 16px;
 }
 .customize-options { color: var(–charcoal); text-align: right; }
 
-/* Loyalty */
 .loyalty {
-text-align: center;
-padding: 24px;
+text-align: center; padding: 24px;
 border: 1px solid var(–green-light);
-border-radius: 10px;
-margin: 32px 0;
+border-radius: 10px; margin: 32px 0;
 }
 .loyalty-title {
 font-family: ‘Cormorant Garamond’, serif;
-font-size: 17px;
-color: var(–green-dark);
-letter-spacing: 0.08em;
-margin-bottom: 8px;
+font-size: 17px; color: var(–green-dark);
+letter-spacing: 0.08em; margin-bottom: 8px;
 }
-.loyalty-desc {
-font-size: 11.5px;
-color: var(–warm-gray);
-line-height: 1.8;
-}
+.loyalty-desc { font-size: 11.5px; color: var(–warm-gray); line-height: 1.8; }
 .loyalty-highlight { color: var(–green-dark); }
 
-/* Footer */
 .footer {
-text-align: center;
-margin-top: 50px;
+text-align: center; margin-top: 50px;
 padding-top: 24px;
 border-top: 1px solid rgba(107,143,113,0.2);
 }
 .footer-location {
-font-size: 10px;
-color: var(–warm-gray);
-letter-spacing: 0.2em;
-text-transform: uppercase;
+font-size: 10px; color: var(–warm-gray);
+letter-spacing: 0.2em; text-transform: uppercase;
 }
 .footer-tagline {
 font-family: ‘Cormorant Garamond’, serif;
-font-size: 14px;
-font-style: italic;
-color: var(–green-mid);
-margin-top: 7px;
+font-size: 14px; font-style: italic;
+color: var(–green-mid); margin-top: 7px;
 }
 
-@keyframes fadeDown {
-from { opacity: 0; transform: translateY(-16px); }
-to   { opacity: 1; transform: translateY(0); }
-}
 @keyframes fadeIn {
 from { opacity: 0; transform: translateY(8px); }
 to   { opacity: 1; transform: translateY(0); }
-}
-.lang-content.active {
-animation: fadeIn 0.3s ease both;
 }
 
 @media (max-width: 500px) {
 .page { padding: 36px 20px 60px; }
 .brand-name { font-size: 34px; }
-.pricing-bar { gap: 16px; padding: 12px 16px; }
 }
 </style>
 
 </head>
 <body>
-
-<!-- Language Toggle -->
 
 <div class="lang-bar">
   <button class="lang-btn active" onclick="setLang('en')">English</button>
@@ -390,7 +300,7 @@ animation: fadeIn 0.3s ease both;
 
 ```
 <div class="header">
-  <div class="logo-mark">
+  <div class="logo-wrap" onclick="logoTap()">
     <svg class="logo-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
       <ellipse cx="50" cy="24" rx="9" ry="20" fill="#6b8f71"/>
       <line x1="50" y1="4" x2="50" y2="44" stroke="#f5f2ec" stroke-width="1.2"/>
@@ -408,53 +318,58 @@ animation: fadeIn 0.3s ease both;
   <div class="header-divider"><span>Menu</span></div>
 </div>
 
-<div class="pricing-bar">
-  <div class="pricing-item">
-    <div class="pricing-label">Small</div>
-    <div class="pricing-value">2 199 Ft</div>
-    <div class="pricing-ml">500 ml</div>
-  </div>
-  <div class="pricing-divider"></div>
-  <div class="pricing-item">
-    <div class="pricing-label">Large</div>
-    <div class="pricing-value">2 499 Ft</div>
-    <div class="pricing-ml">700 ml</div>
-  </div>
-  <div class="pricing-divider"></div>
-  <div class="pricing-item">
-    <div class="pricing-label">Slush</div>
-    <div class="pricing-value">2 599 Ft</div>
-    <div class="pricing-ml">Large only</div>
-  </div>
-</div>
-
-<!-- Pearl Milk Tea -->
+<!-- Classic Boba Milk Tea -->
 <div class="section">
   <div class="section-header">
     <div class="section-dot"></div>
-    <div class="section-title">Pearl Milk Tea</div>
+    <div class="section-title">Classic Boba Milk Tea</div>
     <div class="section-line"></div>
   </div>
-  <div class="section-desc">Served with black sugar pearls · Small or Large</div>
-
-  <div class="item">
-    <div class="item-name">Brown Sugar Pearl Milk Tea — Green Tea</div>
-    <div class="item-name-zh">黑糖珍珠奶茶 · 绿茶</div>
-    <div class="item-desc">Chewy black sugar pearls with fresh milk and delicate jasmine green tea. Light, floral and smooth.</div>
-    <div class="item-tags">
-      <span class="tag tag-star">★ Signature</span>
-      <span class="tag tag-mild">Mild</span>
+  <div class="section-desc">First two served with brown sugar pearls · Last three are pure milk tea — no pearls</div>
+  <div class="section-prices">
+    <div class="price-badge">
+      <div class="price-badge-label">Small · 500 ml</div>
+      <div class="price-badge-value">2 190 Ft</div>
+    </div>
+    <div class="price-badge">
+      <div class="price-badge-label">Large · 700 ml</div>
+      <div class="price-badge-value">2 490 Ft</div>
     </div>
   </div>
 
   <div class="item">
-    <div class="item-name">Brown Sugar Pearl Milk Tea — Black Tea</div>
+    <div class="item-name">Brown Sugar Boba Milk Tea · Black Tea</div>
     <div class="item-name-zh">黑糖珍珠奶茶 · 红茶</div>
-    <div class="item-desc">Chewy black sugar pearls with fresh milk and bold Assam black tea. Rich, creamy and satisfying.</div>
-    <div class="item-tags">
-      <span class="tag tag-bold">Rich</span>
-      <span class="tag tag-new">Popular</span>
-    </div>
+    <div class="item-desc">Chewy brown sugar pearls with fresh milk and bold Assam black tea.</div>
+    <div class="item-tags"><span class="tag tag-star">★ Signature</span><span class="tag tag-bold">Rich</span></div>
+  </div>
+
+  <div class="item">
+    <div class="item-name">Brown Sugar Boba Milk Tea · Green Tea</div>
+    <div class="item-name-zh">黑糖珍珠奶茶 · 绿茶</div>
+    <div class="item-desc">Chewy brown sugar pearls with fresh milk and delicate jasmine green tea.</div>
+    <div class="item-tags"><span class="tag tag-star">★ Signature</span><span class="tag tag-mild">Mild</span></div>
+  </div>
+
+  <div class="item">
+    <div class="item-name">Classic Black Milk Tea</div>
+    <div class="item-name-zh">经典红茶奶茶</div>
+    <div class="item-desc">Smooth Assam black tea with fresh milk. Pure — no pearls.</div>
+    <div class="item-tags"><span class="tag tag-bold">Rich</span></div>
+  </div>
+
+  <div class="item">
+    <div class="item-name">Jasmine Green Milk Tea</div>
+    <div class="item-name-zh">茉莉奶绿</div>
+    <div class="item-desc">Fragrant jasmine green tea with milk. Light, floral and pure — no pearls.</div>
+    <div class="item-tags"><span class="tag tag-mild">Mild</span><span class="tag tag-new">Popular</span></div>
+  </div>
+
+  <div class="item">
+    <div class="item-name">Oolong Milk Tea</div>
+    <div class="item-name-zh">乌龙奶茶</div>
+    <div class="item-desc">Smooth oolong with milk. Naturally sweet and aromatic — no pearls.</div>
+    <div class="item-tags"><span class="tag tag-new">Try it</span></div>
   </div>
 </div>
 
@@ -465,47 +380,57 @@ animation: fadeIn 0.3s ease both;
     <div class="section-title">Fruit Tea</div>
     <div class="section-line"></div>
   </div>
-  <div class="section-desc">Jasmine green tea with real fruit jam · Served with popping boba · Small or Large</div>
+  <div class="section-desc">Jasmine green tea with fruit jam · Served with popping boba</div>
+  <div class="section-prices">
+    <div class="price-badge">
+      <div class="price-badge-label">Small · 500 ml</div>
+      <div class="price-badge-value">2 190 Ft</div>
+    </div>
+    <div class="price-badge">
+      <div class="price-badge-label">Large · 700 ml</div>
+      <div class="price-badge-value">2 490 Ft</div>
+    </div>
+  </div>
 
   <div class="item">
     <div class="item-name">Strawberry Fruit Tea</div>
     <div class="item-name-zh">草莓果茶</div>
-    <div class="item-desc">Sweet strawberry jam with jasmine green tea and strawberry popping boba. Fruity and refreshing.</div>
+    <div class="item-desc">Sweet strawberry jam with jasmine green tea and strawberry popping boba.</div>
     <div class="item-tags"><span class="tag tag-star">★ Bestseller</span><span class="tag tag-fruit">Strawberry Boba</span></div>
   </div>
 
   <div class="item">
     <div class="item-name">Passion Fruit Tea</div>
     <div class="item-name-zh">百香果茶</div>
-    <div class="item-desc">Tangy passion fruit with jasmine tea and passion fruit popping boba. Tropical and energising.</div>
+    <div class="item-desc">Tangy passion fruit with jasmine tea and passion fruit popping boba.</div>
     <div class="item-tags"><span class="tag tag-star">★ Summer Pick</span><span class="tag tag-fruit">Passion Fruit Boba</span></div>
   </div>
 
   <div class="item">
     <div class="item-name">Mango Fruit Tea</div>
     <div class="item-name-zh">芒果果茶</div>
-    <div class="item-desc">Ripe mango jam blended with jasmine tea and mango popping boba. Sweet and exotic.</div>
+    <div class="item-desc">Ripe mango jam with jasmine tea and mango popping boba.</div>
     <div class="item-tags"><span class="tag tag-new">Try it</span><span class="tag tag-fruit">Mango Boba</span></div>
   </div>
 
   <div class="item">
     <div class="item-name">Lychee Fruit Tea</div>
     <div class="item-name-zh">荔枝果茶</div>
-    <div class="item-desc">Delicate lychee jam with light jasmine tea and lychee popping boba. Floral and unique.</div>
+    <div class="item-desc">Delicate lychee jam with jasmine tea and lychee popping boba.</div>
     <div class="item-tags"><span class="tag tag-mild">Mild</span><span class="tag tag-fruit">Lychee Boba</span></div>
   </div>
 
   <div class="item">
     <div class="item-name">Peach Fruit Tea</div>
     <div class="item-name-zh">桃子果茶</div>
-    <div class="item-desc">Juicy peach jam with jasmine tea and peach popping boba. Soft, sweet and delightful.</div>
+    <div class="item-desc">Juicy peach jam with jasmine tea and peach popping boba.</div>
     <div class="item-tags"><span class="tag tag-mild">Mild</span><span class="tag tag-fruit">Peach Boba</span></div>
   </div>
 
   <div class="item">
     <div class="item-name">Grape Fruit Tea</div>
     <div class="item-name-zh">葡萄果茶</div>
-    <div class="item-desc">Rich grape jam with jasmine green tea and grape popping boba. Deep, sweet and refreshing.</div>
+    <div class="item-desc">Rich grape jam with jasmine green tea and grape popping boba.</div>
     <div class="item-tags"><span class="tag tag-new">New</span><span class="tag tag-fruit">Grape Boba</span></div>
   </div>
 </div>
@@ -518,35 +443,35 @@ animation: fadeIn 0.3s ease both;
     <div class="section-line"></div>
   </div>
   <div class="section-desc">Fruit jam blended with creamy milk · Served with popping boba</div>
-  <div class="fmp-badges">
-    <div class="fmp-box">
-      <div class="fmp-label">Small</div>
-      <div class="fmp-value">2 399 Ft</div>
+  <div class="section-prices">
+    <div class="price-badge">
+      <div class="price-badge-label">Small · 500 ml</div>
+      <div class="price-badge-value">2 390 Ft</div>
     </div>
-    <div class="fmp-box">
-      <div class="fmp-label">Large</div>
-      <div class="fmp-value">2 699 Ft</div>
+    <div class="price-badge">
+      <div class="price-badge-label">Large · 700 ml</div>
+      <div class="price-badge-value">2 690 Ft</div>
     </div>
   </div>
 
   <div class="item">
     <div class="item-name">Strawberry Milk Tea</div>
     <div class="item-name-zh">草莓奶茶</div>
-    <div class="item-desc">Sweet strawberry jam blended with creamy milk and strawberry popping boba. Smooth, fruity and indulgent.</div>
+    <div class="item-desc">Sweet strawberry jam with creamy milk and strawberry popping boba.</div>
     <div class="item-tags"><span class="tag tag-star">★ Fan Fav</span><span class="tag tag-fruit">Strawberry Boba</span></div>
   </div>
 
   <div class="item">
     <div class="item-name">Mango Milk Tea</div>
     <div class="item-name-zh">芒果奶茶</div>
-    <div class="item-desc">Tropical mango jam with creamy milk and mango popping boba. Rich, sweet and exotic.</div>
+    <div class="item-desc">Tropical mango jam with creamy milk and mango popping boba.</div>
     <div class="item-tags"><span class="tag tag-new">Popular</span><span class="tag tag-fruit">Mango Boba</span></div>
   </div>
 
   <div class="item">
     <div class="item-name">Passion Fruit Milk Tea</div>
     <div class="item-name-zh">百香果奶茶</div>
-    <div class="item-desc">Tangy passion fruit jam with smooth creamy milk and passion fruit popping boba. Tropical and unique.</div>
+    <div class="item-desc">Tangy passion fruit jam with creamy milk and passion fruit popping boba.</div>
     <div class="item-tags"><span class="tag tag-new">Try it</span><span class="tag tag-fruit">Passion Fruit Boba</span></div>
   </div>
 </div>
@@ -558,12 +483,18 @@ animation: fadeIn 0.3s ease both;
     <div class="section-title">Fruit Slush</div>
     <div class="section-line"></div>
   </div>
-  <div class="section-desc">Blended iced slush · Large only · 2 599 Ft</div>
+  <div class="section-desc">Blended iced slush · Large only</div>
+  <div class="section-prices">
+    <div class="price-badge">
+      <div class="price-badge-label">Large · 700 ml</div>
+      <div class="price-badge-value">2 590 Ft</div>
+    </div>
+  </div>
 
   <div class="item">
     <div class="item-name">Strawberry Slush</div>
     <div class="item-name-zh">草莓冰沙</div>
-    <div class="item-desc">Blended strawberry slush — icy, sweet and perfectly refreshing.</div>
+    <div class="item-desc">Blended strawberry slush — icy, sweet and refreshing.</div>
     <div class="item-tags"><span class="tag tag-star">★ Fan Fav</span></div>
   </div>
   <div class="item">
@@ -575,7 +506,7 @@ animation: fadeIn 0.3s ease both;
   <div class="item">
     <div class="item-name">Mango Slush</div>
     <div class="item-name-zh">芒果冰沙</div>
-    <div class="item-desc">Rich mango blended into a creamy, icy slush. A summer favourite.</div>
+    <div class="item-desc">Rich mango blended into a creamy, icy slush.</div>
     <div class="item-tags"><span class="tag tag-new">Try it</span></div>
   </div>
   <div class="item">
@@ -587,21 +518,15 @@ animation: fadeIn 0.3s ease both;
   <div class="item">
     <div class="item-name">Peach Slush</div>
     <div class="item-name-zh">桃子冰沙</div>
-    <div class="item-desc">Sweet summer peach blended smooth and icy. Soft and irresistible.</div>
+    <div class="item-desc">Sweet summer peach blended smooth and icy.</div>
     <div class="item-tags"><span class="tag tag-mild">Mild</span></div>
   </div>
 </div>
 
 <div class="customize-box">
   <div class="customize-title">Customise Your Drink</div>
-  <div class="customize-row">
-    <span>Sweetness</span>
-    <span class="customize-options">0% · 30% · 50% · 70% · 100%</span>
-  </div>
-  <div class="customize-row">
-    <span>Ice</span>
-    <span class="customize-options">No ice · Less · Normal · Extra</span>
-  </div>
+  <div class="customize-row"><span>Sweetness</span><span class="customize-options">0% · 30% · 50% · 70% · 100%</span></div>
+  <div class="customize-row"><span>Ice</span><span class="customize-options">No ice · Less · Normal · Extra</span></div>
 </div>
 
 <div class="loyalty">
@@ -627,7 +552,7 @@ animation: fadeIn 0.3s ease both;
 
 ```
 <div class="header">
-  <div class="logo-mark">
+  <div class="logo-wrap" onclick="logoTap()">
     <svg class="logo-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
       <ellipse cx="50" cy="24" rx="9" ry="20" fill="#6b8f71"/>
       <line x1="50" y1="4" x2="50" y2="44" stroke="#f5f2ec" stroke-width="1.2"/>
@@ -645,53 +570,58 @@ animation: fadeIn 0.3s ease both;
   <div class="header-divider"><span>Menü</span></div>
 </div>
 
-<div class="pricing-bar">
-  <div class="pricing-item">
-    <div class="pricing-label">Kicsi</div>
-    <div class="pricing-value">2 199 Ft</div>
-    <div class="pricing-ml">500 ml</div>
-  </div>
-  <div class="pricing-divider"></div>
-  <div class="pricing-item">
-    <div class="pricing-label">Nagy</div>
-    <div class="pricing-value">2 499 Ft</div>
-    <div class="pricing-ml">700 ml</div>
-  </div>
-  <div class="pricing-divider"></div>
-  <div class="pricing-item">
-    <div class="pricing-label">Jégkása</div>
-    <div class="pricing-value">2 599 Ft</div>
-    <div class="pricing-ml">Csak nagy</div>
-  </div>
-</div>
-
-<!-- Gyöngyös tejes tea -->
+<!-- Klasszikus Bobás tejes tea -->
 <div class="section">
   <div class="section-header">
     <div class="section-dot"></div>
-    <div class="section-title">Gyöngyös tejes tea</div>
+    <div class="section-title">Klasszikus Bobás tejes tea</div>
     <div class="section-line"></div>
   </div>
-  <div class="section-desc">Barnacukros gyöngyökkel tálalva · Kicsi vagy nagy méretben</div>
-
-  <div class="item">
-    <div class="item-name">Barnacukros gyöngyös tejes tea — Zöld tea</div>
-    <div class="item-name-zh">黑糖珍珠奶茶 · 绿茶</div>
-    <div class="item-desc">Rágós barnacukros gyöngyök friss tejjel és finom jázmin zöld teával. Könnyű, virágos és selymes.</div>
-    <div class="item-tags">
-      <span class="tag tag-star">★ Különlegességünk</span>
-      <span class="tag tag-mild">Enyhe</span>
+  <div class="section-desc">Az első kettő barnacukros gyönggyel · A többi tiszta tejes tea — gyöngy nélkül</div>
+  <div class="section-prices">
+    <div class="price-badge">
+      <div class="price-badge-label">Kicsi · 500 ml</div>
+      <div class="price-badge-value">2 190 Ft</div>
+    </div>
+    <div class="price-badge">
+      <div class="price-badge-label">Nagy · 700 ml</div>
+      <div class="price-badge-value">2 490 Ft</div>
     </div>
   </div>
 
   <div class="item">
-    <div class="item-name">Barnacukros gyöngyös tejes tea — Fekete tea</div>
+    <div class="item-name">Barnacukros bobá tea · Fekete tea</div>
     <div class="item-name-zh">黑糖珍珠奶茶 · 红茶</div>
-    <div class="item-desc">Rágós barnacukros gyöngyök friss tejjel és karakteres Assam fekete teával. Gazdag, krémes és tartalmas.</div>
-    <div class="item-tags">
-      <span class="tag tag-bold">Gazdag</span>
-      <span class="tag tag-new">Népszerű</span>
-    </div>
+    <div class="item-desc">Rágós barnacukros gyöngyök friss tejjel és karakteres Assam fekete teával.</div>
+    <div class="item-tags"><span class="tag tag-star">★ Különlegességünk</span><span class="tag tag-bold">Gazdag</span></div>
+  </div>
+
+  <div class="item">
+    <div class="item-name">Barnacukros bobá tea · Zöld tea</div>
+    <div class="item-name-zh">黑糖珍珠奶茶 · 绿茶</div>
+    <div class="item-desc">Rágós barnacukros gyöngyök friss tejjel és finom jázmin zöld teával.</div>
+    <div class="item-tags"><span class="tag tag-star">★ Különlegességünk</span><span class="tag tag-mild">Enyhe</span></div>
+  </div>
+
+  <div class="item">
+    <div class="item-name">Klasszikus fekete tejes tea</div>
+    <div class="item-name-zh">经典红茶奶茶</div>
+    <div class="item-desc">Selymes Assam fekete tea friss tejjel. Tiszta, gyöngy nélkül.</div>
+    <div class="item-tags"><span class="tag tag-bold">Gazdag</span></div>
+  </div>
+
+  <div class="item">
+    <div class="item-name">Jázmin zöld tejes tea</div>
+    <div class="item-name-zh">茉莉奶绿</div>
+    <div class="item-desc">Illatos jázmin zöld tea tejjel. Könnyű, virágos — gyöngy nélkül.</div>
+    <div class="item-tags"><span class="tag tag-mild">Enyhe</span><span class="tag tag-new">Népszerű</span></div>
+  </div>
+
+  <div class="item">
+    <div class="item-name">Oolong tejes tea</div>
+    <div class="item-name-zh">乌龙奶茶</div>
+    <div class="item-desc">Selymes oolong tejjel. Természetesen édes és aromás — gyöngy nélkül.</div>
+    <div class="item-tags"><span class="tag tag-new">Próbáld ki!</span></div>
   </div>
 </div>
 
@@ -702,47 +632,57 @@ animation: fadeIn 0.3s ease both;
     <div class="section-title">Gyümölcsös tea</div>
     <div class="section-line"></div>
   </div>
-  <div class="section-desc">Jázmin zöld tea valódi gyümölcsdzsemmel · Pukkanós bobával · Kicsi vagy nagy</div>
+  <div class="section-desc">Jázmin zöld tea gyümölcsdzsemmel · Pukkanós bobával tálalva</div>
+  <div class="section-prices">
+    <div class="price-badge">
+      <div class="price-badge-label">Kicsi · 500 ml</div>
+      <div class="price-badge-value">2 190 Ft</div>
+    </div>
+    <div class="price-badge">
+      <div class="price-badge-label">Nagy · 700 ml</div>
+      <div class="price-badge-value">2 490 Ft</div>
+    </div>
+  </div>
 
   <div class="item">
     <div class="item-name">Epres gyümölcstea</div>
     <div class="item-name-zh">草莓果茶</div>
-    <div class="item-desc">Édes eperdzsem jázmin zöld teával és epres pukkanós bobával. Gyümölcsös és frissítő.</div>
+    <div class="item-desc">Édes eperdzsem jázmin zöld teával és epres pukkanós bobával.</div>
     <div class="item-tags"><span class="tag tag-star">★ Sláger</span><span class="tag tag-fruit">Epres boba</span></div>
   </div>
 
   <div class="item">
     <div class="item-name">Maracujás gyümölcstea</div>
     <div class="item-name-zh">百香果茶</div>
-    <div class="item-desc">Fanyar maracuja jázminteával és maracujás pukkanós bobával. Trópusi és energizáló.</div>
+    <div class="item-desc">Fanyar maracuja jázminteával és maracujás pukkanós bobával.</div>
     <div class="item-tags"><span class="tag tag-star">★ Nyári kedvenc</span><span class="tag tag-fruit">Maracujás boba</span></div>
   </div>
 
   <div class="item">
     <div class="item-name">Mangós gyümölcstea</div>
     <div class="item-name-zh">芒果果茶</div>
-    <div class="item-desc">Érett mangódzsem jázminteával és mangós pukkanós bobával. Édes és egzotikus.</div>
+    <div class="item-desc">Érett mangódzsem jázminteával és mangós pukkanós bobával.</div>
     <div class="item-tags"><span class="tag tag-new">Próbáld ki!</span><span class="tag tag-fruit">Mangós boba</span></div>
   </div>
 
   <div class="item">
     <div class="item-name">Licsis gyümölcstea</div>
     <div class="item-name-zh">荔枝果茶</div>
-    <div class="item-desc">Finom licsidzsem könnyű jázminteával és licsis pukkanós bobával. Virágos és különleges.</div>
+    <div class="item-desc">Finom licsidzsem jázminteával és licsis pukkanós bobával.</div>
     <div class="item-tags"><span class="tag tag-mild">Enyhe</span><span class="tag tag-fruit">Licsis boba</span></div>
   </div>
 
   <div class="item">
     <div class="item-name">Barackos gyümölcstea</div>
     <div class="item-name-zh">桃子果茶</div>
-    <div class="item-desc">Lédús barackdzsem jázminteával és barackos pukkanós bobával. Lágy, édes és elragadó.</div>
+    <div class="item-desc">Lédús barackdzsem jázminteával és barackos pukkanós bobával.</div>
     <div class="item-tags"><span class="tag tag-mild">Enyhe</span><span class="tag tag-fruit">Barackos boba</span></div>
   </div>
 
   <div class="item">
     <div class="item-name">Szőlős gyümölcstea</div>
     <div class="item-name-zh">葡萄果茶</div>
-    <div class="item-desc">Gazdag szőlődzsem jázmin zöld teával és szőlős pukkanós bobával. Mély, édes és frissítő.</div>
+    <div class="item-desc">Gazdag szőlődzsem jázmin zöld teával és szőlős pukkanós bobával.</div>
     <div class="item-tags"><span class="tag tag-new">Új!</span><span class="tag tag-fruit">Szőlős boba</span></div>
   </div>
 </div>
@@ -754,36 +694,36 @@ animation: fadeIn 0.3s ease both;
     <div class="section-title">Gyümölcsös tejes ital</div>
     <div class="section-line"></div>
   </div>
-  <div class="section-desc">Gyümölcsdzsem krémes tejjel keverve · Pukkanós bobával</div>
-  <div class="fmp-badges">
-    <div class="fmp-box">
-      <div class="fmp-label">Kicsi</div>
-      <div class="fmp-value">2 399 Ft</div>
+  <div class="section-desc">Gyümölcsdzsem krémes tejjel keverve · Pukkanós bobával tálalva</div>
+  <div class="section-prices">
+    <div class="price-badge">
+      <div class="price-badge-label">Kicsi · 500 ml</div>
+      <div class="price-badge-value">2 390 Ft</div>
     </div>
-    <div class="fmp-box">
-      <div class="fmp-label">Nagy</div>
-      <div class="fmp-value">2 699 Ft</div>
+    <div class="price-badge">
+      <div class="price-badge-label">Nagy · 700 ml</div>
+      <div class="price-badge-value">2 690 Ft</div>
     </div>
   </div>
 
   <div class="item">
     <div class="item-name">Epres tejes ital</div>
     <div class="item-name-zh">草莓奶茶</div>
-    <div class="item-desc">Édes eperdzsem krémes tejjel és epres pukkanós bobával keverve. Selymes, gyümölcsös és kényeztető.</div>
+    <div class="item-desc">Édes eperdzsem krémes tejjel és epres pukkanós bobával.</div>
     <div class="item-tags"><span class="tag tag-star">★ Közönségkedvenc</span><span class="tag tag-fruit">Epres boba</span></div>
   </div>
 
   <div class="item">
     <div class="item-name">Mangós tejes ital</div>
     <div class="item-name-zh">芒果奶茶</div>
-    <div class="item-desc">Trópusi mangódzsem krémes tejjel és mangós pukkanós bobával. Gazdag, édes és egzotikus.</div>
+    <div class="item-desc">Trópusi mangódzsem krémes tejjel és mangós pukkanós bobával.</div>
     <div class="item-tags"><span class="tag tag-new">Népszerű</span><span class="tag tag-fruit">Mangós boba</span></div>
   </div>
 
   <div class="item">
     <div class="item-name">Maracujás tejes ital</div>
     <div class="item-name-zh">百香果奶茶</div>
-    <div class="item-desc">Fanyar maracujadzsem selymes krémes tejjel és maracujás pukkanós bobával. Trópusi és különleges.</div>
+    <div class="item-desc">Fanyar maracujadzsem krémes tejjel és maracujás pukkanós bobával.</div>
     <div class="item-tags"><span class="tag tag-new">Próbáld ki!</span><span class="tag tag-fruit">Maracujás boba</span></div>
   </div>
 </div>
@@ -795,12 +735,18 @@ animation: fadeIn 0.3s ease both;
     <div class="section-title">Gyümölcsös jégkása</div>
     <div class="section-line"></div>
   </div>
-  <div class="section-desc">Turmixolt jeges jégkása · Csak nagy méretben · 2 599 Ft</div>
+  <div class="section-desc">Turmixolt jeges jégkása · Csak nagy méret</div>
+  <div class="section-prices">
+    <div class="price-badge">
+      <div class="price-badge-label">Nagy · 700 ml</div>
+      <div class="price-badge-value">2 590 Ft</div>
+    </div>
+  </div>
 
   <div class="item">
     <div class="item-name">Epres jégkása</div>
     <div class="item-name-zh">草莓冰沙</div>
-    <div class="item-desc">Turmixolt epres jégkása — jeges, édes és tökéletesen frissítő.</div>
+    <div class="item-desc">Turmixolt epres jégkása — jeges, édes és frissítő.</div>
     <div class="item-tags"><span class="tag tag-star">★ Közönségkedvenc</span></div>
   </div>
   <div class="item">
@@ -812,33 +758,27 @@ animation: fadeIn 0.3s ease both;
   <div class="item">
     <div class="item-name">Mangós jégkása</div>
     <div class="item-name-zh">芒果冰沙</div>
-    <div class="item-desc">Gazdag mangó krémes, jeges jégkásává turmixolva. Nyári kedvenc!</div>
+    <div class="item-desc">Gazdag mangó krémes, jeges jégkásává turmixolva.</div>
     <div class="item-tags"><span class="tag tag-new">Próbáld ki!</span></div>
   </div>
   <div class="item">
     <div class="item-name">Licsis jégkása</div>
     <div class="item-name-zh">荔枝冰沙</div>
-    <div class="item-desc">Könnyű, virágos licsi frissítő, jeges jégkásává turmixolva.</div>
+    <div class="item-desc">Könnyű, virágos licsi jeges jégkásává turmixolva.</div>
     <div class="item-tags"><span class="tag tag-mild">Enyhe</span></div>
   </div>
   <div class="item">
     <div class="item-name">Barackos jégkása</div>
     <div class="item-name-zh">桃子冰沙</div>
-    <div class="item-desc">Édes nyári barack selymesre és jegesre turmixolva. Lágy és ellenállhatatlan.</div>
+    <div class="item-desc">Édes nyári barack selymesre és jegesre turmixolva.</div>
     <div class="item-tags"><span class="tag tag-mild">Enyhe</span></div>
   </div>
 </div>
 
 <div class="customize-box">
   <div class="customize-title">Alakítsd kedvedre!</div>
-  <div class="customize-row">
-    <span>Édesség</span>
-    <span class="customize-options">0% · 30% · 50% · 70% · 100%</span>
-  </div>
-  <div class="customize-row">
-    <span>Jég</span>
-    <span class="customize-options">Jég nélkül · Kevesebb · Normál · Extra</span>
-  </div>
+  <div class="customize-row"><span>Édesség</span><span class="customize-options">0% · 30% · 50% · 70% · 100%</span></div>
+  <div class="customize-row"><span>Jég</span><span class="customize-options">Jég nélkül · Kevesebb · Normál · Extra</span></div>
 </div>
 
 <div class="loyalty">
@@ -858,7 +798,7 @@ animation: fadeIn 0.3s ease both;
 
   </div><!-- /lang-hu -->
 
-</div><!-- /page -->
+</div>
 
 <script>
   function setLang(lang) {
@@ -867,6 +807,14 @@ animation: fadeIn 0.3s ease both;
     document.getElementById('lang-' + lang).classList.add('active');
     document.querySelector('[onclick="setLang(\'' + lang + '\')"]').classList.add('active');
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  let tapCount = 0, tapTimer = null;
+  function logoTap() {
+    tapCount++;
+    if (tapTimer) clearTimeout(tapTimer);
+    tapTimer = setTimeout(() => { tapCount = 0; }, 800);
+    if (tapCount >= 5) { tapCount = 0; alert('Staff mode'); }
   }
 </script>
 
