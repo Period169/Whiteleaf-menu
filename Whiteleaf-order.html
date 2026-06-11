@@ -1,120 +1,281 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>White Leaf — Order</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@200;300;400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --cream: #f5f2ec;
-    --green-dark: #2d4a3e;
-    --green-mid: #6b8f71;
-    --green-light: #a8c5a0;
-    --charcoal: #2a2a2a;
-    --warm-gray: #8a8680;
-    --accent: #c4a882;
-  }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  html, body { background: var(--cream); color: var(--charcoal); font-family: 'Jost', sans-serif; font-weight: 300; min-height: 100vh; }
-  body::before { content: ''; position: fixed; inset: 0; background-image: radial-gradient(circle at 20% 20%, rgba(107,143,113,0.06) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(45,74,62,0.05) 0%, transparent 50%); pointer-events: none; z-index: 0; }
-  .lang-bar { position: sticky; top: 0; z-index: 100; background: var(--cream); border-bottom: 1px solid rgba(107,143,113,0.15); padding: 10px 20px; display: flex; justify-content: center; gap: 8px; }
-  .lang-btn { font-family: 'Jost', sans-serif; font-size: 11px; font-weight: 300; letter-spacing: 0.2em; text-transform: uppercase; padding: 6px 18px; border-radius: 20px; border: 1px solid rgba(107,143,113,0.3); background: transparent; color: var(--warm-gray); cursor: pointer; transition: all 0.25s ease; }
-  .lang-btn.active { background: var(--green-dark); color: var(--cream); border-color: var(--green-dark); }
-  .lang-btn:hover:not(.active) { border-color: var(--green-mid); color: var(--green-dark); }
-  .page { max-width: 680px; margin: 0 auto; padding: 48px 40px 120px; position: relative; z-index: 1; }
-  .header { text-align: center; margin-bottom: 40px; animation: fadeDown 0.7s ease both; }
-  .logo-mark { display: flex; justify-content: center; margin-bottom: 18px; }
-  .logo-svg { width: 60px; height: 60px; opacity: 0.9; }
-  .brand-name { font-family: 'Cormorant Garamond', serif; font-size: 40px; font-weight: 300; letter-spacing: 0.12em; color: var(--green-dark); line-height: 1; }
-  .brand-sub { font-size: 10px; letter-spacing: 0.35em; text-transform: uppercase; color: var(--warm-gray); margin-top: 7px; }
-  .header-divider { display: flex; align-items: center; gap: 16px; margin-top: 24px; justify-content: center; }
-  .header-divider::before, .header-divider::after { content: ''; width: 55px; height: 1px; background: var(--green-light); }
-  .header-divider span { font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--green-mid); }
-  .section { margin-bottom: 36px; }
-  .section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 5px; }
-  .section-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green-dark); flex-shrink: 0; }
-  .section-title { font-family: 'Cormorant Garamond', serif; font-size: 21px; font-weight: 400; letter-spacing: 0.06em; color: var(--green-dark); }
-  .section-line { flex: 1; height: 1px; background: linear-gradient(to right, var(--green-light), transparent); }
-  .section-desc { font-size: 11px; color: var(--warm-gray); letter-spacing: 0.04em; margin-bottom: 14px; padding-left: 19px; font-style: italic; }
-  .product-card { border: 1px solid rgba(107,143,113,0.2); border-radius: 10px; padding: 14px 16px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s ease; background: transparent; position: relative; user-select: none; }
-  .product-card:hover { border-color: var(--green-mid); background: rgba(107,143,113,0.04); }
-  .product-card.selected { border-color: var(--green-dark); background: rgba(45,74,62,0.06); }
-  .product-card.selected::after { content: '\2713'; position: absolute; right: 14px; top: 14px; color: var(--green-dark); font-size: 16px; }
-  .product-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
-  .product-name { font-family: 'Cormorant Garamond', serif; font-size: 17px; font-weight: 400; color: var(--charcoal); letter-spacing: 0.02em; }
-  .product-name-zh { font-size: 10px; color: var(--green-mid); margin-top: 2px; letter-spacing: 0.05em; }
-  .product-price { font-family: 'Cormorant Garamond', serif; font-size: 14px; color: var(--warm-gray); white-space: nowrap; text-align: right; flex-shrink: 0; padding-right: 20px; }
-  .size-options { display: none; margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(107,143,113,0.15); gap: 8px; flex-wrap: wrap; align-items: center; }
-  .product-card.selected .size-options { display: flex; }
-  .size-btn { font-family: 'Jost', sans-serif; font-size: 11px; font-weight: 300; letter-spacing: 0.15em; text-transform: uppercase; padding: 6px 14px; border-radius: 20px; border: 1px solid rgba(107,143,113,0.35); background: transparent; color: var(--warm-gray); cursor: pointer; transition: all 0.2s; }
-  .size-btn.active { background: var(--green-dark); color: var(--cream); border-color: var(--green-dark); }
-  .qty-controls { display: none; align-items: center; gap: 10px; margin-top: 10px; }
-  .product-card.selected .qty-controls { display: flex; }
-  .qty-btn { width: 28px; height: 28px; border-radius: 50%; border: 1px solid rgba(107,143,113,0.4); background: transparent; color: var(--green-dark); font-size: 16px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
-  .qty-btn:hover { background: var(--green-dark); color: var(--cream); }
-  .qty-display { font-family: 'Cormorant Garamond', serif; font-size: 18px; color: var(--green-dark); min-width: 20px; text-align: center; }
-  .qty-label { font-size: 10px; color: var(--warm-gray); letter-spacing: 0.1em; }
-  /* TOPPINGS */
-  .toppings-section { margin-bottom: 36px; }
-  .toppings-title { font-family: 'Cormorant Garamond', serif; font-size: 17px; color: var(--green-dark); letter-spacing: 0.06em; margin-bottom: 6px; }
-  .toppings-desc { font-size: 11px; color: var(--warm-gray); font-style: italic; margin-bottom: 14px; }
-  .topping-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border: 1px solid rgba(107,143,113,0.2); border-radius: 10px; margin-bottom: 8px; cursor: pointer; transition: all 0.2s; }
-  .topping-item:hover { border-color: var(--green-mid); background: rgba(107,143,113,0.04); }
-  .topping-item.selected { border-color: var(--green-dark); background: rgba(45,74,62,0.06); }
-  .topping-name { font-family: 'Cormorant Garamond', serif; font-size: 16px; color: var(--charcoal); }
-  .topping-price { font-family: 'Cormorant Garamond', serif; font-size: 14px; color: var(--warm-gray); }
-  .topping-check { width: 22px; height: 22px; border-radius: 50%; border: 1px solid rgba(107,143,113,0.4); display: flex; align-items: center; justify-content: center; font-size: 12px; color: transparent; transition: all 0.2s; flex-shrink: 0; }
-  .topping-item.selected .topping-check { background: var(--green-dark); border-color: var(--green-dark); color: var(--cream); }
-  /* CUSTOMIZE */
-  .customize-section { background: rgba(45,74,62,0.04); border: 1px solid rgba(107,143,113,0.2); border-radius: 10px; padding: 20px 22px; margin-bottom: 36px; }
-  .customize-title { font-family: 'Cormorant Garamond', serif; font-size: 17px; color: var(--green-dark); letter-spacing: 0.06em; margin-bottom: 16px; }
-  .customize-row { margin-bottom: 14px; }
-  .customize-label { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--warm-gray); margin-bottom: 8px; }
-  .option-group { display: flex; gap: 7px; flex-wrap: wrap; }
-  .opt-btn { font-family: 'Jost', sans-serif; font-size: 11px; font-weight: 300; letter-spacing: 0.1em; padding: 5px 13px; border-radius: 20px; border: 1px solid rgba(107,143,113,0.3); background: transparent; color: var(--warm-gray); cursor: pointer; transition: all 0.2s; }
-  .opt-btn.active { background: var(--green-dark); color: var(--cream); border-color: var(--green-dark); }
-  .notes-section { margin-bottom: 36px; }
-  .notes-label { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--warm-gray); margin-bottom: 8px; }
-  .notes-input { width: 100%; background: transparent; border: 1px solid rgba(107,143,113,0.25); border-radius: 8px; padding: 12px 14px; font-family: 'Jost', sans-serif; font-size: 13px; font-weight: 300; color: var(--charcoal); resize: none; outline: none; transition: border-color 0.2s; }
-  .notes-input:focus { border-color: var(--green-mid); }
-  .notes-input::placeholder { color: rgba(138,134,128,0.5); }
-  .order-summary { background: rgba(45,74,62,0.05); border: 1px solid rgba(107,143,113,0.25); border-radius: 10px; padding: 20px 22px; margin-bottom: 24px; }
-  .summary-title { font-family: 'Cormorant Garamond', serif; font-size: 15px; color: var(--green-dark); letter-spacing: 0.06em; margin-bottom: 12px; }
-  .summary-empty { font-size: 12px; color: var(--warm-gray); font-style: italic; }
-  .summary-item { display: flex; justify-content: space-between; font-size: 12.5px; color: var(--charcoal); padding: 5px 0; border-bottom: 1px solid rgba(107,143,113,0.1); gap: 12px; }
-  .summary-item:last-child { border-bottom: none; }
-  .summary-item-name { flex: 1; }
-  .summary-item-price { color: var(--warm-gray); font-family: 'Cormorant Garamond', serif; font-size: 14px; white-space: nowrap; }
-  .summary-total { display: flex; justify-content: space-between; margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(107,143,113,0.2); font-family: 'Cormorant Garamond', serif; font-size: 18px; color: var(--green-dark); }
-  .submit-btn { width: 100%; background: var(--green-dark); color: var(--cream); border: none; border-radius: 10px; padding: 18px; font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 400; letter-spacing: 0.1em; cursor: pointer; transition: all 0.25s ease; margin-bottom: 12px; }
-  .submit-btn:hover { background: #1e3329; transform: translateY(-1px); }
-  .submit-btn:disabled { background: rgba(107,143,113,0.3); color: var(--warm-gray); cursor: not-allowed; transform: none; }
-  .submit-note { text-align: center; font-size: 10.5px; color: var(--warm-gray); letter-spacing: 0.05em; line-height: 1.6; }
-  .success-screen { display: none; text-align: center; padding: 60px 20px; animation: fadeIn 0.5s ease both; }
-  .success-screen.show { display: block; }
-  .success-icon { width: 64px; height: 64px; border: 2px solid var(--green-mid); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; font-size: 28px; }
-  .success-title { font-family: 'Cormorant Garamond', serif; font-size: 28px; color: var(--green-dark); letter-spacing: 0.08em; margin-bottom: 12px; }
-  .success-desc { font-size: 13px; color: var(--warm-gray); line-height: 1.8; margin-bottom: 32px; }
-  .order-number { font-family: 'Cormorant Garamond', serif; font-size: 36px; color: var(--green-dark); letter-spacing: 0.15em; margin-bottom: 8px; }
-  .order-number-label { font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--warm-gray); margin-bottom: 40px; }
-  .new-order-btn { font-family: 'Jost', sans-serif; font-size: 11px; font-weight: 300; letter-spacing: 0.2em; text-transform: uppercase; padding: 10px 28px; border-radius: 20px; border: 1px solid rgba(107,143,113,0.4); background: transparent; color: var(--green-dark); cursor: pointer; transition: all 0.2s; }
-  .new-order-btn:hover { background: var(--green-dark); color: var(--cream); border-color: var(--green-dark); }
-  @keyframes fadeDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-  @media (max-width: 500px) { .page { padding: 36px 20px 100px; } .brand-name { font-size: 34px; } }
+:root {
+  --cream: #f5f2ec;
+  --green-dark: #2d4a3e;
+  --green-mid: #6b8f71;
+  --green-light: #a8c5a0;
+  --charcoal: #2a2a2a;
+  --warm-gray: #8a8680;
+  --accent: #c4a882;
+  --white: #ffffff;
+  --error: #c0392b;
+  --success: #27ae60;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { background: var(--cream); color: var(--charcoal); font-family: 'Jost', sans-serif; font-weight: 300; min-height: 100vh; }
+body::before { content: ''; position: fixed; inset: 0; background-image: radial-gradient(circle at 20% 20%, rgba(107,143,113,0.06) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(45,74,62,0.05) 0%, transparent 50%); pointer-events: none; z-index: 0; }
+
+/* TOP BAR */
+.top-bar { position: sticky; top: 0; z-index: 100; background: var(--cream); border-bottom: 1px solid rgba(107,143,113,0.15); padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; }
+.lang-group { display: flex; gap: 6px; }
+.lang-btn { font-family: 'Jost', sans-serif; font-size: 11px; font-weight: 300; letter-spacing: 0.2em; text-transform: uppercase; padding: 5px 14px; border-radius: 20px; border: 1px solid rgba(107,143,113,0.3); background: transparent; color: var(--warm-gray); cursor: pointer; transition: all 0.2s; }
+.lang-btn.active { background: var(--green-dark); color: var(--cream); border-color: var(--green-dark); }
+.member-btn { font-family: 'Jost', sans-serif; font-size: 11px; font-weight: 300; letter-spacing: 0.1em; padding: 5px 14px; border-radius: 20px; border: 1px solid rgba(107,143,113,0.3); background: transparent; color: var(--green-dark); cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 6px; }
+.member-btn.logged-in { background: rgba(45,74,62,0.08); border-color: var(--green-dark); }
+.member-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); }
+
+/* PAGE */
+.page { max-width: 680px; margin: 0 auto; padding: 24px 16px 120px; position: relative; z-index: 1; }
+
+/* HEADER */
+.header { text-align: center; margin-bottom: 32px; }
+.logo-mark { display: flex; justify-content: center; margin-bottom: 14px; }
+.logo-svg { width: 52px; height: 52px; opacity: 0.9; }
+.brand-name { font-family: 'Cormorant Garamond', serif; font-size: 36px; font-weight: 300; letter-spacing: 0.12em; color: var(--green-dark); line-height: 1; }
+.brand-sub { font-size: 10px; letter-spacing: 0.35em; text-transform: uppercase; color: var(--warm-gray); margin-top: 6px; }
+.header-divider { display: flex; align-items: center; gap: 14px; margin-top: 20px; justify-content: center; }
+.header-divider::before, .header-divider::after { content: ''; width: 45px; height: 1px; background: var(--green-light); }
+.header-divider span { font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--green-mid); }
+
+/* MEMBER PANEL */
+.member-panel { background: rgba(45,74,62,0.05); border: 1px solid rgba(107,143,113,0.2); border-radius: 12px; padding: 14px 16px; margin-bottom: 24px; display: none; }
+.member-panel.show { display: block; }
+.member-panel-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.member-name { font-family: 'Cormorant Garamond', serif; font-size: 18px; color: var(--green-dark); }
+.member-logout { font-size: 10px; color: var(--warm-gray); cursor: pointer; letter-spacing: 0.1em; text-decoration: underline; }
+.member-stats { display: flex; gap: 16px; }
+.member-stat { text-align: center; }
+.member-stat-val { font-family: 'Cormorant Garamond', serif; font-size: 20px; color: var(--green-dark); }
+.member-stat-label { font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--warm-gray); margin-top: 2px; }
+
+/* STAMP CARD */
+.stamp-card { background: var(--white); border: 1px solid rgba(107,143,113,0.2); border-radius: 10px; padding: 12px 14px; margin-top: 12px; }
+.stamp-card-title { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--warm-gray); margin-bottom: 10px; }
+.stamp-dots { display: flex; gap: 6px; flex-wrap: wrap; }
+.stamp-dot { width: 28px; height: 28px; border-radius: 50%; border: 1.5px solid rgba(107,143,113,0.3); display: flex; align-items: center; justify-content: center; font-size: 14px; }
+.stamp-dot.filled { background: var(--green-dark); border-color: var(--green-dark); }
+.stamp-dot.filled::after { content: '✓'; color: var(--cream); font-size: 12px; }
+
+/* SECTION */
+.section { margin-bottom: 28px; }
+.section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+.section-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green-dark); flex-shrink: 0; }
+.section-title { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 400; letter-spacing: 0.06em; color: var(--green-dark); }
+.section-line { flex: 1; height: 1px; background: linear-gradient(to right, var(--green-light), transparent); }
+.section-desc { font-size: 11px; color: var(--warm-gray); letter-spacing: 0.03em; margin-bottom: 12px; padding-left: 16px; font-style: italic; }
+
+/* PRODUCT CARD */
+.product-card { border: 1px solid rgba(107,143,113,0.2); border-radius: 10px; padding: 12px 14px; margin-bottom: 8px; cursor: pointer; transition: all 0.2s; background: transparent; position: relative; }
+.product-card:hover { border-color: var(--green-mid); background: rgba(107,143,113,0.03); }
+.product-card.selected { border-color: var(--green-dark); background: rgba(45,74,62,0.05); }
+.product-card.selected::after { content: '✓'; position: absolute; right: 12px; top: 12px; color: var(--green-dark); font-size: 15px; }
+.product-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.product-name { font-family: 'Cormorant Garamond', serif; font-size: 16px; font-weight: 400; color: var(--charcoal); letter-spacing: 0.02em; }
+.product-name-zh { font-size: 10px; color: var(--green-mid); margin-top: 2px; }
+.product-price { font-family: 'Cormorant Garamond', serif; font-size: 13px; color: var(--warm-gray); white-space: nowrap; padding-right: 18px; }
+.sub-options { display: none; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(107,143,113,0.12); }
+.product-card.selected .sub-options { display: block; }
+.sub-label { font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--warm-gray); margin-bottom: 7px; }
+.btn-group { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+.sel-btn { font-family: 'Jost', sans-serif; font-size: 11px; font-weight: 300; letter-spacing: 0.12em; padding: 5px 12px; border-radius: 20px; border: 1px solid rgba(107,143,113,0.3); background: transparent; color: var(--warm-gray); cursor: pointer; transition: all 0.18s; }
+.sel-btn.active { background: var(--green-dark); color: var(--cream); border-color: var(--green-dark); }
+.qty-row { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+.qty-btn { width: 26px; height: 26px; border-radius: 50%; border: 1px solid rgba(107,143,113,0.35); background: transparent; color: var(--green-dark); font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+.qty-btn:hover { background: var(--green-dark); color: var(--cream); }
+.qty-num { font-family: 'Cormorant Garamond', serif; font-size: 17px; color: var(--green-dark); min-width: 18px; text-align: center; }
+.qty-label { font-size: 10px; color: var(--warm-gray); }
+
+/* PROMO BADGE */
+.promo-badge { display: inline-block; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; background: rgba(196,168,130,0.15); color: var(--accent); border: 1px solid rgba(196,168,130,0.4); padding: 2px 8px; border-radius: 10px; margin-bottom: 8px; }
+
+/* TOPPINGS */
+.topping-item { display: flex; align-items: center; justify-content: space-between; padding: 9px 12px; border: 1px solid rgba(107,143,113,0.18); border-radius: 8px; margin-bottom: 6px; cursor: pointer; transition: all 0.15s; }
+.topping-item:hover { border-color: var(--green-mid); }
+.topping-item.selected { border-color: var(--green-dark); background: rgba(45,74,62,0.05); }
+.topping-name { font-family: 'Cormorant Garamond', serif; font-size: 15px; color: var(--charcoal); }
+.topping-right { display: flex; align-items: center; gap: 10px; }
+.topping-price { font-size: 12px; color: var(--warm-gray); }
+.topping-check { width: 20px; height: 20px; border-radius: 50%; border: 1px solid rgba(107,143,113,0.35); display: flex; align-items: center; justify-content: center; font-size: 11px; color: transparent; transition: all 0.15s; }
+.topping-item.selected .topping-check { background: var(--green-dark); border-color: var(--green-dark); color: var(--cream); }
+.boba-flavours { display: none; margin-top: 8px; padding: 10px 12px; background: rgba(45,74,62,0.04); border-radius: 8px; }
+.boba-flavours.show { display: block; }
+
+/* CUSTOMIZE */
+.customize-box { background: rgba(45,74,62,0.04); border: 1px solid rgba(107,143,113,0.18); border-radius: 10px; padding: 16px; margin-bottom: 24px; }
+.customize-title { font-family: 'Cormorant Garamond', serif; font-size: 16px; color: var(--green-dark); letter-spacing: 0.06em; margin-bottom: 14px; }
+.customize-row { margin-bottom: 12px; }
+
+/* COUPON SELECTOR */
+.coupon-box { background: rgba(196,168,130,0.06); border: 1px solid rgba(196,168,130,0.3); border-radius: 10px; padding: 14px 16px; margin-bottom: 24px; display: none; }
+.coupon-box.show { display: block; }
+.coupon-title { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--warm-gray); margin-bottom: 10px; }
+.coupon-item { display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; border: 1px solid rgba(196,168,130,0.3); border-radius: 8px; margin-bottom: 6px; cursor: pointer; transition: all 0.15s; }
+.coupon-item:hover { border-color: var(--accent); }
+.coupon-item.selected { border-color: var(--accent); background: rgba(196,168,130,0.1); }
+.coupon-name { font-size: 13px; color: var(--charcoal); }
+.coupon-desc { font-size: 10px; color: var(--warm-gray); margin-top: 2px; }
+.coupon-check { width: 18px; height: 18px; border-radius: 50%; border: 1px solid rgba(196,168,130,0.4); display: flex; align-items: center; justify-content: center; font-size: 10px; color: transparent; flex-shrink: 0; }
+.coupon-item.selected .coupon-check { background: var(--accent); border-color: var(--accent); color: white; }
+
+/* NOTES */
+.notes-box { margin-bottom: 24px; }
+.notes-label { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--warm-gray); margin-bottom: 8px; }
+.notes-input { width: 100%; background: transparent; border: 1px solid rgba(107,143,113,0.22); border-radius: 8px; padding: 10px 12px; font-family: 'Jost', sans-serif; font-size: 13px; font-weight: 300; color: var(--charcoal); resize: none; outline: none; transition: border-color 0.2s; }
+.notes-input:focus { border-color: var(--green-mid); }
+.notes-input::placeholder { color: rgba(138,134,128,0.45); }
+
+/* ORDER SUMMARY */
+.order-summary { background: rgba(45,74,62,0.04); border: 1px solid rgba(107,143,113,0.22); border-radius: 10px; padding: 16px; margin-bottom: 20px; }
+.summary-title { font-family: 'Cormorant Garamond', serif; font-size: 15px; color: var(--green-dark); letter-spacing: 0.06em; margin-bottom: 10px; }
+.summary-empty { font-size: 12px; color: var(--warm-gray); font-style: italic; }
+.summary-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--charcoal); padding: 4px 0; border-bottom: 1px solid rgba(107,143,113,0.08); gap: 10px; }
+.summary-row:last-child { border-bottom: none; }
+.summary-row-name { flex: 1; }
+.summary-row-price { color: var(--warm-gray); font-family: 'Cormorant Garamond', serif; font-size: 13px; white-space: nowrap; }
+.summary-row.discount .summary-row-price { color: var(--success); }
+.summary-total { display: flex; justify-content: space-between; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(107,143,113,0.2); font-family: 'Cormorant Garamond', serif; font-size: 18px; color: var(--green-dark); }
+
+/* PAYMENT */
+.payment-box { margin-bottom: 20px; }
+.payment-label { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--warm-gray); margin-bottom: 8px; }
+.payment-options { display: flex; gap: 8px; }
+.pay-btn { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid rgba(107,143,113,0.25); background: transparent; font-family: 'Jost', sans-serif; font-size: 12px; color: var(--warm-gray); cursor: pointer; transition: all 0.18s; text-align: center; }
+.pay-btn.active { border-color: var(--green-dark); background: rgba(45,74,62,0.07); color: var(--green-dark); font-weight: 400; }
+
+/* SUBMIT */
+.submit-btn { width: 100%; background: var(--green-dark); color: var(--cream); border: none; border-radius: 10px; padding: 16px; font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 400; letter-spacing: 0.1em; cursor: pointer; transition: all 0.2s; margin-bottom: 10px; }
+.submit-btn:hover:not(:disabled) { background: #1e3329; transform: translateY(-1px); }
+.submit-btn:disabled { background: rgba(107,143,113,0.3); color: var(--warm-gray); cursor: not-allowed; transform: none; }
+.submit-note { text-align: center; font-size: 10px; color: var(--warm-gray); letter-spacing: 0.04em; line-height: 1.6; }
+
+/* SUCCESS */
+.success-screen { display: none; text-align: center; padding: 60px 20px; }
+.success-screen.show { display: block; }
+.success-icon { width: 60px; height: 60px; border: 2px solid var(--green-mid); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 26px; }
+.success-title { font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--green-dark); letter-spacing: 0.08em; margin-bottom: 10px; }
+.success-desc { font-size: 13px; color: var(--warm-gray); line-height: 1.8; margin-bottom: 28px; }
+.order-num { font-family: 'Cormorant Garamond', serif; font-size: 40px; color: var(--green-dark); letter-spacing: 0.15em; margin-bottom: 6px; }
+.order-num-label { font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--warm-gray); margin-bottom: 10px; }
+.points-earned { display: inline-block; background: rgba(45,74,62,0.08); border: 1px solid rgba(107,143,113,0.25); border-radius: 20px; padding: 6px 16px; font-size: 12px; color: var(--green-dark); margin-bottom: 28px; }
+.new-order-btn { font-family: 'Jost', sans-serif; font-size: 11px; font-weight: 300; letter-spacing: 0.2em; text-transform: uppercase; padding: 10px 26px; border-radius: 20px; border: 1px solid rgba(107,143,113,0.35); background: transparent; color: var(--green-dark); cursor: pointer; transition: all 0.18s; }
+.new-order-btn:hover { background: var(--green-dark); color: var(--cream); }
+
+/* MODAL */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
+.modal-overlay.show { display: flex; }
+.modal { background: var(--cream); border-radius: 16px; width: 100%; max-width: 420px; max-height: 90vh; overflow-y: auto; padding: 28px 24px; }
+.modal-title { font-family: 'Cormorant Garamond', serif; font-size: 24px; color: var(--green-dark); letter-spacing: 0.06em; margin-bottom: 6px; }
+.modal-sub { font-size: 12px; color: var(--warm-gray); margin-bottom: 22px; }
+.modal-tabs { display: flex; gap: 6px; margin-bottom: 20px; }
+.modal-tab { flex: 1; padding: 8px; border-radius: 8px; border: 1px solid rgba(107,143,113,0.25); background: transparent; font-family: 'Jost', sans-serif; font-size: 12px; color: var(--warm-gray); cursor: pointer; transition: all 0.18s; }
+.modal-tab.active { background: var(--green-dark); color: var(--cream); border-color: var(--green-dark); }
+.form-field { margin-bottom: 14px; }
+.form-label { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--warm-gray); margin-bottom: 6px; display: block; }
+.form-input { width: 100%; padding: 10px 12px; border: 1px solid rgba(107,143,113,0.25); border-radius: 8px; background: transparent; font-family: 'Jost', sans-serif; font-size: 13px; color: var(--charcoal); outline: none; transition: border-color 0.18s; }
+.form-input:focus { border-color: var(--green-mid); }
+.form-btn { width: 100%; padding: 14px; background: var(--green-dark); color: var(--cream); border: none; border-radius: 8px; font-family: 'Cormorant Garamond', serif; font-size: 16px; cursor: pointer; transition: all 0.18s; margin-top: 4px; }
+.form-btn:hover { background: #1e3329; }
+.form-btn:disabled { background: rgba(107,143,113,0.3); cursor: not-allowed; }
+.form-error { font-size: 12px; color: var(--error); margin-top: 8px; display: none; }
+.form-error.show { display: block; }
+.modal-close { position: absolute; top: 16px; right: 16px; width: 28px; height: 28px; border-radius: 50%; border: 1px solid rgba(107,143,113,0.25); background: transparent; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--warm-gray); }
+.modal-inner { position: relative; }
+.skip-link { text-align: center; margin-top: 14px; font-size: 11px; color: var(--warm-gray); cursor: pointer; text-decoration: underline; }
+
+/* TOAST */
+.toast { position: fixed; top: 70px; left: 50%; transform: translateX(-50%); background: var(--green-dark); color: var(--cream); padding: 9px 22px; border-radius: 20px; font-size: 13px; z-index: 300; opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; }
+.toast.show { opacity: 1; }
+
+@keyframes fadeDown { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: translateY(0); } }
+@media (max-width: 500px) { .page { padding: 20px 12px 100px; } .brand-name { font-size: 30px; } }
 </style>
 </head>
 <body>
 
-<div class="lang-bar">
-  <button class="lang-btn active" id="btn-en">English</button>
-  <button class="lang-btn" id="btn-hu">Magyar</button>
+<div class="toast" id="toast"></div>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <div class="lang-group">
+    <button class="lang-btn active" id="btn-en">English</button>
+    <button class="lang-btn" id="btn-hu">Magyar</button>
+  </div>
+  <button class="member-btn" id="member-btn">
+    <span id="member-btn-text">Sign In</span>
+  </button>
 </div>
 
+<!-- AUTH MODAL -->
+<div class="modal-overlay" id="auth-modal">
+  <div class="modal modal-inner">
+    <button class="modal-close" id="modal-close">✕</button>
+    <div class="modal-title">White Leaf</div>
+    <div class="modal-sub" id="modal-sub">Sign in to earn stamps & rewards</div>
+    <div class="modal-tabs">
+      <button class="modal-tab active" id="tab-login">Sign In</button>
+      <button class="modal-tab" id="tab-register">Register</button>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="form-login">
+      <div class="form-field">
+        <label class="form-label">Email or Phone</label>
+        <input class="form-input" type="text" id="login-identifier" placeholder="email@example.com">
+      </div>
+      <div class="form-field">
+        <label class="form-label">Password</label>
+        <input class="form-input" type="password" id="login-password" placeholder="••••••">
+      </div>
+      <div class="form-error" id="login-error"></div>
+      <button class="form-btn" id="login-btn">Sign In</button>
+      <div class="skip-link" id="skip-login">Continue without account</div>
+    </div>
+
+    <!-- REGISTER -->
+    <div id="form-register" style="display:none">
+      <div class="form-field">
+        <label class="form-label">Email</label>
+        <input class="form-input" type="email" id="reg-email" placeholder="email@example.com">
+      </div>
+      <div class="form-field">
+        <label class="form-label">Phone (optional)</label>
+        <input class="form-input" type="tel" id="reg-phone" placeholder="+36...">
+      </div>
+      <div class="form-field">
+        <label class="form-label">Name (optional)</label>
+        <input class="form-input" type="text" id="reg-name" placeholder="Your name">
+      </div>
+      <div class="form-field">
+        <label class="form-label">Birthday (optional)</label>
+        <input class="form-input" type="date" id="reg-birthday">
+      </div>
+      <div class="form-field">
+        <label class="form-label">Password</label>
+        <input class="form-input" type="password" id="reg-password" placeholder="At least 6 characters">
+      </div>
+      <div class="form-field">
+        <label class="form-label">Referral Code (optional)</label>
+        <input class="form-input" type="text" id="reg-referral" placeholder="Friend's code">
+      </div>
+      <div class="form-error" id="reg-error"></div>
+      <button class="form-btn" id="reg-btn">Create Account</button>
+      <div class="skip-link" id="skip-register">Continue without account</div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN PAGE -->
 <div class="page">
   <div id="order-form">
+
+    <!-- HEADER -->
     <div class="header">
       <div class="logo-mark">
         <svg class="logo-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -130,520 +291,530 @@
         </svg>
       </div>
       <div class="brand-name">White Leaf</div>
-      <div class="brand-sub" id="sub-text"></div>
-      <div class="header-divider"><span id="divider-text"></span></div>
+      <div class="brand-sub" id="header-sub">Place Your Order</div>
+      <div class="header-divider"><span id="header-divider-text">Order</span></div>
     </div>
 
-```
-<div id="products-container"></div>
+    <!-- MEMBER PANEL -->
+    <div class="member-panel" id="member-panel">
+      <div class="member-panel-top">
+        <div class="member-name" id="panel-name"></div>
+        <span class="member-logout" id="logout-btn">Sign out</span>
+      </div>
+      <div class="member-stats">
+        <div class="member-stat">
+          <div class="member-stat-val" id="panel-points">0</div>
+          <div class="member-stat-label" id="stat-points-label">Points</div>
+        </div>
+        <div class="member-stat">
+          <div class="member-stat-val" id="panel-coupons">0</div>
+          <div class="member-stat-label" id="stat-coupons-label">Coupons</div>
+        </div>
+        <div class="member-stat">
+          <div class="member-stat-val" id="panel-balance">0</div>
+          <div class="member-stat-label" id="stat-balance-label">Ft Balance</div>
+        </div>
+      </div>
+      <div class="stamp-card">
+        <div class="stamp-card-title" id="stamp-title">Loyalty Stamps</div>
+        <div class="stamp-dots" id="stamp-dots"></div>
+      </div>
+    </div>
 
-<!-- TOPPINGS -->
-<div class="toppings-section" id="toppings-section">
-  <div class="toppings-title" id="toppings-title"></div>
-  <div class="toppings-desc" id="toppings-desc"></div>
-  <div id="toppings-list"></div>
-</div>
+    <!-- PRODUCTS -->
+    <div id="products-container"></div>
 
-<div class="customize-section" id="customize-section">
-  <div class="customize-title" id="custom-title"></div>
-  <div class="customize-row">
-    <div class="customize-label" id="sweet-label"></div>
-    <div class="option-group" id="sweetness-group"></div>
-  </div>
-  <div class="customize-row">
-    <div class="customize-label" id="ice-label"></div>
-    <div class="option-group" id="ice-group"></div>
-  </div>
-</div>
+    <!-- SLUSH TOPPINGS (paid) -->
+    <div id="slush-toppings-section" style="display:none">
+      <div class="section">
+        <div class="section-header"><div class="section-dot"></div><div class="section-title" id="slush-topping-title">Add Toppings</div><div class="section-line"></div></div>
+        <div class="section-desc" id="slush-topping-desc">Each topping +300 Ft</div>
+        <div id="slush-toppings-list"></div>
+      </div>
+    </div>
 
-<div class="notes-section">
-  <div class="notes-label" id="notes-label"></div>
-  <textarea class="notes-input" id="notes-input" rows="2"></textarea>
-</div>
+    <!-- CUSTOMIZE -->
+    <div class="customize-box" id="customize-box">
+      <div class="customize-title" id="customize-title">Customise Your Drink</div>
+      <div class="customize-row">
+        <div class="sub-label" id="sweet-label">Sweetness</div>
+        <div class="btn-group" id="sweetness-group"></div>
+      </div>
+      <div class="customize-row">
+        <div class="sub-label" id="ice-label">Ice</div>
+        <div class="btn-group" id="ice-group"></div>
+      </div>
+    </div>
 
-<div class="order-summary">
-  <div class="summary-title" id="summary-title"></div>
-  <div id="summary-content"></div>
-  <div class="summary-total" id="summary-total" style="display:none">
-    <span id="total-label"></span>
-    <span id="total-amount">0 Ft</span>
-  </div>
-</div>
+    <!-- COUPONS -->
+    <div class="coupon-box" id="coupon-box">
+      <div class="coupon-title" id="coupon-title">Your Coupons</div>
+      <div id="coupon-list"></div>
+    </div>
 
-<button class="submit-btn" id="submit-btn" disabled>
-  <span id="submit-text"></span>
-</button>
-<div class="submit-note" id="submit-note"></div>
-```
+    <!-- NOTES -->
+    <div class="notes-box">
+      <div class="notes-label" id="notes-label">Special Requests</div>
+      <textarea class="notes-input" id="notes-input" rows="2" placeholder="Allergies, special requests..."></textarea>
+    </div>
 
-  </div>
+    <!-- SUMMARY -->
+    <div class="order-summary">
+      <div class="summary-title" id="summary-title">Your Order</div>
+      <div id="summary-content"><div class="summary-empty" id="summary-empty">No items selected yet.</div></div>
+      <div class="summary-total" id="summary-total" style="display:none">
+        <span id="total-label">Total</span>
+        <span id="total-amount">0 Ft</span>
+      </div>
+    </div>
 
+    <!-- PAYMENT -->
+    <div class="payment-box">
+      <div class="payment-label" id="payment-label">Payment Method</div>
+      <div class="payment-options">
+        <button class="pay-btn active" id="pay-counter">Pay at Counter</button>
+        <button class="pay-btn" id="pay-online">SimplePay Online</button>
+      </div>
+    </div>
+
+    <button class="submit-btn" id="submit-btn" disabled>Place Order</button>
+    <div class="submit-note" id="submit-note">Pay at the counter after placing your order.</div>
+
+  </div><!-- /order-form -->
+
+  <!-- SUCCESS -->
   <div class="success-screen" id="success-screen">
-    <div class="success-icon">&#10003;</div>
-    <div class="success-title" id="success-title"></div>
-    <div class="success-desc" id="success-desc"></div>
-    <div class="order-number" id="order-number"></div>
-    <div class="order-number-label" id="order-num-label"></div>
-    <button class="new-order-btn" id="new-order-btn"></button>
+    <div class="success-icon">✓</div>
+    <div class="success-title" id="success-title">Order Received</div>
+    <div class="success-desc" id="success-desc">Please proceed to the counter to pay.<br>We'll start preparing your drink shortly.</div>
+    <div class="order-num" id="order-num-display"></div>
+    <div class="order-num-label" id="order-num-label">Order Number</div>
+    <div class="points-earned" id="points-earned-display" style="display:none"></div>
+    <button class="new-order-btn" id="new-order-btn">New Order</button>
   </div>
-</div>
+
+</div><!-- /page -->
 
 <script>
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwk_JEpLKyaiOUbfs3SxvxiTfjyu779JSrQmBKP_-HomiSwjlPaOxMFFYppccZ5UWHl/exec';
+const API = 'https://whiteleaf-backend-production.up.railway.app';
 
-const toppings = {
+// ── DATA ──────────────────────────────────────────────────────────────────────
+const PRODUCTS = {
   en: [
-    { id:'tp-pearl',   name:'Tapioca Pearls', zh:'\u73cd\u73e0',       price:300, hasFlavour:false },
-    { id:'tp-coconut', name:'Coconut Jelly',  zh:'\u6e38\u88c2',       price:300, hasFlavour:false },
-    { id:'tp-boba',    name:'Popping Boba',   zh:'\u7206\u7206\u73e0', price:300, hasFlavour:true  },
+    { section:'Pearl Milk Tea', desc:'Choose tapioca pearls or coconut jelly · Small or Large', items:[
+      { id:'pmt-green', name:'Brown Sugar Pearl Milk Tea — Green Tea', zh:'黑糖珍珠奶茶 · 绿茶', prices:{Small:2199,Large:2499}, sizes:['Small','Large'], base:'milk' },
+      { id:'pmt-black', name:'Brown Sugar Pearl Milk Tea — Black Tea', zh:'黑糖珍珠奶茶 · 红茶', prices:{Small:2199,Large:2499}, sizes:['Small','Large'], base:'milk' },
+      { id:'cmt-green', name:'Coconut Milk Tea — Green Tea', zh:'椰果奶茶 · 绿茶', prices:{Small:2199,Large:2499}, sizes:['Small','Large'], base:'coconut-fixed' },
+      { id:'cmt-black', name:'Coconut Milk Tea — Black Tea', zh:'椰果奶茶 · 红茶', prices:{Small:2199,Large:2499}, sizes:['Small','Large'], base:'coconut-fixed' },
+    ]},
+    { section:'Fruit Tea', desc:'Choose popping boba or coconut jelly · Small or Large', items:[
+      { id:'ft-straw', name:'Strawberry Fruit Tea', zh:'草莓果茶', prices:{Small:2199,Large:2499}, sizes:['Small','Large'], base:'fruittea', bobaFl:'Strawberry' },
+      { id:'ft-pass',  name:'Passion Fruit Tea',   zh:'百香果茶', prices:{Small:2199,Large:2499}, sizes:['Small','Large'], base:'fruittea', bobaFl:'Passion Fruit' },
+      { id:'ft-mango', name:'Mango Fruit Tea',     zh:'芒果果茶', prices:{Small:2199,Large:2499}, sizes:['Small','Large'], base:'fruittea', bobaFl:'Mango' },
+      { id:'ft-lych',  name:'Lychee Fruit Tea',    zh:'荔枝果茶', prices:{Small:2199,Large:2499}, sizes:['Small','Large'], base:'fruittea', bobaFl:'Lychee' },
+      { id:'ft-peach', name:'Peach Fruit Tea',     zh:'桃子果茶', prices:{Small:2199,Large:2499}, sizes:['Small','Large'], base:'fruittea', bobaFl:'Peach' },
+      { id:'ft-grape', name:'Grape Fruit Tea',     zh:'葡萄果茶', prices:{Small:2199,Large:2499}, sizes:['Small','Large'], base:'fruittea', bobaFl:'Grape' },
+    ]},
+    { section:'Fruit Milk Tea', desc:'Choose popping boba or coconut jelly', fmpBadges:[{l:'Small',v:'2 399 Ft'},{l:'Large',v:'2 699 Ft'}], items:[
+      { id:'fmt-straw', name:'Strawberry Milk Tea',    zh:'草莓奶茶',   prices:{Small:2399,Large:2699}, sizes:['Small','Large'], base:'milk' },
+      { id:'fmt-mango', name:'Mango Milk Tea',         zh:'芒果奶茶',   prices:{Small:2399,Large:2699}, sizes:['Small','Large'], base:'milk' },
+      { id:'fmt-pass',  name:'Passion Fruit Milk Tea', zh:'百香果奶茶', prices:{Small:2399,Large:2699}, sizes:['Small','Large'], base:'milk' },
+    ]},
+    { section:'Fruit Slush', desc:'Blended iced slush · Large only · 2 599 Ft', items:[
+      { id:'sl-straw', name:'Strawberry Slush',    zh:'草莓冰沙',   prices:{Large:2599}, sizes:['Large'], base:'slush' },
+      { id:'sl-pass',  name:'Passion Fruit Slush', zh:'百香果冰沙', prices:{Large:2599}, sizes:['Large'], base:'slush' },
+      { id:'sl-mango', name:'Mango Slush',         zh:'芒果冰沙',   prices:{Large:2599}, sizes:['Large'], base:'slush' },
+      { id:'sl-lych',  name:'Lychee Slush',        zh:'荔枝冰沙',   prices:{Large:2599}, sizes:['Large'], base:'slush' },
+      { id:'sl-peach', name:'Peach Slush',         zh:'桃子冰沙',   prices:{Large:2599}, sizes:['Large'], base:'slush' },
+    ]},
   ],
   hu: [
-    { id:'tp-pearl',   name:'T\u00e1pi\u00f3ka gy\u00f6ngy', zh:'\u73cd\u73e0',       price:300, hasFlavour:false },
-    { id:'tp-coconut', name:'K\u00f3kuszzsele',              zh:'\u6e38\u88c2',       price:300, hasFlavour:false },
-    { id:'tp-boba',    name:'Pukkan\u00f3s boba',            zh:'\u7206\u7206\u73e0', price:300, hasFlavour:true  },
+    { section:'Tápioka tejes tea', desc:'Tápioka gyöngy vagy kókuszzsele · Kicsi vagy nagy méretben', items:[
+      { id:'pmt-green', name:'Barnacukros tápioka tejes tea — Zöld tea', zh:'黑糖珍珠奶茶 · 绿茶', prices:{Kicsi:2199,Nagy:2499}, sizes:['Kicsi','Nagy'], base:'milk' },
+      { id:'pmt-black', name:'Barnacukros tápioka tejes tea — Fekete tea', zh:'黑糖珍珠奶茶 · 红茶', prices:{Kicsi:2199,Nagy:2499}, sizes:['Kicsi','Nagy'], base:'milk' },
+      { id:'cmt-green', name:'Kókuszzsele tejes tea — Zöld tea', zh:'椰果奶茶 · 绿茶', prices:{Kicsi:2199,Nagy:2499}, sizes:['Kicsi','Nagy'], base:'coconut-fixed' },
+      { id:'cmt-black', name:'Kókuszzsele tejes tea — Fekete tea', zh:'椰果奶茶 · 红茶', prices:{Kicsi:2199,Nagy:2499}, sizes:['Kicsi','Nagy'], base:'coconut-fixed' },
+    ]},
+    { section:'Gyümölcsös tea', desc:'Pukkanós boba vagy kókuszzsele · Kicsi vagy nagy', items:[
+      { id:'ft-straw', name:'Epres gyümölcstea',     zh:'草莓果茶', prices:{Kicsi:2199,Nagy:2499}, sizes:['Kicsi','Nagy'], base:'fruittea', bobaFl:'Epres' },
+      { id:'ft-pass',  name:'Maracujás gyümölcstea', zh:'百香果茶', prices:{Kicsi:2199,Nagy:2499}, sizes:['Kicsi','Nagy'], base:'fruittea', bobaFl:'Maracujás' },
+      { id:'ft-mango', name:'Mangós gyümölcstea',    zh:'芒果果茶', prices:{Kicsi:2199,Nagy:2499}, sizes:['Kicsi','Nagy'], base:'fruittea', bobaFl:'Mangós' },
+      { id:'ft-lych',  name:'Licsis gyümölcstea',    zh:'荔枝果茶', prices:{Kicsi:2199,Nagy:2499}, sizes:['Kicsi','Nagy'], base:'fruittea', bobaFl:'Licsis' },
+      { id:'ft-peach', name:'Barackos gyümölcstea',  zh:'桃子果茶', prices:{Kicsi:2199,Nagy:2499}, sizes:['Kicsi','Nagy'], base:'fruittea', bobaFl:'Barackos' },
+      { id:'ft-grape', name:'Szőlős gyümölcstea',    zh:'葡萄果茶', prices:{Kicsi:2199,Nagy:2499}, sizes:['Kicsi','Nagy'], base:'fruittea', bobaFl:'Szőlős' },
+    ]},
+    { section:'Gyümölcsös tejes tea', desc:'Pukkanós boba vagy kókuszzsele', fmpBadges:[{l:'Kicsi',v:'2 399 Ft'},{l:'Nagy',v:'2 699 Ft'}], items:[
+      { id:'fmt-straw', name:'Epres tejes tea',      zh:'草莓奶茶',   prices:{Kicsi:2399,Nagy:2699}, sizes:['Kicsi','Nagy'], base:'milk' },
+      { id:'fmt-mango', name:'Mangós tejes tea',     zh:'芒果奶茶',   prices:{Kicsi:2399,Nagy:2699}, sizes:['Kicsi','Nagy'], base:'milk' },
+      { id:'fmt-pass',  name:'Maracujás tejes tea',  zh:'百香果奶茶', prices:{Kicsi:2399,Nagy:2699}, sizes:['Kicsi','Nagy'], base:'milk' },
+    ]},
+    { section:'Gyümölcsös jégkása', desc:'Turmixolt jeges jégkása · Csak nagy méretben · 2 599 Ft', items:[
+      { id:'sl-straw', name:'Epres jégkása',      zh:'草莓冰沙',   prices:{Nagy:2599}, sizes:['Nagy'], base:'slush' },
+      { id:'sl-pass',  name:'Maracujás jégkása',  zh:'百香果冰沙', prices:{Nagy:2599}, sizes:['Nagy'], base:'slush' },
+      { id:'sl-mango', name:'Mangós jégkása',     zh:'芒果冰沙',   prices:{Nagy:2599}, sizes:['Nagy'], base:'slush' },
+      { id:'sl-lych',  name:'Licsis jégkása',     zh:'荔枝冰沙',   prices:{Nagy:2599}, sizes:['Nagy'], base:'slush' },
+      { id:'sl-peach', name:'Barackos jégkása',   zh:'桃子冰沙',   prices:{Nagy:2599}, sizes:['Nagy'], base:'slush' },
+    ]},
   ]
 };
 
-const bobaFlavours = {
+const SLUSH_TOPPINGS = {
   en: [
-    { id:'bf-straw', name:'Strawberry' },
-    { id:'bf-pass',  name:'Passion Fruit' },
-    { id:'bf-mango', name:'Mango' },
-    { id:'bf-lych',  name:'Lychee' },
-    { id:'bf-peach', name:'Peach' },
-    { id:'bf-grape', name:'Grape' },
+    { id:'tp-pearl',   name:'Tapioca Pearls', price:300 },
+    { id:'tp-coconut', name:'Coconut Jelly',  price:300 },
+    { id:'tp-boba',    name:'Popping Boba',   price:300 },
   ],
   hu: [
-    { id:'bf-straw', name:'Epres' },
-    { id:'bf-pass',  name:'Maracuj\u00e1s' },
-    { id:'bf-mango', name:'Mang\u00f3s' },
-    { id:'bf-lych',  name:'Licsis' },
-    { id:'bf-peach', name:'Barackos' },
-    { id:'bf-grape', name:'Sz\u0151l\u0151s' },
+    { id:'tp-pearl',   name:'Tápioka gyöngy', price:300 },
+    { id:'tp-coconut', name:'Kókuszzsele',     price:300 },
+    { id:'tp-boba',    name:'Pukkanós boba',   price:300 },
   ]
 };
 
-const products = {
-  en: [
-    {
-      section: 'Pearl Milk Tea',
-      desc: 'Served with black sugar tapioca pearls \u00b7 Small or Large',
-      items: [
-        { id:'pmt-green', name:'Brown Sugar Pearl Milk Tea \u2014 Green Tea', zh:'\u9ed1\u7cd6\u73cd\u73e0\u5976\u8336 \u00b7 \u7eff\u8336', prices:{Small:2199,Large:2499}, sizes:['Small','Large'] },
-        { id:'pmt-black', name:'Brown Sugar Pearl Milk Tea \u2014 Black Tea', zh:'\u9ed1\u7cd6\u73cd\u73e0\u5976\u8336 \u00b7 \u7ea2\u8336', prices:{Small:2199,Large:2499}, sizes:['Small','Large'] },
-        { id:'cmt-green', base:'coconut-fixed', name:'Coconut Milk Tea — Green Tea', zh:'椰果奶茶 · 绿茶', prices:{Small:2199,Large:2499}, sizes:['Small','Large'] },
-        { id:'cmt-black', base:'coconut-fixed', name:'Coconut Milk Tea — Black Tea', zh:'椰果奶茶 · 红茶', prices:{Small:2199,Large:2499}, sizes:['Small','Large'] },
-      ]
-    },
-    {
-      section: 'Fruit Tea',
-      desc: 'Jasmine green tea with real fruit jam \u00b7 Served with popping boba \u00b7 Small or Large',
-      items: [
-        { id:'ft-straw', base:'fruittea', bobaFl:'bf-straw', name:'Strawberry Fruit Tea',    zh:'\u8349\u8393\u679c\u8336', prices:{Small:2199,Large:2499}, sizes:['Small','Large'] },
-        { id:'ft-pass',  base:'fruittea', bobaFl:'bf-pass',  name:'Passion Fruit Tea',       zh:'\u767e\u9999\u679c\u8336', prices:{Small:2199,Large:2499}, sizes:['Small','Large'] },
-        { id:'ft-mango', base:'fruittea', bobaFl:'bf-mango', name:'Mango Fruit Tea',         zh:'\u8292\u679c\u679c\u8336', prices:{Small:2199,Large:2499}, sizes:['Small','Large'] },
-        { id:'ft-lych',  base:'fruittea', bobaFl:'bf-lych',  name:'Lychee Fruit Tea',        zh:'\u8354\u679d\u679c\u8336', prices:{Small:2199,Large:2499}, sizes:['Small','Large'] },
-        { id:'ft-peach', base:'fruittea', bobaFl:'bf-peach', name:'Peach Fruit Tea',         zh:'\u6843\u5b50\u679c\u8336', prices:{Small:2199,Large:2499}, sizes:['Small','Large'] },
-        { id:'ft-grape', base:'fruittea', bobaFl:'bf-grape', name:'Grape Fruit Tea',         zh:'\u8461\u8404\u679c\u8336', prices:{Small:2199,Large:2499}, sizes:['Small','Large'] },
-      ]
-    },
-    {
-      section: 'Fruit Milk Tea',
-      desc: 'Fruit jam blended with creamy milk \u00b7 Served with popping boba',
-      items: [
-        { id:'fmt-straw', base:'milk', name:'Strawberry Milk Tea',    zh:'\u8349\u8393\u5976\u8336',   prices:{Small:2399,Large:2699}, sizes:['Small','Large'] },
-        { id:'fmt-mango', base:'milk', name:'Mango Milk Tea',         zh:'\u8292\u679c\u5976\u8336',   prices:{Small:2399,Large:2699}, sizes:['Small','Large'] },
-        { id:'fmt-pass',  base:'milk', name:'Passion Fruit Milk Tea', zh:'\u767e\u9999\u679c\u5976\u8336', prices:{Small:2399,Large:2699}, sizes:['Small','Large'] },
-      ]
-    },
-    {
-      section: 'Fruit Slush',
-      desc: 'Blended iced slush \u00b7 Large only \u00b7 2 599 Ft',
-      items: [
-        { id:'sl-straw', base:'slush', name:'Strawberry Slush',    zh:'\u8349\u8393\u51b0\u6c99',   prices:{Large:2599}, sizes:['Large'] },
-        { id:'sl-pass',  base:'slush', name:'Passion Fruit Slush', zh:'\u767e\u9999\u679c\u51b0\u6c99', prices:{Large:2599}, sizes:['Large'] },
-        { id:'sl-mango', base:'slush', name:'Mango Slush',         zh:'\u8292\u679c\u51b0\u6c99',   prices:{Large:2599}, sizes:['Large'] },
-        { id:'sl-lych',  base:'slush', name:'Lychee Slush',        zh:'\u8354\u679d\u51b0\u6c99',   prices:{Large:2599}, sizes:['Large'] },
-        { id:'sl-peach', base:'slush', name:'Peach Slush',         zh:'\u6843\u5b50\u51b0\u6c99',   prices:{Large:2599}, sizes:['Large'] },
-      ]
-    }
-  ],
-  hu: [
-    {
-      section: 'T\u00e1pi\u00f3ka tejes tea',
-      desc: 'Barnacukros t\u00e1pi\u00f3ka gy\u00f6ngy\u00f6kkel t\u00e1lalva \u00b7 Kicsi vagy nagy m\u00e9retben',
-      items: [
-        { id:'pmt-green', base:'milk', name:'Barnacukros t\u00e1pi\u00f3ka tejes tea \u2013 Z\u00f6ld tea', zh:'\u9ed1\u7cd6\u73cd\u73e0\u5976\u8336 \u00b7 \u7eff\u8336', prices:{Kicsi:2199,Nagy:2499}, sizes:['Kicsi','Nagy'] },
-        { id:'pmt-black', base:'milk', name:'Barnacukros t\u00e1pi\u00f3ka tejes tea \u2013 Fekete tea',   zh:'\u9ed1\u7cd6\u73cd\u73e0\u5976\u8336 \u00b7 \u7ea2\u8336', prices:{Kicsi:2199,Nagy:2499}, sizes:['Kicsi','Nagy'] },
-        { id:'cmt-green', base:'coconut-fixed', name:'Kókuszzsele tejes tea – Zöld tea', zh:'椰果奶茶 · 绿茶', prices:{Kicsi:2199,Nagy:2499}, sizes:['Kicsi','Nagy'] },
-        { id:'cmt-black', base:'coconut-fixed', name:'Kókuszzsele tejes tea – Fekete tea', zh:'椰果奶茶 · 红茶', prices:{Kicsi:2199,Nagy:2499}, sizes:['Kicsi','Nagy'] },
-      ]
-    },
-    {
-      section: 'Gy\u00fcm\u00f6lcs\u00f6s tea',
-      desc: 'J\u00e1zmin z\u00f6ld tea val\u00f3di gy\u00fcm\u00f6lcsdzsemmel \u00b7 Pukkan\u00f3s bob\u00e1val \u00b7 Kicsi vagy nagy',
-      items: [
-        { id:'ft-straw', base:'fruittea', bobaFl:'bf-straw', name:'Epres gy\u00fcm\u00f6lcstea',         zh:'\u8349\u8393\u679c\u8336', prices:{Kicsi:2199,Nagy:2499}, sizes:['Kicsi','Nagy'] },
-        { id:'ft-pass',  base:'fruittea', bobaFl:'bf-pass',  name:'Maracuj\u00e1s gy\u00fcm\u00f6lcstea', zh:'\u767e\u9999\u679c\u8336', prices:{Kicsi:2199,Nagy:2499}, sizes:['Kicsi','Nagy'] },
-        { id:'ft-mango', name:'Mang\u00f3s gy\u00fcm\u00f6lcstea',    zh:'\u8292\u679c\u679c\u8336', prices:{Kicsi:2199,Nagy:2499}, sizes:['Kicsi','Nagy'] },
-        { id:'ft-lych',  base:'fruittea', bobaFl:'bf-lych',  name:'Licsis gy\u00fcm\u00f6lcstea',        zh:'\u8354\u679d\u679c\u8336', prices:{Kicsi:2199,Nagy:2499}, sizes:['Kicsi','Nagy'] },
-        { id:'ft-peach', base:'fruittea', bobaFl:'bf-peach', name:'Barackos gy\u00fcm\u00f6lcstea',      zh:'\u6843\u5b50\u679c\u8336', prices:{Kicsi:2199,Nagy:2499}, sizes:['Kicsi','Nagy'] },
-        { id:'ft-grape', base:'fruittea', bobaFl:'bf-grape', name:'Sz\u0151l\u0151s gy\u00fcm\u00f6lcstea', zh:'\u8461\u8404\u679c\u8336', prices:{Kicsi:2199,Nagy:2499}, sizes:['Kicsi','Nagy'] },
-      ]
-    },
-    {
-      section: 'Gy\u00fcm\u00f6lcs\u00f6s tejes tea',
-      desc: 'Gy\u00fcm\u00f6lcsdzsem kr\u00e9mes tejjel keverve \u00b7 Pukkan\u00f3s bob\u00e1val',
-      items: [
-        { id:'fmt-straw', base:'milk', name:'Epres tejes tea',      zh:'\u8349\u8393\u5976\u8336',       prices:{Kicsi:2399,Nagy:2699}, sizes:['Kicsi','Nagy'] },
-        { id:'fmt-mango', base:'milk', name:'Mang\u00f3s tejes tea',     zh:'\u8292\u679c\u5976\u8336',       prices:{Kicsi:2399,Nagy:2699}, sizes:['Kicsi','Nagy'] },
-        { id:'fmt-pass',  base:'milk', name:'Maracuj\u00e1s tejes tea',  zh:'\u767e\u9999\u679c\u5976\u8336', prices:{Kicsi:2399,Nagy:2699}, sizes:['Kicsi','Nagy'] },
-      ]
-    },
-    {
-      section: 'Gy\u00fcm\u00f6lcs\u00f6s j\u00e9gk\u00e1sa',
-      desc: 'Turmixolt jeges j\u00e9gk\u00e1sa \u00b7 Csak nagy m\u00e9retben \u00b7 2 599 Ft',
-      items: [
-        { id:'sl-straw', name:'Epres j\u00e9gk\u00e1sa',        zh:'\u8349\u8393\u51b0\u6c99',       prices:{Nagy:2599}, sizes:['Nagy'] },
-        { id:'sl-pass',  name:'Maracuj\u00e1s j\u00e9gk\u00e1sa', zh:'\u767e\u9999\u679c\u51b0\u6c99', prices:{Nagy:2599}, sizes:['Nagy'] },
-        { id:'sl-mango', name:'Mang\u00f3s j\u00e9gk\u00e1sa',   zh:'\u8292\u679c\u51b0\u6c99',       prices:{Nagy:2599}, sizes:['Nagy'] },
-        { id:'sl-lych',  name:'Licsis j\u00e9gk\u00e1sa',        zh:'\u8354\u679d\u51b0\u6c99',       prices:{Nagy:2599}, sizes:['Nagy'] },
-        { id:'sl-peach', name:'Barackos j\u00e9gk\u00e1sa',      zh:'\u6843\u5b50\u51b0\u6c99',       prices:{Nagy:2599}, sizes:['Nagy'] },
-      ]
-    }
-  ]
-};
-
-const i18n = {
+const I18N = {
   en: {
-    sub: 'Place Your Order', divider: 'Order',
-    customTitle: 'Customise Your Drink',
-    sweetLabel: 'Sweetness', iceLabel: 'Ice',
-    sweetOpts: ['0%','30%','50%','70%','100%'],
-    iceOpts: ['No ice','Less','Normal','Extra'],
-    defaultSweetness: '50%', defaultIce: 'Normal',
-    notesLabel: 'Special Requests', notesPlaceholder: 'Allergies, special requests...',
-    summaryTitle: 'Your Order', summaryEmpty: 'No items selected yet.',
-    totalLabel: 'Total', submitText: 'Place Order',
-    submitNote: 'Pay at the counter after placing your order.',
-    successTitle: 'Order Received',
-    successDesc: 'Please proceed to the counter to pay. We will start preparing your drink shortly.',
-    orderNumLabel: 'Order Number', newOrderBtn: 'New Order',
-    sizeLabel: 'Size', qtyLabel: 'Qty',
-    customTitleSlush: 'Slush is fixed \u2014 no customisation needed',
-    toppingsTitle: 'Add Toppings (Slush)',
-    toppingsDesc: 'Each topping +300 Ft',
-    bobaFlavourLabel: 'Choose Boba Flavour',
-    baseLabel: 'Choose your base',
-    basePearl: 'Tapioca Pearls',
-    baseCoconut: 'Coconut Jelly',
-    baseBoba: 'Popping Boba',
-    baseCoconutAlt: 'Coconut Jelly',
+    headerSub:'Place Your Order', headerDivider:'Order',
+    sweet:'Sweetness', ice:'Ice',
+    sweetOpts:['0%','30%','50%','70%','100%'],
+    iceOpts:['No ice','Less','Normal','Extra'],
+    defSweet:'50%', defIce:'Normal',
+    notesLabel:'Special Requests', notesPlaceholder:'Allergies, special requests...',
+    summaryTitle:'Your Order', summaryEmpty:'No items selected yet.',
+    totalLabel:'Total', submitBtn:'Place Order',
+    submitNote:'Pay at the counter after placing your order.',
+    successTitle:'Order Received',
+    successDesc:'Please proceed to the counter to pay.\nWe\'ll start preparing your drink shortly.',
+    orderNumLabel:'Order Number', newOrderBtn:'New Order',
+    sizeLabel:'Size', qtyLabel:'Qty', baseLabel:'Base',
+    basePearl:'Tapioca Pearls', baseCoconut:'Coconut Jelly',
+    baseBoba:'Popping Boba', bobaFlLabel:'Boba Flavour',
+    slushToppingTitle:'Add Toppings', slushToppingDesc:'Each topping +300 Ft',
+    couponTitle:'Your Coupons', payLabel:'Payment Method',
+    payCash:'Pay at Counter', payOnline:'SimplePay Online',
+    stampTitle:'Loyalty Stamps · Buy 8 Get 1 Free',
+    signIn:'Sign In', signedIn:'Member',
+    pointsLabel:'Points', couponsLabel:'Coupons', balanceLabel:'Ft Balance',
+    customTitle:'Customise Your Drink',
+    customSlush:'Slush — no customisation needed',
+    discountLabel:'Discount',
   },
   hu: {
-    sub: 'Rendel\u00e9s lead\u00e1sa', divider: 'Rendel\u00e9s',
-    customTitle: 'Alak\u00edtsd kedvedre!',
-    sweetLabel: '\u00c9dess\u00e9g', iceLabel: 'J\u00e9g',
-    sweetOpts: ['0%','30%','50%','70%','100%'],
-    iceOpts: ['J\u00e9g n\u00e9lk\u00fcl','Kevesebb','Norm\u00e1l','Extra'],
-    defaultSweetness: '50%', defaultIce: 'Norm\u00e1l',
-    notesLabel: 'K\u00fcl\u00f6nleges k\u00e9r\u00e9s', notesPlaceholder: 'Allergia, k\u00fcl\u00f6nleges k\u00e9r\u00e9sek...',
-    summaryTitle: 'Rendel\u00e9sed', summaryEmpty: 'M\u00e9g nem v\u00e1lasztott\u00e1l term\u00e9ket.',
-    totalLabel: '\u00d6sszesen', submitText: 'Rendel\u00e9s lead\u00e1sa',
-    submitNote: 'Fizet\u00e9s a pultban a rendel\u00e9s lead\u00e1sa ut\u00e1n.',
-    successTitle: 'Rendel\u00e9s fogadva!',
-    successDesc: 'K\u00e9rj\u00fck menj a pulthoz fizetni. Nemsok\u00e1ra elk\u00e9sz\u00edtj\u00fck italodat.',
-    orderNumLabel: 'Rendel\u00e9ssz\u00e1m', newOrderBtn: '\u00daj rendel\u00e9s',
-    sizeLabel: 'M\u00e9ret', qtyLabel: 'Db',
-    customTitleSlush: 'A j\u00e9gk\u00e1sa r\u00f6gz\u00edtett \u2014 nem szab\u00e1lyozhat\u00f3',
-    toppingsTitle: 'Felt\u00e9tek hozz\u00e1ad\u00e1sa (J\u00e9gk\u00e1sa)',
-    toppingsDesc: 'Minden felt\u00e9t +300 Ft',
-    bobaFlavourLabel: '\u00cdz v\u00e1laszt\u00e1sa',
-    baseLabel: 'Alap felt\u00e9t v\u00e1laszt\u00e1sa',
-    basePearl: 'T\u00e1pi\u00f3ka gy\u00f6ngy',
-    baseCoconut: 'K\u00f3kuszzsele',
-    baseBoba: 'Pukkan\u00f3s boba',
-    baseCoconutAlt: 'K\u00f3kuszzsele',
+    headerSub:'Rendelés leadása', headerDivider:'Rendelés',
+    sweet:'Édesség', ice:'Jég',
+    sweetOpts:['0%','30%','50%','70%','100%'],
+    iceOpts:['Jég nélkül','Kevesebb','Normál','Extra'],
+    defSweet:'50%', defIce:'Normál',
+    notesLabel:'Különleges kérés', notesPlaceholder:'Allergia, különleges kérések...',
+    summaryTitle:'Rendelésed', summaryEmpty:'Még nem választottál terméket.',
+    totalLabel:'Összesen', submitBtn:'Rendelés leadása',
+    submitNote:'Fizetés a pultban a rendelés leadása után.',
+    successTitle:'Rendelés fogadva!',
+    successDesc:'Kérjük menj a pulthoz fizetni.\nNemsokára elkészítjük italodat.',
+    orderNumLabel:'Rendelésszám', newOrderBtn:'Új rendelés',
+    sizeLabel:'Méret', qtyLabel:'Db', baseLabel:'Alap',
+    basePearl:'Tápioka gyöngy', baseCoconut:'Kókuszzsele',
+    baseBoba:'Pukkanós boba', bobaFlLabel:'Boba ízesítés',
+    slushToppingTitle:'Feltétek hozzáadása', slushToppingDesc:'Minden feltét +300 Ft',
+    couponTitle:'Kuponjaim', payLabel:'Fizetési mód',
+    payCash:'Fizetés a pultban', payOnline:'SimplePay Online',
+    stampTitle:'Hűségpecsét · Vegyél 8-at, a 9. ingyen',
+    signIn:'Bejelentkezés', signedIn:'Tag',
+    pointsLabel:'Pont', couponsLabel:'Kupon', balanceLabel:'Ft Egyenleg',
+    customTitle:'Alakítsd kedvedre!',
+    customSlush:'Jégkása — nem szabályozható',
+    discountLabel:'Kedvezmény',
   }
 };
 
-let currentLang = 'en';
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let lang = 'en';
+let member = null;
+let token = localStorage.getItem('wl_token');
 let cart = {};
-let selectedToppings = {};
-let selectedBobaFlavour = null;
-let selectedBases = {}; // { itemId: 'pearl'|'coconut'|'boba' }
+let selectedBases = {};
+let selectedBobaFlavours = {};
+let slushToppings = {};
 let sweetness = '50%';
 let ice = 'Normal';
+let paymentMethod = 'counter';
+let selectedCouponId = null;
+let myCoupons = [];
+let activePromos = [];
 
-document.getElementById('btn-en').addEventListener('click', function() { setLang('en'); });
-document.getElementById('btn-hu').addEventListener('click', function() { setLang('hu'); });
-document.getElementById('submit-btn').addEventListener('click', submitOrder);
-document.getElementById('new-order-btn').addEventListener('click', resetOrder);
-
-function setLang(lang) {
-  currentLang = lang;
-  document.getElementById('btn-en').classList.toggle('active', lang === 'en');
-  document.getElementById('btn-hu').classList.toggle('active', lang === 'hu');
-  cart = {};
-  selectedToppings = {};
-  selectedBobaFlavour = null;
-  selectedBases = {};
-  sweetness = i18n[lang].defaultSweetness;
-  ice = i18n[lang].defaultIce;
+// ── INIT ──────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', async function() {
+  setupListeners();
+  if (token) await loadMember();
+  await loadPromos();
   renderAll();
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+async function loadMember() {
+  try {
+    const r = await fetch(API + '/api/auth/me', { headers:{ 'Authorization':'Bearer '+token } });
+    if (!r.ok) { token = null; localStorage.removeItem('wl_token'); return; }
+    member = await r.json();
+    await loadCoupons();
+  } catch(e) { token = null; }
 }
 
+async function loadCoupons() {
+  if (!token) return;
+  try {
+    const r = await fetch(API + '/api/coupons', { headers:{ 'Authorization':'Bearer '+token } });
+    if (r.ok) myCoupons = await r.json();
+  } catch(e) {}
+}
+
+async function loadPromos() {
+  try {
+    const r = await fetch(API + '/api/promotions/active');
+    if (r.ok) activePromos = await r.json();
+  } catch(e) {}
+}
+
+function setupListeners() {
+  document.getElementById('btn-en').addEventListener('click', function() { setLang('en'); });
+  document.getElementById('btn-hu').addEventListener('click', function() { setLang('hu'); });
+  document.getElementById('member-btn').addEventListener('click', function() {
+    if (member) showMemberOptions();
+    else openAuthModal();
+  });
+  document.getElementById('modal-close').addEventListener('click', closeAuthModal);
+  document.getElementById('auth-modal').addEventListener('click', function(e) { if (e.target === this) closeAuthModal(); });
+  document.getElementById('tab-login').addEventListener('click', function() { switchTab('login'); });
+  document.getElementById('tab-register').addEventListener('click', function() { switchTab('register'); });
+  document.getElementById('login-btn').addEventListener('click', doLogin);
+  document.getElementById('reg-btn').addEventListener('click', doRegister);
+  document.getElementById('skip-login').addEventListener('click', closeAuthModal);
+  document.getElementById('skip-register').addEventListener('click', closeAuthModal);
+  document.getElementById('logout-btn').addEventListener('click', doLogout);
+  document.getElementById('submit-btn').addEventListener('click', doSubmit);
+  document.getElementById('new-order-btn').addEventListener('click', resetOrder);
+  document.getElementById('pay-counter').addEventListener('click', function() { setPayment('counter'); });
+  document.getElementById('pay-online').addEventListener('click', function() { setPayment('simplepay'); });
+}
+
+function setLang(l) {
+  lang = l;
+  document.getElementById('btn-en').classList.toggle('active', l === 'en');
+  document.getElementById('btn-hu').classList.toggle('active', l === 'hu');
+  cart = {}; selectedBases = {}; selectedBobaFlavours = {}; slushToppings = {};
+  sweetness = I18N[l].defSweet; ice = I18N[l].defIce;
+  renderAll();
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+// ── RENDER ────────────────────────────────────────────────────────────────────
 function renderAll() {
-  var t = i18n[currentLang];
-  document.getElementById('sub-text').textContent = t.sub;
-  document.getElementById('divider-text').textContent = t.divider;
-  document.getElementById('custom-title').textContent = t.customTitle;
-  document.getElementById('sweet-label').textContent = t.sweetLabel;
-  document.getElementById('ice-label').textContent = t.iceLabel;
+  var t = I18N[lang];
+  document.getElementById('header-sub').textContent = t.headerSub;
+  document.getElementById('header-divider-text').textContent = t.headerDivider;
+  document.getElementById('sweet-label').textContent = t.sweet;
+  document.getElementById('ice-label').textContent = t.ice;
   document.getElementById('notes-label').textContent = t.notesLabel;
   document.getElementById('notes-input').placeholder = t.notesPlaceholder;
   document.getElementById('summary-title').textContent = t.summaryTitle;
   document.getElementById('total-label').textContent = t.totalLabel;
-  document.getElementById('submit-text').textContent = t.submitText;
+  document.getElementById('submit-btn').textContent = t.submitBtn;
   document.getElementById('submit-note').textContent = t.submitNote;
-  document.getElementById('toppings-title').textContent = t.toppingsTitle;
-  document.getElementById('toppings-desc').textContent = t.toppingsDesc;
-  document.getElementById('toppings-desc').textContent = t.toppingsDesc;
+  document.getElementById('coupon-title').textContent = t.couponTitle;
+  document.getElementById('payment-label').textContent = t.payLabel;
+  document.getElementById('pay-counter').textContent = t.payCash;
+  document.getElementById('pay-online').textContent = t.payOnline;
+  document.getElementById('slush-topping-title').textContent = t.slushToppingTitle;
+  document.getElementById('slush-topping-desc').textContent = t.slushToppingDesc;
+  document.getElementById('stat-points-label').textContent = t.pointsLabel;
+  document.getElementById('stat-coupons-label').textContent = t.couponsLabel;
+  document.getElementById('stat-balance-label').textContent = t.balanceLabel;
+  document.getElementById('stamp-title').textContent = t.stampTitle;
+  document.getElementById('member-btn-text').textContent = member ? (member.name || t.signedIn) : t.signIn;
 
-  var sg = document.getElementById('sweetness-group');
-  sg.innerHTML = '';
-  t.sweetOpts.forEach(function(v) {
-    var b = document.createElement('button');
-    b.className = 'opt-btn' + (v === sweetness ? ' active' : '');
-    b.textContent = v;
-    b.addEventListener('click', function() { selectOpt('sweetness', v, sg); });
-    sg.appendChild(b);
-  });
-
-  var ig = document.getElementById('ice-group');
-  ig.innerHTML = '';
-  t.iceOpts.forEach(function(v) {
-    var b = document.createElement('button');
-    b.className = 'opt-btn' + (v === ice ? ' active' : '');
-    b.textContent = v;
-    b.addEventListener('click', function() { selectOpt('ice', v, ig); });
-    ig.appendChild(b);
-  });
-
-  renderToppings();
+  renderSweetness(); renderIce();
   renderProducts();
+  renderSlushToppings();
+  renderCustomizeVisibility();
+  renderMemberPanel();
+  renderCoupons();
   renderSummary();
 }
 
-function renderToppings() {
-  var t = i18n[currentLang];
-  var list = document.getElementById('toppings-list');
-  list.innerHTML = '';
-  toppings[currentLang].forEach(function(tp) {
-    var isSelected = !!selectedToppings[tp.id];
-
-    var wrapper = document.createElement('div');
-
-    var item = document.createElement('div');
-    item.className = 'topping-item' + (isSelected ? ' selected' : '');
-    var nameEl = document.createElement('div');
-    nameEl.className = 'topping-name';
-    nameEl.textContent = tp.name;
-    var priceEl = document.createElement('div');
-    priceEl.className = 'topping-price';
-    priceEl.textContent = '+300 Ft';
-    var checkEl = document.createElement('div');
-    checkEl.className = 'topping-check';
-    checkEl.textContent = '\u2713';
-    item.appendChild(nameEl);
-    item.appendChild(priceEl);
-    item.appendChild(checkEl);
-    item.addEventListener('click', (function(id, name, price) {
-      return function() { toggleTopping(id, name, price); };
-    })(tp.id, tp.name, tp.price));
-    wrapper.appendChild(item);
-
-    // Boba flavour picker
-    if (tp.hasFlavour && isSelected) {
-      var flavourBox = document.createElement('div');
-      flavourBox.style.cssText = 'padding:12px 14px;background:rgba(45,74,62,0.04);border:1px solid rgba(107,143,113,0.2);border-top:none;border-radius:0 0 10px 10px;margin-bottom:0;';
-      var flavourLabel = document.createElement('div');
-      flavourLabel.style.cssText = 'font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--warm-gray);margin-bottom:8px;';
-      flavourLabel.textContent = t.bobaFlavourLabel;
-      flavourBox.appendChild(flavourLabel);
-      var flavourGroup = document.createElement('div');
-      flavourGroup.style.cssText = 'display:flex;gap:7px;flex-wrap:wrap;';
-      bobaFlavours[currentLang].forEach(function(fl) {
-        var btn = document.createElement('button');
-        btn.className = 'opt-btn' + (selectedBobaFlavour === fl.id ? ' active' : '');
-        btn.textContent = fl.name;
-        btn.addEventListener('click', function(e) {
-          e.stopPropagation();
-          selectedBobaFlavour = fl.id;
-          renderToppings();
-          renderSummary();
-        });
-        flavourGroup.appendChild(btn);
-      });
-      flavourBox.appendChild(flavourGroup);
-      item.style.borderRadius = '10px 10px 0 0';
-      wrapper.appendChild(flavourBox);
-    }
-
-    wrapper.style.marginBottom = '8px';
-    list.appendChild(wrapper);
+function renderSweetness() {
+  var g = document.getElementById('sweetness-group');
+  g.innerHTML = '';
+  I18N[lang].sweetOpts.forEach(function(v) {
+    var b = document.createElement('button');
+    b.className = 'sel-btn' + (v === sweetness ? ' active' : '');
+    b.textContent = v;
+    b.addEventListener('click', function() { sweetness = v; g.querySelectorAll('.sel-btn').forEach(function(x){ x.classList.remove('active'); }); b.classList.add('active'); });
+    g.appendChild(b);
   });
 }
 
-function toggleTopping(id, name, price) {
-  if (selectedToppings[id]) {
-    delete selectedToppings[id];
-    if (id === 'tp-boba') selectedBobaFlavour = null;
-  } else {
-    selectedToppings[id] = { id: id, name: name, price: price };
+function renderIce() {
+  var g = document.getElementById('ice-group');
+  g.innerHTML = '';
+  I18N[lang].iceOpts.forEach(function(v) {
+    var b = document.createElement('button');
+    b.className = 'sel-btn' + (v === ice ? ' active' : '');
+    b.textContent = v;
+    b.addEventListener('click', function() { ice = v; g.querySelectorAll('.sel-btn').forEach(function(x){ x.classList.remove('active'); }); b.classList.add('active'); });
+    g.appendChild(b);
+  });
+}
+
+function renderMemberPanel() {
+  var panel = document.getElementById('member-panel');
+  if (!member) { panel.classList.remove('show'); return; }
+  panel.classList.add('show');
+  document.getElementById('panel-name').textContent = member.name || member.email || member.phone || 'Member';
+  document.getElementById('panel-points').textContent = member.points || 0;
+  document.getElementById('panel-coupons').textContent = member.couponCount || 0;
+  document.getElementById('panel-balance').textContent = (member.balance || 0).toLocaleString();
+
+  var dots = document.getElementById('stamp-dots');
+  dots.innerHTML = '';
+  var goal = 8;
+  var count = member.stampCount || 0;
+  for (var i = 0; i < goal; i++) {
+    var d = document.createElement('div');
+    d.className = 'stamp-dot' + (i < count ? ' filled' : '');
+    dots.appendChild(d);
   }
-  renderToppings();
-  renderSummary();
+
+  var memberBtn = document.getElementById('member-btn');
+  memberBtn.classList.add('logged-in');
+  var dot = document.createElement('span');
+  dot.className = 'member-dot';
+  if (!memberBtn.querySelector('.member-dot')) memberBtn.prepend(dot);
 }
 
 function renderProducts() {
   var container = document.getElementById('products-container');
   container.innerHTML = '';
-  var data = products[currentLang];
-  var t = i18n[currentLang];
+  var t = I18N[lang];
+  var data = PRODUCTS[lang];
+  var hasSlush = false;
 
-  data.forEach(function(section) {
+  data.forEach(function(sec) {
     var secDiv = document.createElement('div');
     secDiv.className = 'section';
 
-    var header = document.createElement('div');
-    header.className = 'section-header';
-    header.innerHTML = '<div class="section-dot"></div>';
+    var hdr = document.createElement('div');
+    hdr.className = 'section-header';
+    hdr.innerHTML = '<div class="section-dot"></div>';
     var titleEl = document.createElement('div');
     titleEl.className = 'section-title';
-    titleEl.textContent = section.section;
-    var lineEl = document.createElement('div');
-    lineEl.className = 'section-line';
-    header.appendChild(titleEl);
-    header.appendChild(lineEl);
-    secDiv.appendChild(header);
+    titleEl.textContent = sec.section;
+    hdr.appendChild(titleEl);
+    hdr.appendChild(Object.assign(document.createElement('div'), {className:'section-line'}));
+    secDiv.appendChild(hdr);
 
     var descEl = document.createElement('div');
     descEl.className = 'section-desc';
-    descEl.textContent = section.desc;
+    descEl.textContent = sec.desc;
     secDiv.appendChild(descEl);
 
-    section.items.forEach(function(item) {
+    if (sec.fmpBadges) {
+      var badges = document.createElement('div');
+      badges.style.cssText = 'display:flex;gap:7px;margin-bottom:12px;padding-left:16px;';
+      sec.fmpBadges.forEach(function(b) {
+        var box = document.createElement('div');
+        box.style.cssText = 'border:1px solid rgba(107,143,113,0.3);border-radius:4px;padding:3px 10px;text-align:center;';
+        box.innerHTML = '<div style="font-size:7.5px;letter-spacing:0.12em;text-transform:uppercase;color:var(--warm-gray);">'+b.l+'</div><div style="font-family:Cormorant Garamond,serif;font-size:13px;color:var(--green-dark);">'+b.v+'</div>';
+        badges.appendChild(box);
+      });
+      secDiv.appendChild(badges);
+    }
+
+    sec.items.forEach(function(item) {
+      if (item.base === 'slush') hasSlush = true;
       var inCart = cart[item.id];
       var isSelected = !!inCart;
-      var selectedSize = inCart ? inCart.size : item.sizes[0];
+      var selSize = inCart ? inCart.size : item.sizes[0];
       var qty = inCart ? inCart.qty : 1;
 
       var priceStr = item.sizes.length > 1
-        ? item.sizes.map(function(s) { return s + ' ' + item.prices[s].toLocaleString() + ' Ft'; }).join(' / ')
-        : Object.values(item.prices)[0].toLocaleString() + ' Ft';
+        ? item.sizes.map(function(s){ return s+' '+item.prices[s].toLocaleString()+' Ft'; }).join(' / ')
+        : Object.values(item.prices)[0].toLocaleString()+' Ft';
+
+      // Check promo
+      var promo = activePromos.find(function(p){ return !p.product_id || p.product_id === item.id; });
 
       var card = document.createElement('div');
-      card.className = 'product-card' + (isSelected ? ' selected' : '');
-      card.id = 'card-' + item.id;
+      card.className = 'product-card'+(isSelected?' selected':'');
 
-      var productTop = document.createElement('div');
-      productTop.className = 'product-top';
+      if (promo) {
+        var pb = document.createElement('div');
+        pb.className = 'promo-badge';
+        pb.textContent = 'Special Price';
+        card.appendChild(pb);
+      }
+
+      var top = document.createElement('div');
+      top.className = 'product-top';
       var nameDiv = document.createElement('div');
-      var nameEl = document.createElement('div');
-      nameEl.className = 'product-name';
-      nameEl.textContent = item.name;
-      var zhEl = document.createElement('div');
-      zhEl.className = 'product-name-zh';
-      zhEl.textContent = item.zh;
-      nameDiv.appendChild(nameEl);
-      nameDiv.appendChild(zhEl);
-      var priceEl = document.createElement('div');
-      priceEl.className = 'product-price';
-      priceEl.textContent = priceStr;
-      productTop.appendChild(nameDiv);
-      productTop.appendChild(priceEl);
-      productTop.addEventListener('click', (function(id) {
-        return function() { toggleProduct(id); };
-      })(item.id));
+      var ne = document.createElement('div'); ne.className = 'product-name'; ne.textContent = item.name;
+      var zhe = document.createElement('div'); zhe.className = 'product-name-zh'; zhe.textContent = item.zh;
+      nameDiv.appendChild(ne); nameDiv.appendChild(zhe);
+      var pe = document.createElement('div'); pe.className = 'product-price'; pe.textContent = priceStr;
+      top.appendChild(nameDiv); top.appendChild(pe);
+      top.addEventListener('click', (function(id){ return function(){ toggleProduct(id); }; })(item.id));
+      card.appendChild(top);
 
-      var sizeDiv = document.createElement('div');
-      sizeDiv.className = 'size-options';
-      var sizeSpan = document.createElement('span');
-      sizeSpan.style.cssText = 'font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--warm-gray);margin-right:4px;';
-      sizeSpan.textContent = t.sizeLabel;
-      sizeDiv.appendChild(sizeSpan);
-      item.sizes.forEach(function(s) {
-        var btn = document.createElement('button');
-        btn.className = 'size-btn' + (s === selectedSize ? ' active' : '');
-        btn.textContent = s;
-        btn.addEventListener('click', (function(id, size) {
-          return function(e) { e.stopPropagation(); selectSize(id, size); };
-        })(item.id, s));
-        sizeDiv.appendChild(btn);
-      });
+      if (isSelected && item.base !== 'slush') {
+        var sub = document.createElement('div');
+        sub.className = 'sub-options';
 
-      var qtyDiv = document.createElement('div');
-      qtyDiv.className = 'qty-controls';
-      var minusBtn = document.createElement('button');
-      minusBtn.className = 'qty-btn';
-      minusBtn.textContent = '-';
-      minusBtn.addEventListener('click', (function(id) {
-        return function(e) { e.stopPropagation(); changeQty(id, -1); };
-      })(item.id));
-      var qtyDisplay = document.createElement('span');
-      qtyDisplay.className = 'qty-display';
-      qtyDisplay.id = 'qty-display-' + item.id;
-      qtyDisplay.textContent = qty;
-      var plusBtn = document.createElement('button');
-      plusBtn.className = 'qty-btn';
-      plusBtn.textContent = '+';
-      plusBtn.addEventListener('click', (function(id) {
-        return function(e) { e.stopPropagation(); changeQty(id, 1); };
-      })(item.id));
-      var qtyLabel = document.createElement('span');
-      qtyLabel.className = 'qty-label';
-      qtyLabel.textContent = t.qtyLabel;
-      qtyDiv.appendChild(minusBtn);
-      qtyDiv.appendChild(qtyDisplay);
-      qtyDiv.appendChild(plusBtn);
-      qtyDiv.appendChild(qtyLabel);
+        // Size
+        var szLabel = document.createElement('div'); szLabel.className = 'sub-label'; szLabel.textContent = t.sizeLabel;
+        var szGroup = document.createElement('div'); szGroup.className = 'btn-group';
+        item.sizes.forEach(function(s) {
+          var b = document.createElement('button');
+          b.className = 'sel-btn'+(s===selSize?' active':'');
+          b.textContent = s;
+          b.addEventListener('click', (function(id,size){ return function(e){ e.stopPropagation(); selectSize(id,size); }; })(item.id,s));
+          szGroup.appendChild(b);
+        });
+        sub.appendChild(szLabel); sub.appendChild(szGroup);
 
-      card.appendChild(productTop);
-      card.appendChild(sizeDiv);
-      card.appendChild(qtyDiv);
-
-      // Base selector for milk and fruittea
-      if (isSelected && item.base && item.base !== 'slush') {
-        var baseDiv = document.createElement('div');
-        baseDiv.style.cssText = 'margin-top:12px;padding-top:12px;border-top:1px solid rgba(107,143,113,0.15);';
-        var baseLbl = document.createElement('div');
-        baseLbl.style.cssText = 'font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--warm-gray);margin-bottom:8px;';
-        baseLbl.textContent = t.baseLabel;
-        baseDiv.appendChild(baseLbl);
-        var baseGroup = document.createElement('div');
-        baseGroup.style.cssText = 'display:flex;gap:7px;flex-wrap:wrap;';
-
-        var baseOpts = [];
+        // Base choice
         if (item.base === 'milk') {
-          baseOpts = [{val:'pearl', label:t.basePearl}, {val:'coconut', label:t.baseCoconut}];
+          var bLabel = document.createElement('div'); bLabel.className = 'sub-label'; bLabel.style.marginTop='8px'; bLabel.textContent = t.baseLabel;
+          var bGroup = document.createElement('div'); bGroup.className = 'btn-group';
+          [{val:'pearl',lbl:t.basePearl},{val:'coconut',lbl:t.baseCoconut}].forEach(function(opt) {
+            var b = document.createElement('button');
+            b.className = 'sel-btn'+((selectedBases[item.id]||'pearl')===opt.val?' active':'');
+            b.textContent = opt.lbl;
+            b.addEventListener('click', (function(id,v){ return function(e){ e.stopPropagation(); selectedBases[id]=v; renderProducts(); renderSummary(); }; })(item.id,opt.val));
+            bGroup.appendChild(b);
+          });
+          sub.appendChild(bLabel); sub.appendChild(bGroup);
         } else if (item.base === 'fruittea') {
-          baseOpts = [{val:'boba', label:t.baseBoba}, {val:'coconut', label:t.baseCoconutAlt}];
+          var bLabel2 = document.createElement('div'); bLabel2.className = 'sub-label'; bLabel2.style.marginTop='8px'; bLabel2.textContent = t.baseLabel;
+          var bGroup2 = document.createElement('div'); bGroup2.className = 'btn-group';
+          [{val:'boba',lbl:t.baseBoba+' ('+item.bobaFl+')'},{val:'coconut',lbl:t.baseCoconut}].forEach(function(opt) {
+            var b = document.createElement('button');
+            b.className = 'sel-btn'+((selectedBases[item.id]||'boba')===opt.val?' active':'');
+            b.textContent = opt.lbl;
+            b.addEventListener('click', (function(id,v){ return function(e){ e.stopPropagation(); selectedBases[id]=v; renderProducts(); renderSummary(); }; })(item.id,opt.val));
+            bGroup2.appendChild(b);
+          });
+          sub.appendChild(bLabel2); sub.appendChild(bGroup2);
         }
 
-        baseOpts.forEach(function(opt) {
-          var btn = document.createElement('button');
-          btn.className = 'size-btn' + (selectedBases[item.id] === opt.val ? ' active' : '');
-          btn.textContent = opt.label;
-          btn.addEventListener('click', (function(iid, val) {
-            return function(e) { e.stopPropagation(); selectedBases[iid] = val; renderProducts(); renderSummary(); };
-          })(item.id, opt.val));
-          baseGroup.appendChild(btn);
-        });
+        // Qty
+        var qRow = document.createElement('div'); qRow.className = 'qty-row';
+        var mb = document.createElement('button'); mb.className = 'qty-btn'; mb.textContent = '−';
+        mb.addEventListener('click', (function(id){ return function(e){ e.stopPropagation(); changeQty(id,-1); }; })(item.id));
+        var qn = document.createElement('span'); qn.className = 'qty-num'; qn.textContent = qty;
+        var pb2 = document.createElement('button'); pb2.className = 'qty-btn'; pb2.textContent = '+';
+        pb2.addEventListener('click', (function(id){ return function(e){ e.stopPropagation(); changeQty(id,1); }; })(item.id));
+        var ql = document.createElement('span'); ql.className = 'qty-label'; ql.textContent = t.qtyLabel;
+        qRow.appendChild(mb); qRow.appendChild(qn); qRow.appendChild(pb2); qRow.appendChild(ql);
+        sub.appendChild(qRow);
 
-        baseDiv.appendChild(baseGroup);
-        card.appendChild(baseDiv);
+        card.appendChild(sub);
       }
 
       secDiv.appendChild(card);
@@ -651,221 +822,343 @@ function renderProducts() {
 
     container.appendChild(secDiv);
   });
+
+  // Show/hide slush toppings
+  document.getElementById('slush-toppings-section').style.display = hasSlush ? 'block' : 'none';
 }
 
-function isSlushOnly() {
-  var keys = Object.keys(cart);
-  if (keys.length === 0) return false;
-  return keys.every(function(id) { return id.indexOf('sl-') === 0; });
-}
-
-function updateCustomizeVisibility() {
-  var section = document.getElementById('customize-section');
-  var titleEl = document.getElementById('custom-title');
-  if (isSlushOnly()) {
-    section.style.opacity = '0.35';
-    section.style.pointerEvents = 'none';
-    titleEl.textContent = i18n[currentLang].customTitleSlush;
-  } else {
-    section.style.opacity = '1';
-    section.style.pointerEvents = '';
-    titleEl.textContent = i18n[currentLang].customTitle;
-  }
-}
-
-function toggleProduct(id) {
-  if (cart[id]) {
-    delete cart[id];
-    delete selectedBases[id];
-  } else {
-    var item = findItem(id);
-    cart[id] = { name: item.name, zh: item.zh, size: item.sizes[0], qty: 1, prices: item.prices, base: item.base, bobaFl: item.bobaFl || null };
-    if (item.base === 'milk') selectedBases[id] = 'pearl';
-    if (item.base === 'fruittea') selectedBases[id] = 'boba';
-  }
-  renderProducts();
-  renderSummary();
-  updateCustomizeVisibility();
-}
-
-function selectSize(id, size) {
-  if (!cart[id]) return;
-  cart[id].size = size;
-  renderProducts();
-  renderSummary();
-}
-
-function changeQty(id, delta) {
-  if (!cart[id]) return;
-  cart[id].qty = Math.max(1, cart[id].qty + delta);
-  var el = document.getElementById('qty-display-' + id);
-  if (el) el.textContent = cart[id].qty;
-  renderSummary();
-}
-
-function findItem(id) {
-  var data = products[currentLang];
-  for (var i = 0; i < data.length; i++) {
-    for (var j = 0; j < data[i].items.length; j++) {
-      if (data[i].items[j].id === id) return data[i].items[j];
-    }
-  }
-  return null;
-}
-
-function selectOpt(type, val, group) {
-  group.querySelectorAll('.opt-btn').forEach(function(b) { b.classList.remove('active'); });
-  group.querySelectorAll('.opt-btn').forEach(function(b) {
-    if (b.textContent === val) b.classList.add('active');
+function renderSlushToppings() {
+  var list = document.getElementById('slush-toppings-list');
+  list.innerHTML = '';
+  SLUSH_TOPPINGS[lang].forEach(function(tp) {
+    var isSelected = !!slushToppings[tp.id];
+    var item = document.createElement('div');
+    item.className = 'topping-item'+(isSelected?' selected':'');
+    var nameEl = document.createElement('div'); nameEl.className = 'topping-name'; nameEl.textContent = tp.name;
+    var right = document.createElement('div'); right.className = 'topping-right';
+    var priceEl = document.createElement('div'); priceEl.className = 'topping-price'; priceEl.textContent = '+'+tp.price+' Ft';
+    var check = document.createElement('div'); check.className = 'topping-check'; check.textContent = '✓';
+    right.appendChild(priceEl); right.appendChild(check);
+    item.appendChild(nameEl); item.appendChild(right);
+    item.addEventListener('click', (function(id,name,price){ return function(){ toggleSlushTopping(id,name,price); }; })(tp.id,tp.name,tp.price));
+    list.appendChild(item);
   });
-  if (type === 'sweetness') sweetness = val;
-  if (type === 'ice') ice = val;
+}
+
+function renderCustomizeVisibility() {
+  var t = I18N[lang];
+  var box = document.getElementById('customize-box');
+  var titleEl = document.getElementById('customize-title');
+  var keys = Object.keys(cart);
+  var allSlush = keys.length > 0 && keys.every(function(id){ return id.indexOf('sl-')===0; });
+  if (allSlush) {
+    box.style.opacity = '0.35';
+    box.style.pointerEvents = 'none';
+    titleEl.textContent = t.customSlush;
+  } else {
+    box.style.opacity = '1';
+    box.style.pointerEvents = '';
+    titleEl.textContent = t.customTitle;
+  }
+}
+
+function renderCoupons() {
+  var box = document.getElementById('coupon-box');
+  var list = document.getElementById('coupon-list');
+  if (!member || myCoupons.length === 0) { box.classList.remove('show'); return; }
+  box.classList.add('show');
+  list.innerHTML = '';
+  myCoupons.forEach(function(c) {
+    var item = document.createElement('div');
+    item.className = 'coupon-item'+(selectedCouponId===c.id?' selected':'');
+    var info = document.createElement('div');
+    var name = document.createElement('div'); name.className = 'coupon-name'; name.textContent = c.coupon_name;
+    var desc = document.createElement('div'); desc.className = 'coupon-desc';
+    if (c.min_order > 0) desc.textContent = 'Min. '+c.min_order.toLocaleString()+' Ft';
+    info.appendChild(name); info.appendChild(desc);
+    var check = document.createElement('div'); check.className = 'coupon-check'; check.textContent = '✓';
+    item.appendChild(info); item.appendChild(check);
+    item.addEventListener('click', (function(id){ return function(){ selectedCouponId = selectedCouponId===id ? null : id; renderCoupons(); renderSummary(); }; })(c.id));
+    list.appendChild(item);
+  });
 }
 
 function renderSummary() {
-  var t = i18n[currentLang];
+  var t = I18N[lang];
   var content = document.getElementById('summary-content');
   var totalEl = document.getElementById('summary-total');
   var totalAmt = document.getElementById('total-amount');
   var submitBtn = document.getElementById('submit-btn');
   var cartKeys = Object.keys(cart);
-  var toppingKeys = Object.keys(selectedToppings);
+  var slushKeys = Object.keys(slushToppings);
 
-  if (cartKeys.length === 0 && toppingKeys.length === 0) {
-    content.innerHTML = '';
-    var emptyEl = document.createElement('div');
-    emptyEl.className = 'summary-empty';
-    emptyEl.textContent = t.summaryEmpty;
-    content.appendChild(emptyEl);
+  if (cartKeys.length === 0) {
+    content.innerHTML = '<div class="summary-empty">'+t.summaryEmpty+'</div>';
     totalEl.style.display = 'none';
     submitBtn.disabled = true;
     return;
   }
 
   content.innerHTML = '';
-  var total = 0;
+  var subtotal = 0;
 
   cartKeys.forEach(function(id) {
     var c = cart[id];
     var price = c.prices[c.size] * c.qty;
-    total += price;
-    var row = document.createElement('div');
-    row.className = 'summary-item';
-    var nameSpan = document.createElement('span');
-    nameSpan.className = 'summary-item-name';
-    nameSpan.textContent = c.name + ' \u00b7 ' + c.size + (c.qty > 1 ? ' x' + c.qty : '');
-    var priceSpan = document.createElement('span');
-    priceSpan.className = 'summary-item-price';
-    priceSpan.textContent = price.toLocaleString() + ' Ft';
-    row.appendChild(nameSpan);
-    row.appendChild(priceSpan);
-    content.appendChild(row);
-  });
-
-  toppingKeys.forEach(function(id) {
-    var tp = selectedToppings[id];
-    total += tp.price;
-    var row = document.createElement('div');
-    row.className = 'summary-item';
-    var nameSpan = document.createElement('span');
-    nameSpan.className = 'summary-item-name';
-    var displayName = '+ ' + tp.name;
-    if (id === 'tp-boba' && selectedBobaFlavour) {
-      var fl = bobaFlavours[currentLang].find(function(f) { return f.id === selectedBobaFlavour; });
-      if (fl) displayName += ' (' + fl.name + ')';
+    subtotal += price;
+    var row = document.createElement('div'); row.className = 'summary-row';
+    var baseInfo = '';
+    if (selectedBases[id]) {
+      var bmap = {pearl:t.basePearl,coconut:t.baseCoconut,boba:t.baseBoba};
+      baseInfo = ' · '+(bmap[selectedBases[id]]||'');
     }
-    nameSpan.textContent = displayName;
-    var priceSpan = document.createElement('span');
-    priceSpan.className = 'summary-item-price';
-    priceSpan.textContent = '+' + tp.price + ' Ft';
-    row.appendChild(nameSpan);
-    row.appendChild(priceSpan);
-    content.appendChild(row);
+    var ns = document.createElement('span'); ns.className = 'summary-row-name'; ns.textContent = c.name+' · '+c.size+baseInfo+(c.qty>1?' ×'+c.qty:'');
+    var ps = document.createElement('span'); ps.className = 'summary-row-price'; ps.textContent = price.toLocaleString()+' Ft';
+    row.appendChild(ns); row.appendChild(ps); content.appendChild(row);
   });
 
+  slushKeys.forEach(function(id) {
+    var tp = slushToppings[id];
+    subtotal += tp.price;
+    var row = document.createElement('div'); row.className = 'summary-row';
+    var ns = document.createElement('span'); ns.className = 'summary-row-name'; ns.textContent = '+ '+tp.name;
+    var ps = document.createElement('span'); ps.className = 'summary-row-price'; ps.textContent = '+'+tp.price+' Ft';
+    row.appendChild(ns); row.appendChild(ps); content.appendChild(row);
+  });
+
+  // Coupon discount
+  var discount = 0;
+  if (selectedCouponId) {
+    var coupon = myCoupons.find(function(c){ return c.id===selectedCouponId; });
+    if (coupon && subtotal >= (coupon.min_order||0)) {
+      if (coupon.coupon_type === 'fixed_discount') discount = Math.min(coupon.coupon_value, subtotal);
+      else if (coupon.coupon_type === 'percent_discount') discount = Math.floor(subtotal * coupon.coupon_value/100);
+      if (discount > 0) {
+        var dRow = document.createElement('div'); dRow.className = 'summary-row discount';
+        var dn = document.createElement('span'); dn.className = 'summary-row-name'; dn.textContent = t.discountLabel;
+        var dp = document.createElement('span'); dp.className = 'summary-row-price'; dp.textContent = '−'+discount.toLocaleString()+' Ft';
+        dRow.appendChild(dn); dRow.appendChild(dp); content.appendChild(dRow);
+      }
+    }
+  }
+
+  var total = Math.max(0, subtotal - discount);
   totalEl.style.display = 'flex';
-  totalAmt.textContent = total.toLocaleString() + ' Ft';
-  submitBtn.disabled = cartKeys.length === 0;
+  totalAmt.textContent = total.toLocaleString()+' Ft';
+  submitBtn.disabled = false;
 }
 
-function generateOrderNum() {
-  return Math.floor(1000 + Math.random() * 9000).toString();
+// ── ACTIONS ───────────────────────────────────────────────────────────────────
+function toggleProduct(id) {
+  if (cart[id]) {
+    delete cart[id];
+    delete selectedBases[id];
+  } else {
+    var item = findItem(id);
+    cart[id] = { name:item.name, zh:item.zh, size:item.sizes[0], qty:1, prices:item.prices, base:item.base };
+    if (item.base === 'milk') selectedBases[id] = 'pearl';
+    if (item.base === 'fruittea') selectedBases[id] = 'boba';
+  }
+  renderProducts(); renderCustomizeVisibility(); renderSummary();
 }
 
-async function submitOrder() {
-  var t = i18n[currentLang];
+function selectSize(id, size) {
+  if (!cart[id]) return;
+  cart[id].size = size;
+  renderProducts(); renderSummary();
+}
+
+function changeQty(id, delta) {
+  if (!cart[id]) return;
+  cart[id].qty = Math.max(1, cart[id].qty + delta);
+  renderProducts(); renderSummary();
+}
+
+function toggleSlushTopping(id, name, price) {
+  if (slushToppings[id]) delete slushToppings[id];
+  else slushToppings[id] = { name, price };
+  renderSlushToppings(); renderSummary();
+}
+
+function setPayment(method) {
+  paymentMethod = method;
+  document.getElementById('pay-counter').classList.toggle('active', method==='counter');
+  document.getElementById('pay-online').classList.toggle('active', method==='simplepay');
+  document.getElementById('submit-note').textContent = method==='counter' ? I18N[lang].submitNote : 'You will be redirected to SimplePay to complete payment.';
+}
+
+function findItem(id) {
+  for (var s of PRODUCTS[lang]) for (var i of s.items) if (i.id===id) return i;
+  return null;
+}
+
+// ── AUTH ──────────────────────────────────────────────────────────────────────
+function openAuthModal() { document.getElementById('auth-modal').classList.add('show'); }
+function closeAuthModal() { document.getElementById('auth-modal').classList.remove('show'); }
+function switchTab(tab) {
+  document.getElementById('tab-login').classList.toggle('active', tab==='login');
+  document.getElementById('tab-register').classList.toggle('active', tab==='register');
+  document.getElementById('form-login').style.display = tab==='login'?'block':'none';
+  document.getElementById('form-register').style.display = tab==='register'?'block':'none';
+}
+
+async function doLogin() {
+  var btn = document.getElementById('login-btn');
+  var err = document.getElementById('login-error');
+  var identifier = document.getElementById('login-identifier').value.trim();
+  var password = document.getElementById('login-password').value;
+  if (!identifier || !password) { showError(err,'Please fill all fields'); return; }
+  btn.disabled = true; btn.textContent = '...';
+  try {
+    var r = await fetch(API+'/api/auth/login', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({identifier,password}) });
+    var data = await r.json();
+    if (!r.ok) { showError(err, data.error||'Login failed'); return; }
+    token = data.token;
+    member = data.member;
+    myCoupons = [];
+    localStorage.setItem('wl_token', token);
+    await loadCoupons();
+    closeAuthModal();
+    renderAll();
+    showToast('Welcome back, '+(member.name||'Member')+'!');
+  } catch(e) { showError(err,'Connection error'); }
+  finally { btn.disabled=false; btn.textContent='Sign In'; }
+}
+
+async function doRegister() {
+  var btn = document.getElementById('reg-btn');
+  var err = document.getElementById('reg-error');
+  var email = document.getElementById('reg-email').value.trim();
+  var phone = document.getElementById('reg-phone').value.trim();
+  var name = document.getElementById('reg-name').value.trim();
+  var birthday = document.getElementById('reg-birthday').value;
+  var password = document.getElementById('reg-password').value;
+  var referralCode = document.getElementById('reg-referral').value.trim();
+  if (!email && !phone) { showError(err,'Email or phone required'); return; }
+  if (!password || password.length < 6) { showError(err,'Password must be at least 6 characters'); return; }
+  btn.disabled=true; btn.textContent='...';
+  try {
+    var r = await fetch(API+'/api/auth/register', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({email:email||undefined,phone:phone||undefined,name:name||undefined,birthday:birthday||undefined,password,referralCode:referralCode||undefined}) });
+    var data = await r.json();
+    if (!r.ok) { showError(err, data.error||'Registration failed'); return; }
+    token = data.token;
+    member = data.member;
+    myCoupons = [];
+    localStorage.setItem('wl_token', token);
+    await loadCoupons();
+    closeAuthModal();
+    renderAll();
+    showToast('Welcome! You received a 500 Ft welcome coupon 🎉');
+  } catch(e) { showError(err,'Connection error'); }
+  finally { btn.disabled=false; btn.textContent='Create Account'; }
+}
+
+function doLogout() {
+  token = null; member = null; myCoupons = []; selectedCouponId = null;
+  localStorage.removeItem('wl_token');
+  document.getElementById('member-btn').classList.remove('logged-in');
+  var dot = document.getElementById('member-btn').querySelector('.member-dot');
+  if (dot) dot.remove();
+  renderAll();
+  showToast('Signed out');
+}
+
+function showMemberOptions() {
+  showToast((member.name||'Member')+' · '+member.points+' pts · '+member.stampCount+'/8 stamps');
+}
+
+// ── SUBMIT ────────────────────────────────────────────────────────────────────
+async function doSubmit() {
   var btn = document.getElementById('submit-btn');
   btn.disabled = true;
-  document.getElementById('submit-text').textContent = '...';
+  var origText = btn.textContent;
+  btn.textContent = '...';
 
-  var orderNum = generateOrderNum();
-  var timestamp = new Date().toLocaleString('hu-HU', { timeZone: 'Europe/Budapest' });
-
-  var lines = Object.values(cart).map(function(c) {
-    return c.name + ' (' + c.zh + ') \u00b7 ' + c.size + (c.qty > 1 ? ' x' + c.qty : '') + ' \u00b7 ' + (c.prices[c.size] * c.qty).toLocaleString() + ' Ft';
+  var cartKeys = Object.keys(cart);
+  var items = cartKeys.map(function(id) {
+    var c = cart[id];
+    var item = findItem(id);
+    return {
+      productId: id,
+      name: c.name,
+      nameZh: c.zh,
+      size: c.size,
+      baseChoice: selectedBases[id] || null,
+      quantity: c.qty,
+      unitPrice: c.prices[c.size]
+    };
   });
 
-  var toppingLines = Object.values(selectedToppings).map(function(tp) {
-    var name = tp.name;
-    if (tp.id === 'tp-boba' && selectedBobaFlavour) {
-      var fl = bobaFlavours[currentLang].find(function(f) { return f.id === selectedBobaFlavour; });
-      if (fl) name += ' (' + fl.name + ')';
-    }
-    return '+ ' + name + ' \u00b7 +' + tp.price + ' Ft';
+  var toppings = Object.keys(slushToppings).map(function(id) {
+    var tp = slushToppings[id];
+    return { id, name:tp.name, price:tp.price };
   });
-
-  var allLines = lines.concat(toppingLines);
-  var total = Object.values(cart).reduce(function(s, c) { return s + c.prices[c.size] * c.qty; }, 0)
-            + Object.values(selectedToppings).reduce(function(s, tp) { return s + tp.price; }, 0);
-
-  var notes = document.getElementById('notes-input').value.trim();
 
   var payload = {
-    orderNum: orderNum,
-    timestamp: timestamp,
-    items: allLines.join('\n'),
-    sweetness: sweetness,
-    ice: ice,
-    notes: notes,
-    total: total.toLocaleString() + ' Ft',
-    lang: currentLang
+    items, toppings,
+    sweetness, ice,
+    notes: document.getElementById('notes-input').value.trim(),
+    paymentMethod: paymentMethod === 'counter' ? 'counter' : 'simplepay',
+    couponId: selectedCouponId || undefined,
+    lang
   };
 
   try {
-    await fetch(GOOGLE_SCRIPT_URL, {
-      method: 'POST', mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
+    var r = await fetch(API+'/api/orders', {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json', ...(token ? {'Authorization':'Bearer '+token} : {}) },
       body: JSON.stringify(payload)
     });
-  } catch(e) {}
+    var data = await r.json();
+    if (!r.ok) { showToast('Error: '+(data.error||'Failed')); btn.disabled=false; btn.textContent=origText; return; }
 
-  document.getElementById('order-form').style.display = 'none';
-  var s = document.getElementById('success-screen');
-  s.classList.add('show');
-  document.getElementById('success-title').textContent = t.successTitle;
-  document.getElementById('success-desc').textContent = t.successDesc;
-  document.getElementById('order-number').textContent = '#' + orderNum;
-  document.getElementById('order-num-label').textContent = t.orderNumLabel;
-  document.getElementById('new-order-btn').textContent = t.newOrderBtn;
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Show success
+    document.getElementById('order-form').style.display = 'none';
+    var s = document.getElementById('success-screen');
+    s.classList.add('show');
+    document.getElementById('success-title').textContent = I18N[lang].successTitle;
+    document.getElementById('success-desc').textContent = I18N[lang].successDesc;
+    document.getElementById('order-num-display').textContent = '#'+data.orderNumber;
+    document.getElementById('order-num-label').textContent = I18N[lang].orderNumLabel;
+    document.getElementById('new-order-btn').textContent = I18N[lang].newOrderBtn;
+
+    // Refresh member
+    if (token) {
+      await loadMember();
+      if (member) {
+        var pe = document.getElementById('points-earned-display');
+        pe.textContent = '+'+data.pointsEarned+' pts earned';
+        pe.style.display = 'inline-block';
+      }
+    }
+
+    window.scrollTo({top:0,behavior:'smooth'});
+  } catch(e) {
+    showToast('Connection error. Please try again.');
+    btn.disabled=false; btn.textContent=origText;
+  }
 }
 
 function resetOrder() {
-  cart = {};
-  selectedToppings = {};
-  selectedBobaFlavour = null;
-  selectedBases = {};
-  sweetness = i18n[currentLang].defaultSweetness;
-  ice = i18n[currentLang].defaultIce;
-  document.getElementById('notes-input').value = '';
-  document.getElementById('order-form').style.display = 'block';
+  cart={}; selectedBases={}; selectedBobaFlavours={}; slushToppings={}; selectedCouponId=null;
+  sweetness=I18N[lang].defSweet; ice=I18N[lang].defIce;
+  document.getElementById('notes-input').value='';
+  document.getElementById('order-form').style.display='block';
   document.getElementById('success-screen').classList.remove('show');
+  document.getElementById('points-earned-display').style.display='none';
   renderAll();
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 
-renderAll();
+// ── UTILS ─────────────────────────────────────────────────────────────────────
+function showError(el, msg) { el.textContent=msg; el.classList.add('show'); }
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._t);
+  t._t = setTimeout(function(){ t.classList.remove('show'); }, 2800);
+}
 </script>
-
 </body>
 </html>
