@@ -333,17 +333,11 @@ body::before { content: ''; position: fixed; inset: 0; background-image: radial-
       </div>
     </div>
 
-    <!-- CUSTOMIZE -->
-    <div class="customize-box" id="customize-box">
-      <div class="customize-title" id="customize-title">Customise Your Drink</div>
-      <div class="customize-row">
-        <div class="sub-label" id="sweet-label">Sweetness</div>
-        <div class="btn-group" id="sweetness-group"></div>
-      </div>
-      <div class="customize-row">
-        <div class="sub-label" id="ice-label">Ice</div>
-        <div class="btn-group" id="ice-group"></div>
-      </div>
+    <!-- Sweetness/Ice moved inside each product card -->
+    <div id="customize-box" style="display:none">
+      <div id="customize-title"></div>
+      <div id="sweet-label"></div><div id="sweetness-group"></div>
+      <div id="ice-label"></div><div id="ice-group"></div>
     </div>
 
     <!-- COUPONS -->
@@ -602,7 +596,7 @@ function setLang(l) {
   cart = {}; selectedBases = {}; selectedBobaFlavours = {}; slushToppings = {};
   sweetness = I18N[l].defSweet; ice = I18N[l].defIce;
   renderAll();
-  window.scrollTo({ top:0, behavior:'smooth' });
+  window.scrollTo(0, 0);
 }
 
 // ── RENDER ────────────────────────────────────────────────────────────────────
@@ -803,6 +797,32 @@ function renderProducts() {
           sub.appendChild(bLabel2); sub.appendChild(bGroup2);
         }
 
+        // Per-item Sweetness
+        var swLbl = document.createElement('div'); swLbl.className = 'sub-label'; swLbl.style.marginTop='8px'; swLbl.textContent = t.sweet;
+        var swGrp = document.createElement('div'); swGrp.className = 'btn-group';
+        var curSweet = inCart ? (inCart.sweetness || I18N[lang].defSweet) : I18N[lang].defSweet;
+        t.sweetOpts.forEach(function(v) {
+          var b = document.createElement('button');
+          b.className = 'sel-btn'+(v===curSweet?' active':'');
+          b.textContent = v;
+          b.addEventListener('click', (function(iid,val,grp){ return function(e){ e.stopPropagation(); if(cart[iid]) cart[iid].sweetness=val; grp.querySelectorAll('.sel-btn').forEach(function(x){x.classList.remove('active');}); e.currentTarget.classList.add('active'); }; })(item.id,v,swGrp));
+          swGrp.appendChild(b);
+        });
+        sub.appendChild(swLbl); sub.appendChild(swGrp);
+
+        // Per-item Ice
+        var iceLbl = document.createElement('div'); iceLbl.className = 'sub-label'; iceLbl.style.marginTop='8px'; iceLbl.textContent = t.ice;
+        var iceGrp = document.createElement('div'); iceGrp.className = 'btn-group';
+        var curIce = inCart ? (inCart.ice || I18N[lang].defIce) : I18N[lang].defIce;
+        t.iceOpts.forEach(function(v) {
+          var b = document.createElement('button');
+          b.className = 'sel-btn'+(v===curIce?' active':'');
+          b.textContent = v;
+          b.addEventListener('click', (function(iid,val,grp){ return function(e){ e.stopPropagation(); if(cart[iid]) cart[iid].ice=val; grp.querySelectorAll('.sel-btn').forEach(function(x){x.classList.remove('active');}); e.currentTarget.classList.add('active'); }; })(item.id,v,iceGrp));
+          iceGrp.appendChild(b);
+        });
+        sub.appendChild(iceLbl); sub.appendChild(iceGrp);
+
         // Qty
         var qRow = document.createElement('div'); qRow.className = 'qty-row';
         var mb = document.createElement('button'); mb.className = 'qty-btn'; mb.textContent = '−';
@@ -955,7 +975,7 @@ function toggleProduct(id) {
     delete selectedBases[id];
   } else {
     var item = findItem(id);
-    cart[id] = { name:item.name, zh:item.zh, size:item.sizes[0], qty:1, prices:item.prices, base:item.base };
+    cart[id] = { name:item.name, zh:item.zh, size:item.sizes[0], qty:1, prices:item.prices, base:item.base, sweetness:I18N[lang].defSweet, ice:I18N[lang].defIce };
     if (item.base === 'milk') selectedBases[id] = 'pearl';
     if (item.base === 'fruittea') selectedBases[id] = 'boba';
   }
@@ -976,7 +996,7 @@ function changeQty(id, delta) {
 
 function toggleSlushTopping(id, name, price) {
   if (slushToppings[id]) delete slushToppings[id];
-  else slushToppings[id] = { name, price };
+  else slushToppings[id] = { name: name, price: price };
   renderSlushToppings(); renderSummary();
 }
 
@@ -988,7 +1008,12 @@ function setPayment(method) {
 }
 
 function findItem(id) {
-  for (var s of PRODUCTS[lang]) for (var i of s.items) if (i.id===id) return i;
+  var data = PRODUCTS[lang];
+  for (var si = 0; si < data.length; si++) {
+    for (var ii = 0; ii < data[si].items.length; ii++) {
+      if (data[si].items[ii].id === id) return data[si].items[ii];
+    }
+  }
   return null;
 }
 
@@ -1010,7 +1035,7 @@ async function doLogin() {
   if (!identifier || !password) { showError(err,'Please fill all fields'); return; }
   btn.disabled = true; btn.textContent = '...';
   try {
-    var r = await fetch(API+'/api/auth/login', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({identifier,password}) });
+    var r = await fetch(API+'/api/auth/login', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({identifier:identifier, password:password}) });
     var data = await r.json();
     if (!r.ok) { showError(err, data.error||'Login failed'); return; }
     token = data.token;
@@ -1038,7 +1063,13 @@ async function doRegister() {
   if (!password || password.length < 6) { showError(err,'Password must be at least 6 characters'); return; }
   btn.disabled=true; btn.textContent='...';
   try {
-    var r = await fetch(API+'/api/auth/register', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({email:email||undefined,phone:phone||undefined,name:name||undefined,birthday:birthday||undefined,password,referralCode:referralCode||undefined}) });
+    var regPayload = {password:password};
+    if (email) regPayload.email = email;
+    if (phone) regPayload.phone = phone;
+    if (name) regPayload.name = name;
+    if (birthday) regPayload.birthday = birthday;
+    if (referralCode) regPayload.referralCode = referralCode;
+    var r = await fetch(API+'/api/auth/register', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(regPayload) });
     var data = await r.json();
     if (!r.ok) { showError(err, data.error||'Registration failed'); return; }
     token = data.token;
@@ -1077,7 +1108,6 @@ async function doSubmit() {
   var cartKeys = Object.keys(cart);
   var items = cartKeys.map(function(id) {
     var c = cart[id];
-    var item = findItem(id);
     return {
       productId: id,
       name: c.name,
@@ -1085,28 +1115,30 @@ async function doSubmit() {
       size: c.size,
       baseChoice: selectedBases[id] || null,
       quantity: c.qty,
-      unitPrice: c.prices[c.size]
+      unitPrice: c.prices[c.size],
+      sweetness: c.sweetness || I18N[lang].defSweet,
+      ice: c.ice || I18N[lang].defIce
     };
   });
 
   var toppings = Object.keys(slushToppings).map(function(id) {
     var tp = slushToppings[id];
-    return { id, name:tp.name, price:tp.price };
+    return { id: id, name: tp.name, price: tp.price };
   });
 
   var payload = {
-    items, toppings,
-    sweetness, ice,
+    items: items,
+    toppings: toppings,
     notes: document.getElementById('notes-input').value.trim(),
     paymentMethod: paymentMethod === 'counter' ? 'counter' : 'simplepay',
-    couponId: selectedCouponId || undefined,
-    lang
+    lang: lang
   };
+  if (selectedCouponId) payload.couponId = selectedCouponId;
 
   try {
     var r = await fetch(API+'/api/orders', {
       method:'POST',
-      headers:{ 'Content-Type':'application/json', ...(token ? {'Authorization':'Bearer '+token} : {}) },
+      headers: (function(){ var h={'Content-Type':'application/json'}; if(token) h['Authorization']='Bearer '+token; return h; })(),
       body: JSON.stringify(payload)
     });
     var data = await r.json();
@@ -1132,7 +1164,7 @@ async function doSubmit() {
       }
     }
 
-    window.scrollTo({top:0,behavior:'smooth'});
+    window.scrollTo(0, 0);
   } catch(e) {
     showToast('Connection error. Please try again.');
     btn.disabled=false; btn.textContent=origText;
@@ -1147,7 +1179,7 @@ function resetOrder() {
   document.getElementById('success-screen').classList.remove('show');
   document.getElementById('points-earned-display').style.display='none';
   renderAll();
-  window.scrollTo({top:0,behavior:'smooth'});
+  window.scrollTo(0, 0);
 }
 
 // ── UTILS ─────────────────────────────────────────────────────────────────────
