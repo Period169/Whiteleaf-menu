@@ -351,6 +351,24 @@ body.show-history .view-history { display: block; }
   margin: 20px 0 10px 4px;
 }
 
+/* ─── PRINT BUTTON ────────────────────────────────────── */
+.btn-print {
+  background: transparent;
+  color: var(--warm-gray);
+  border: 1px solid #e0ddd8;
+  border-radius: 8px;
+  padding: 7px 14px;
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: background 0.15s;
+  margin-top: 10px;
+  display: block;
+  width: 100%;
+}
+.btn-print:active { background: #f0ece6; }
+
 /* ─── TOAST ────────────────────────────────────────────── */
 #toast {
   position: fixed;
@@ -448,6 +466,7 @@ var PAY_LABELS = {
 
 var activeOrders  = [];
 var historyOrders = [];
+var ordersById    = {};
 var seenIds       = new Set();
 var isFirstLoad   = true;
 var audioCtx      = null;
@@ -512,6 +531,7 @@ function processOrders(orders) {
       newHistory.push(o);
     }
     seenIds.add(o.id);
+    ordersById[o.id] = o;
   }
 
   // Sort active: oldest first (顶部最老的待处理订单)
@@ -688,6 +708,9 @@ function makeCard(order, isActive) {
   // Payment method
   var payLabel = PAY_LABELS[order.payment_method] || order.payment_method || '';
 
+  // Print button (always shown)
+  var printBtn = '<button class="btn-print" onclick="printReceipt(\'' + order.id + '\')">🖨 打印小票</button>';
+
   card.innerHTML =
     '<div class="card-header">' +
       '<div>' +
@@ -706,9 +729,97 @@ function makeCard(order, isActive) {
     '<div class="items-block">' + itemsHtml + '</div>' +
     toppingsHtml +
     notesHtml +
-    btnsHtml;
+    btnsHtml +
+    printBtn;
 
   return card;
+}
+
+// ── PRINT RECEIPT ─────────────────────────────────────────
+function printReceipt(orderId) {
+  var order = ordersById[orderId];
+  if (!order) return;
+
+  var d        = new Date(order.created_at);
+  var dateTime = d.getFullYear() + '/' + pad2(d.getMonth()+1) + '/' + pad2(d.getDate()) +
+                 '  ' + pad2(d.getHours()) + ':' + pad2(d.getMinutes());
+  var items    = order.order_items   || [];
+  var toppings = order.order_toppings || [];
+  var payLabel = PAY_LABELS[order.payment_method] || order.payment_method || '';
+
+  var itemRows = '';
+  for (var i = 0; i < items.length; i++) {
+    var item    = items[i];
+    var details = [];
+    if (item.size)        details.push(item.size);
+    if (item.base_choice) details.push(item.base_choice);
+    if (item.sweetness)   details.push(item.sweetness);
+    if (item.ice)         details.push(item.ice);
+    var qtyStr = item.quantity > 1 ? '&times;' + item.quantity + '  ' : '';
+    itemRows +=
+      '<tr>' +
+        '<td class="r-name">' + qtyStr + escHtml(item.product_name) +
+          (details.length ? '<div class="r-sub">' + escHtml(details.join(' &middot; ')) + '</div>' : '') +
+        '</td>' +
+        '<td class="r-price">' + item.total_price.toLocaleString() + ' Ft</td>' +
+      '</tr>';
+  }
+
+  var toppingRows = '';
+  for (var t = 0; t < toppings.length; t++) {
+    var tp = toppings[t];
+    toppingRows +=
+      '<tr class="r-topping">' +
+        '<td class="r-name">+ ' + escHtml(tp.topping_name) + '</td>' +
+        '<td class="r-price">' + (tp.price ? tp.price.toLocaleString() + ' Ft' : '免费') + '</td>' +
+      '</tr>';
+  }
+
+  var notesRow = (order.notes && order.notes.trim())
+    ? '<div class="r-notes">备注：' + escHtml(order.notes) + '</div>' : '';
+
+  var html = '<!DOCTYPE html><html><head><meta charset="UTF-8">' +
+    '<title>小票 #' + order.order_number + '</title>' +
+    '<style>' +
+    '@page{size:80mm auto;margin:4mm}' +
+    '*{margin:0;padding:0;box-sizing:border-box}' +
+    'body{font-family:"Courier New",monospace;font-size:12px;color:#000;width:72mm;padding:2mm}' +
+    '.center{text-align:center}' +
+    '.shop{font-size:17px;font-weight:bold;letter-spacing:3px;margin:4px 0 2px}' +
+    '.shop-sub{font-size:10px;margin-bottom:6px}' +
+    '.div{border-top:1px dashed #000;margin:6px 0}' +
+    '.onum{font-size:22px;font-weight:bold;margin:4px 0 2px}' +
+    '.otime{font-size:10px;color:#444;margin-bottom:4px}' +
+    'table{width:100%;border-collapse:collapse}' +
+    'td{padding:3px 0;vertical-align:top}' +
+    '.r-name{width:62%}' +
+    '.r-price{text-align:right;white-space:nowrap}' +
+    '.r-sub{font-size:10px;color:#555;margin-top:1px}' +
+    '.r-topping td{color:#555}' +
+    '.r-notes{font-size:11px;color:#444;border:1px dashed #ccc;padding:4px 6px;margin:4px 0}' +
+    '.total{display:flex;justify-content:space-between;font-size:14px;font-weight:bold;margin:4px 0}' +
+    '.pay{display:flex;justify-content:space-between;font-size:11px;color:#555;margin-bottom:6px}' +
+    '.thanks{font-size:11px;margin-top:6px}' +
+    '</style></head><body>' +
+    '<div class="center"><div class="shop">WHITE LEAF</div><div class="shop-sub">Eger, Hungary</div></div>' +
+    '<div class="div"></div>' +
+    '<div class="center"><div class="onum">#' + order.order_number + '</div><div class="otime">' + dateTime + '</div></div>' +
+    '<div class="div"></div>' +
+    '<table>' + itemRows + (toppingRows ? '<tr><td colspan="2"><div class="div"></div></td></tr>' + toppingRows : '') + '</table>' +
+    notesRow +
+    '<div class="div"></div>' +
+    '<div class="total"><span>合计</span><span>' + order.total.toLocaleString() + ' Ft</span></div>' +
+    '<div class="pay"><span>支付方式</span><span>' + payLabel + '</span></div>' +
+    '<div class="div"></div>' +
+    '<div class="center thanks">谢谢惠顾！ · Thank you!</div>' +
+    '</body></html>';
+
+  var win = window.open('', '_blank', 'width=420,height=620,left=200,top=80');
+  if (!win) { showToast('请允许弹出窗口后重试'); return; }
+  win.document.write(html);
+  win.document.close();
+  win.focus();
+  setTimeout(function() { win.print(); }, 350);
 }
 
 // ── UTILS ─────────────────────────────────────────────────
