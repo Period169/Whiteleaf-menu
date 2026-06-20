@@ -932,7 +932,9 @@ function renderSummary() {
       var bmap = {pearl:t.basePearl,coconut:t.baseCoconut,boba:t.baseBoba};
       baseInfo = ' · '+(bmap[selectedBases[id]]||'');
     }
-    var ns = document.createElement('span'); ns.className = 'summary-row-name'; ns.textContent = c.name+' · '+c.size+baseInfo+(c.qty>1?' ×'+c.qty:'');
+    var sweetnessInfo = (c.base !== 'slush' && c.sweetness) ? ' · '+c.sweetness : '';
+    var iceInfo = (c.base !== 'slush' && c.ice) ? ' · '+c.ice : '';
+    var ns = document.createElement('span'); ns.className = 'summary-row-name'; ns.textContent = c.name+' · '+c.size+baseInfo+sweetnessInfo+iceInfo+(c.qty>1?' ×'+c.qty:'');
     var ps = document.createElement('span'); ps.className = 'summary-row-price'; ps.textContent = price.toLocaleString()+' Ft';
     row.appendChild(ns); row.appendChild(ps); content.appendChild(row);
   });
