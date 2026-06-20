@@ -442,9 +442,9 @@ var ACTIVE_STATUSES = ['pending_confirm', 'pending_payment', 'accepted', 'prepar
 var STATUS_LABELS = {
   pending_confirm:  '新订单',
   pending_payment:  '待付款',
-  accepted:         '已接单',
+  accepted:         '制作中',   // legacy — treated same as preparing
   preparing:        '制作中',
-  ready:            '等待取餐',
+  ready:            '已备好',
   completed:        '已完成',
   cancelled:        '已取消'
 };
@@ -452,7 +452,7 @@ var STATUS_LABELS = {
 var STATUS_TAG_CLASS = {
   pending_confirm:  'tag-new',
   pending_payment:  'tag-new',
-  accepted:         'tag-accepted',
+  accepted:         'tag-preparing',
   preparing:        'tag-preparing',
   ready:            'tag-ready',
   completed:        'tag-completed',
@@ -682,25 +682,22 @@ function makeCard(order, isActive) {
     var oid = order.id;
     if (order.status === 'pending_confirm') {
       btnsHtml = '<div class="btn-row">' +
-        '<button class="btn-primary" data-oid="' + oid + '" onclick="updateStatus(\'' + oid + '\',\'accepted\')">✓ 接单</button>' +
-        '<button class="btn-secondary" data-oid="' + oid + '" onclick="updateStatus(\'' + oid + '\',\'cancelled\')">拒绝</button>' +
+        '<button class="btn-primary" data-oid="' + oid + '" onclick="updateStatus(\'' + oid + '\',\'preparing\')">▶ 开始制作</button>' +
+        '<button class="btn-secondary" data-oid="' + oid + '" onclick="updateStatus(\'' + oid + '\',\'cancelled\')">取消</button>' +
         '</div>';
     } else if (order.status === 'pending_payment') {
       btnsHtml = '<div class="btn-row">' +
         '<button class="btn-secondary" style="flex:2;color:#c0392b;border-color:#c0392b" data-oid="' + oid + '" onclick="updateStatus(\'' + oid + '\',\'cancelled\')">取消订单</button>' +
         '</div>';
-    } else if (order.status === 'accepted') {
-      btnsHtml = '<div class="btn-row">' +
-        '<button class="btn-primary" data-oid="' + oid + '" onclick="updateStatus(\'' + oid + '\',\'preparing\')">▶ 开始制作</button>' +
-        '<button class="btn-secondary" data-oid="' + oid + '" onclick="updateStatus(\'' + oid + '\',\'cancelled\')">取消</button>' +
-        '</div>';
-    } else if (order.status === 'preparing') {
+    } else if (order.status === 'accepted' || order.status === 'preparing') {
+      // accepted = legacy DB value, treat same as preparing
       btnsHtml = '<div class="btn-row">' +
         '<button class="btn-primary green" data-oid="' + oid + '" onclick="updateStatus(\'' + oid + '\',\'ready\')">🔔 已备好</button>' +
+        '<button class="btn-secondary" data-oid="' + oid + '" onclick="updateStatus(\'' + oid + '\',\'cancelled\')">取消</button>' +
         '</div>';
     } else if (order.status === 'ready') {
       btnsHtml = '<div class="btn-row">' +
-        '<button class="btn-primary green" data-oid="' + oid + '" onclick="updateStatus(\'' + oid + '\',\'completed\')">✓ 已取餐</button>' +
+        '<button class="btn-primary" data-oid="' + oid + '" onclick="updateStatus(\'' + oid + '\',\'completed\')">✓ 归档完成</button>' +
         '</div>';
     }
   }
@@ -743,78 +740,87 @@ function printReceipt(orderId) {
   var d        = new Date(order.created_at);
   var dateTime = d.getFullYear() + '/' + pad2(d.getMonth()+1) + '/' + pad2(d.getDate()) +
                  '  ' + pad2(d.getHours()) + ':' + pad2(d.getMinutes());
-  var items    = order.order_items   || [];
+  var items    = order.order_items    || [];
   var toppings = order.order_toppings || [];
   var payLabel = PAY_LABELS[order.payment_method] || order.payment_method || '';
 
-  var itemRows = '';
+  var baseMap = { pearl: 'Tapioca Pearls', coconut: 'Coconut Jelly', boba: 'Popping Boba' };
+
+  // Build per-item blocks with structured spec lines
+  var itemBlocks = '';
   for (var i = 0; i < items.length; i++) {
-    var item    = items[i];
-    var details = [];
-    if (item.size)        details.push(item.size);
-    if (item.base_choice) details.push(item.base_choice);
-    if (item.sweetness)   details.push(item.sweetness);
-    if (item.ice)         details.push(item.ice);
-    var qtyStr = item.quantity > 1 ? '&times;' + item.quantity + '  ' : '';
-    itemRows +=
-      '<tr>' +
-        '<td class="r-name">' + qtyStr + escHtml(item.product_name) +
-          (details.length ? '<div class="r-sub">' + escHtml(details.join(' &middot; ')) + '</div>' : '') +
-        '</td>' +
-        '<td class="r-price">' + item.total_price.toLocaleString() + ' Ft</td>' +
-      '</tr>';
+    var item     = items[i];
+    var qtyLabel = item.quantity > 1 ? ' ×' + item.quantity : '';
+    var specs    = '';
+    if (item.size)        specs += '<div class="spec">Size : ' + escHtml(item.size) + '</div>';
+    if (item.base_choice) specs += '<div class="spec">Base : ' + escHtml(baseMap[item.base_choice] || item.base_choice) + '</div>';
+    if (item.sweetness)   specs += '<div class="spec">Sugar: ' + escHtml(item.sweetness) + '</div>';
+    if (item.ice)         specs += '<div class="spec">Ice  : ' + escHtml(item.ice) + '</div>';
+    itemBlocks +=
+      '<div class="item">' +
+        '<div class="item-hdr">' +
+          '<span class="item-n">' + escHtml(item.product_name) + escHtml(qtyLabel) + '</span>' +
+          '<span class="item-p">' + item.total_price.toLocaleString() + ' Ft</span>' +
+        '</div>' +
+        specs +
+      '</div>';
   }
 
-  var toppingRows = '';
+  // Toppings
+  var toppingBlocks = '';
   for (var t = 0; t < toppings.length; t++) {
     var tp = toppings[t];
-    toppingRows +=
-      '<tr class="r-topping">' +
-        '<td class="r-name">+ ' + escHtml(tp.topping_name) + '</td>' +
-        '<td class="r-price">' + (tp.price ? tp.price.toLocaleString() + ' Ft' : '免费') + '</td>' +
-      '</tr>';
+    toppingBlocks +=
+      '<div class="tp-row">' +
+        '<span>+ ' + escHtml(tp.topping_name) + '</span>' +
+        '<span>' + (tp.price ? tp.price.toLocaleString() + ' Ft' : '免费') + '</span>' +
+      '</div>';
   }
 
-  var notesRow = (order.notes && order.notes.trim())
-    ? '<div class="r-notes">备注：' + escHtml(order.notes) + '</div>' : '';
+  var notesBlock = (order.notes && order.notes.trim())
+    ? '<div class="notes">备注：' + escHtml(order.notes) + '</div>' : '';
 
-  var html = '<!DOCTYPE html><html><head><meta charset="UTF-8">' +
-    '<title>小票 #' + order.order_number + '</title>' +
-    '<style>' +
-    '@page{size:80mm auto;margin:4mm}' +
+  var css =
+    '@page{size:80mm auto;margin:3mm 4mm}' +
     '*{margin:0;padding:0;box-sizing:border-box}' +
-    'body{font-family:"Courier New",monospace;font-size:12px;color:#000;width:72mm;padding:2mm}' +
-    '.center{text-align:center}' +
-    '.shop{font-size:17px;font-weight:bold;letter-spacing:3px;margin:4px 0 2px}' +
-    '.shop-sub{font-size:10px;margin-bottom:6px}' +
-    '.div{border-top:1px dashed #000;margin:6px 0}' +
-    '.onum{font-size:22px;font-weight:bold;margin:4px 0 2px}' +
-    '.otime{font-size:10px;color:#444;margin-bottom:4px}' +
-    'table{width:100%;border-collapse:collapse}' +
-    'td{padding:3px 0;vertical-align:top}' +
-    '.r-name{width:62%}' +
-    '.r-price{text-align:right;white-space:nowrap}' +
-    '.r-sub{font-size:10px;color:#555;margin-top:1px}' +
-    '.r-topping td{color:#555}' +
-    '.r-notes{font-size:11px;color:#444;border:1px dashed #ccc;padding:4px 6px;margin:4px 0}' +
-    '.total{display:flex;justify-content:space-between;font-size:14px;font-weight:bold;margin:4px 0}' +
-    '.pay{display:flex;justify-content:space-between;font-size:11px;color:#555;margin-bottom:6px}' +
-    '.thanks{font-size:11px;margin-top:6px}' +
-    '</style></head><body>' +
-    '<div class="center"><div class="shop">WHITE LEAF</div><div class="shop-sub">Eger, Hungary</div></div>' +
-    '<div class="div"></div>' +
-    '<div class="center"><div class="onum">#' + order.order_number + '</div><div class="otime">' + dateTime + '</div></div>' +
-    '<div class="div"></div>' +
-    '<table>' + itemRows + (toppingRows ? '<tr><td colspan="2"><div class="div"></div></td></tr>' + toppingRows : '') + '</table>' +
-    notesRow +
-    '<div class="div"></div>' +
+    'body{font-family:"Courier New",Courier,monospace;font-size:12px;color:#000}' +
+    '.c{text-align:center}' +
+    '.shop{font-size:16px;font-weight:bold;letter-spacing:3px;margin:3px 0 1px}' +
+    '.addr{font-size:10px;margin-bottom:5px}' +
+    '.dv{border-top:1px dashed #555;margin:5px 0}' +
+    '.onum{font-size:18px;font-weight:bold;margin:3px 0 1px}' +
+    '.otime{font-size:10px;color:#444}' +
+    '.opay{font-size:11px;color:#333;margin-top:2px;margin-bottom:4px}' +
+    '.item{margin:5px 0}' +
+    '.item-hdr{display:flex;justify-content:space-between;align-items:baseline;gap:4px}' +
+    '.item-n{font-weight:bold;flex:1}' +
+    '.item-p{white-space:nowrap;text-align:right}' +
+    '.spec{font-size:10px;color:#333;padding-left:8px;line-height:1.7}' +
+    '.tp-row{display:flex;justify-content:space-between;font-size:11px;color:#444;margin:2px 0}' +
+    '.notes{font-size:11px;border:1px dashed #aaa;padding:3px 5px;margin:3px 0}' +
+    '.total{display:flex;justify-content:space-between;font-size:14px;font-weight:bold;margin:3px 0}' +
+    '.thanks{font-size:11px;margin-top:5px}';
+
+  var html =
+    '<!DOCTYPE html><html><head><meta charset="UTF-8">' +
+    '<title>#' + order.order_number + '</title>' +
+    '<style>' + css + '</style></head><body>' +
+    '<div class="c"><div class="shop">WHITE LEAF</div><div class="addr">Eger, Hungary</div></div>' +
+    '<div class="dv"></div>' +
+    '<div class="onum">#' + order.order_number + '</div>' +
+    '<div class="otime">' + dateTime + '</div>' +
+    '<div class="opay">' + payLabel + '</div>' +
+    '<div class="dv"></div>' +
+    itemBlocks +
+    (toppingBlocks ? '<div class="dv"></div>' + toppingBlocks : '') +
+    (notesBlock    ? '<div class="dv"></div>' + notesBlock    : '') +
+    '<div class="dv"></div>' +
     '<div class="total"><span>合计</span><span>' + order.total.toLocaleString() + ' Ft</span></div>' +
-    '<div class="pay"><span>支付方式</span><span>' + payLabel + '</span></div>' +
-    '<div class="div"></div>' +
-    '<div class="center thanks">谢谢惠顾！ · Thank you!</div>' +
+    '<div class="dv"></div>' +
+    '<div class="c thanks">谢谢惠顾！ · Thank you!</div>' +
     '</body></html>';
 
-  var win = window.open('', '_blank', 'width=420,height=620,left=200,top=80');
+  var win = window.open('', '_blank', 'width=420,height=640,left=200,top=80');
   if (!win) { showToast('请允许弹出窗口后重试'); return; }
   win.document.write(html);
   win.document.close();
