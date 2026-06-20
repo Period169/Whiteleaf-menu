@@ -351,6 +351,14 @@ body.show-history .view-history { display: block; }
   margin: 20px 0 10px 4px;
 }
 
+/* ─── STUDENT DISCOUNT ─────────────────────────────────── */
+.student-disc-row {
+  font-size: 12px;
+  color: var(--green-mid);
+  padding: 4px 0 8px;
+  letter-spacing: 0.02em;
+}
+
 /* ─── PRINT BUTTON ────────────────────────────────────── */
 .btn-print {
   background: transparent;
@@ -666,6 +674,10 @@ function makeCard(order, isActive) {
     toppingsHtml += '</div>';
   }
 
+  // Student discount
+  var studentDiscHtml = order.student_discount
+    ? '<div class="student-disc-row">Student discount  −200 Ft</div>' : '';
+
   // Notes
   var notesHtml = (order.notes && order.notes.trim())
     ? '<div class="notes-row">备注：' + escHtml(order.notes) + '</div>' : '';
@@ -725,6 +737,7 @@ function makeCard(order, isActive) {
     '</div>' +
     '<div class="items-block">' + itemsHtml + '</div>' +
     toppingsHtml +
+    studentDiscHtml +
     notesHtml +
     btnsHtml +
     printBtn;
@@ -780,6 +793,9 @@ function printReceipt(orderId) {
   var notesBlock = (order.notes && order.notes.trim())
     ? '<div class="notes">备注：' + escHtml(order.notes) + '</div>' : '';
 
+  var studentDiscBlock = order.student_discount
+    ? '<div class="tp-row" style="color:#27ae60"><span>Student discount</span><span>−200 Ft</span></div>' : '';
+
   var css =
     '@page{size:80mm auto;margin:3mm 4mm}' +
     '*{margin:0;padding:0;box-sizing:border-box}' +
@@ -812,8 +828,9 @@ function printReceipt(orderId) {
     '<div class="opay">' + payLabel + '</div>' +
     '<div class="dv"></div>' +
     itemBlocks +
-    (toppingBlocks ? '<div class="dv"></div>' + toppingBlocks : '') +
-    (notesBlock    ? '<div class="dv"></div>' + notesBlock    : '') +
+    (toppingBlocks    ? '<div class="dv"></div>' + toppingBlocks    : '') +
+    (studentDiscBlock ? '<div class="dv"></div>' + studentDiscBlock : '') +
+    (notesBlock       ? '<div class="dv"></div>' + notesBlock       : '') +
     '<div class="dv"></div>' +
     '<div class="total"><span>合计</span><span>' + order.total.toLocaleString() + ' Ft</span></div>' +
     '<div class="dv"></div>' +
