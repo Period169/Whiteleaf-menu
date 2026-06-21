@@ -339,8 +339,37 @@ html, body {
 /* ─── VIEW TOGGLE ──────────────────────────────────────── */
 .view-active  { display: block; }
 .view-history { display: none; }
+.view-stats   { display: none; }
 body.show-history .view-active  { display: none; }
 body.show-history .view-history { display: block; }
+body.show-stats   .view-active  { display: none; }
+body.show-stats   .view-stats   { display: block; }
+
+/* ─── STATS DETAIL ─────────────────────────────────────── */
+.stats-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 20px 16px; padding: 4px 0 8px;
+}
+.stats-grid-item { text-align: center; }
+.stats-grid-val {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 34px; color: var(--green-dark); line-height: 1;
+}
+.stats-grid-label {
+  font-size: 9px; color: var(--warm-gray);
+  letter-spacing: 0.12em; text-transform: uppercase; margin-top: 4px;
+}
+.top-drink-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 0; border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+.top-drink-row:last-child { border-bottom: none; }
+.top-drink-rank { font-size: 18px; margin-right: 10px; }
+.top-drink-name { flex: 1; font-size: 13px; color: var(--charcoal); }
+.top-drink-count {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 20px; color: var(--green-dark);
+}
 
 /* ─── DATE GROUP ───────────────────────────────────────── */
 .date-header {
@@ -377,6 +406,90 @@ body.show-history .view-history { display: block; }
 }
 .btn-print:active { background: #f0ece6; }
 
+/* ─── PIN SCREEN ────────────────────────────────────────── */
+#pin-screen {
+  position: fixed; inset: 0;
+  background: var(--green-dark);
+  z-index: 1000;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+}
+#pin-screen.hidden { display: none; }
+.pin-logo { font-family: 'Cormorant Garamond', serif; font-size: 32px; color: var(--cream); letter-spacing: 0.1em; margin-bottom: 4px; }
+.pin-sub  { font-size: 10px; color: var(--green-light); letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 36px; }
+.pin-input {
+  width: 180px; padding: 14px 16px;
+  border: 1px solid rgba(255,255,255,0.2); border-radius: 10px;
+  background: rgba(255,255,255,0.08); color: var(--cream);
+  font-size: 24px; text-align: center; letter-spacing: 6px;
+  outline: none; font-family: monospace; margin-bottom: 14px;
+  -webkit-text-security: disc; type: password;
+}
+.pin-input::placeholder { letter-spacing: 2px; font-size: 13px; color: rgba(255,255,255,0.3); }
+.pin-btn {
+  width: 180px; padding: 14px;
+  background: var(--accent); color: var(--green-dark);
+  border: none; border-radius: 10px;
+  font-family: 'Noto Sans SC', sans-serif; font-size: 14px; font-weight: 500;
+  cursor: pointer; transition: opacity 0.2s;
+}
+.pin-btn:active { opacity: 0.8; }
+.pin-error { font-size: 12px; color: #e74c3c; margin-top: 12px; height: 18px; }
+.logout-btn {
+  font-size: 11px; color: rgba(255,255,255,0.55);
+  background: transparent; border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 8px; padding: 5px 12px; cursor: pointer;
+  font-family: 'Noto Sans SC', sans-serif; transition: opacity 0.2s;
+}
+.logout-btn:active { opacity: 0.6; }
+
+/* ─── STATS BAR ─────────────────────────────────────────── */
+.stats-bar {
+  background: rgba(45,74,62,0.92);
+  display: flex; justify-content: space-around;
+  padding: 10px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  gap: 0;
+}
+.stat-item { flex: 1; text-align: center; border-right: 1px solid rgba(255,255,255,0.1); padding: 2px 6px; }
+.stat-item:last-child { border-right: none; }
+.stat-value { font-family: 'Cormorant Garamond', serif; font-size: 16px; color: var(--cream); line-height: 1; margin-bottom: 3px; }
+.stat-label { font-size: 9px; color: var(--green-light); letter-spacing: 0.12em; text-transform: uppercase; }
+
+/* ─── CANCEL MODAL ──────────────────────────────────────── */
+#cancel-modal {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5); z-index: 200;
+  align-items: center; justify-content: center; padding: 20px;
+}
+#cancel-modal.show { display: flex; }
+.cancel-card {
+  background: #fff; border-radius: 16px; padding: 24px;
+  width: 100%; max-width: 340px;
+  animation: popIn 0.25s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.cancel-title { font-family: 'Cormorant Garamond', serif; font-size: 20px; color: var(--green-dark); margin-bottom: 16px; }
+.cancel-option {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid rgba(107,143,113,0.2); border-radius: 8px;
+  margin-bottom: 8px; cursor: pointer;
+  font-size: 14px; color: var(--charcoal);
+  transition: border-color 0.15s;
+}
+.cancel-option:hover { border-color: var(--green-dark); background: rgba(45,74,62,0.04); }
+.cancel-option input[type="radio"] { accent-color: var(--green-dark); width: 16px; height: 16px; flex-shrink: 0; }
+.cancel-reason-tag {
+  display: inline-block; font-size: 11px;
+  color: #c0392b; background: rgba(192,57,43,0.06);
+  border: 1px solid rgba(192,57,43,0.18);
+  padding: 2px 8px; border-radius: 8px; margin-top: 5px;
+}
+
 /* ─── TOAST ────────────────────────────────────────────── */
 #toast {
   position: fixed;
@@ -398,6 +511,16 @@ body.show-history .view-history { display: block; }
 </head>
 <body>
 
+<!-- PIN SCREEN -->
+<div id="pin-screen">
+  <div class="pin-logo">White Leaf</div>
+  <div class="pin-sub">Admin Access</div>
+  <input class="pin-input" id="pin-input" type="password" inputmode="numeric"
+         placeholder="PIN 码" maxlength="8" autocomplete="off">
+  <button class="pin-btn" id="pin-btn" onclick="doLogin()">进入后台</button>
+  <div class="pin-error" id="pin-error"></div>
+</div>
+
 <!-- TOP BAR -->
 <div class="topbar">
   <div>
@@ -407,6 +530,27 @@ body.show-history .view-history { display: block; }
   <div class="topbar-right">
     <div class="pending-badge" id="pending-badge"></div>
     <div class="status-dot" id="status-dot"></div>
+    <button class="logout-btn" onclick="doLogout()">退出</button>
+  </div>
+</div>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="stat-item">
+    <div class="stat-value" id="stat-orders">—</div>
+    <div class="stat-label">今日订单</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-value" id="stat-revenue">—</div>
+    <div class="stat-label">营业额 Ft</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-value" id="stat-avg">—</div>
+    <div class="stat-label">均单价 Ft</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-value" id="stat-student">—</div>
+    <div class="stat-label">学生优惠</div>
   </div>
 </div>
 
@@ -430,20 +574,32 @@ body.show-history .view-history { display: block; }
       </div>
     </div>
   </div>
+  <div class="view-stats">
+    <div class="section-label">今日统计</div>
+    <div id="stats-detail">
+      <div class="empty-state">
+        <div class="empty-icon">📊</div>
+        <div class="empty-text">加载中…</div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- BOTTOM NAV -->
 <div class="bottom-nav">
   <button class="nav-btn active" id="nav-active"  onclick="showView('active')">📋 进行中</button>
   <button class="nav-btn"        id="nav-history" onclick="showView('history')">📜 历史</button>
+  <button class="nav-btn"        id="nav-stats"   onclick="showView('stats')">📊 统计</button>
 </div>
 
 <div id="toast"></div>
 
 <script>
-var API          = 'https://whiteleaf-backend-production.up.railway.app';
-var ADMIN_KEY    = 'whiteleaf-admin-2024';
+var API           = 'https://whiteleaf-backend-production.up.railway.app';
 var POLL_INTERVAL = 10000;
+var adminToken    = localStorage.getItem('wl_admin_token') || '';
+var pollInterval  = null;
+var statsInterval = null;
 
 var ACTIVE_STATUSES = ['pending_confirm', 'pending_payment', 'accepted', 'preparing', 'ready'];
 
@@ -512,8 +668,9 @@ function playAlert() {
 async function fetchOrders() {
   try {
     var res = await fetch(API + '/api/admin/orders', {
-      headers: { 'x-admin-key': ADMIN_KEY }
+      headers: { 'Authorization': 'Bearer ' + adminToken }
     });
+    if (res.status === 401 || res.status === 403) { doLogout(); return; }
     if (!res.ok) throw new Error('HTTP ' + res.status);
     var orders = await res.json();
     processOrders(orders);
@@ -571,10 +728,11 @@ async function updateStatus(orderId, newStatus) {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
-        'x-admin-key': ADMIN_KEY
+        'Authorization': 'Bearer ' + adminToken
       },
       body: JSON.stringify({ status: newStatus })
     });
+    if (res.status === 401 || res.status === 403) { doLogout(); return; }
     if (!res.ok) throw new Error('HTTP ' + res.status);
     await fetchOrders();
   } catch(e) {
@@ -877,7 +1035,10 @@ function updateBadge() {
 function showView(v) {
   document.getElementById('nav-active').classList.toggle('active',  v === 'active');
   document.getElementById('nav-history').classList.toggle('active', v === 'history');
+  document.getElementById('nav-stats').classList.toggle('active',   v === 'stats');
   document.body.classList.toggle('show-history', v === 'history');
+  document.body.classList.toggle('show-stats',   v === 'stats');
+  if (v === 'stats') fetchStats();
 }
 
 function showToast(msg) {
@@ -888,12 +1049,116 @@ function showToast(msg) {
   t._timer = setTimeout(function() { t.style.opacity = '0'; }, 2500);
 }
 
+// ── AUTH ──────────────────────────────────────────────────
+async function doLogin() {
+  var pin    = document.getElementById('pin-input').value.trim();
+  var errEl  = document.getElementById('pin-error');
+  var btn    = document.getElementById('pin-btn');
+  if (!pin) { errEl.textContent = '请输入 PIN 码'; return; }
+  btn.disabled = true;
+  errEl.textContent = '';
+  try {
+    var res  = await fetch(API + '/api/admin/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pin: pin })
+    });
+    var data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Login failed');
+    adminToken = data.token;
+    localStorage.setItem('wl_admin_token', adminToken);
+    document.getElementById('pin-screen').classList.add('hidden');
+    document.getElementById('pin-input').value = '';
+    startPolling();
+  } catch(e) {
+    errEl.textContent = 'PIN 错误，请重试';
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function doLogout() {
+  adminToken = '';
+  localStorage.removeItem('wl_admin_token');
+  if (pollInterval)  clearInterval(pollInterval);
+  if (statsInterval) clearInterval(statsInterval);
+  pollInterval = statsInterval = null;
+  document.getElementById('pin-screen').classList.remove('hidden');
+  document.getElementById('pin-input').value = '';
+  document.getElementById('pin-error').textContent = '';
+}
+
+function startPolling() {
+  if (pollInterval)  clearInterval(pollInterval);
+  if (statsInterval) clearInterval(statsInterval);
+  fetchOrders();
+  fetchStats();
+  pollInterval  = setInterval(fetchOrders, POLL_INTERVAL);
+  statsInterval = setInterval(fetchStats, 60000);
+}
+
+// ── STATS ─────────────────────────────────────────────────
+async function fetchStats() {
+  try {
+    var res  = await fetch(API + '/api/admin/dashboard', {
+      headers: { 'Authorization': 'Bearer ' + adminToken }
+    });
+    if (res.status === 401 || res.status === 403) { doLogout(); return; }
+    if (!res.ok) return;
+    var data = await res.json();
+    document.getElementById('stat-orders').textContent  = data.todayOrders || 0;
+    document.getElementById('stat-revenue').textContent = (data.todayRevenue || 0).toLocaleString();
+    document.getElementById('stat-avg').textContent     = data.avgOrderValue ? data.avgOrderValue.toLocaleString() : '—';
+    document.getElementById('stat-student').textContent = data.studentDiscountOrders || 0;
+    renderStats(data);
+  } catch(e) {}
+}
+
+function renderStats(data) {
+  var el = document.getElementById('stats-detail');
+  if (!data) return;
+
+  var ranks = ['🥇','🥈','🥉'];
+  var topHtml = '';
+  var drinks  = data.topDrinks || [];
+  if (drinks.length > 0) {
+    for (var i = 0; i < drinks.length; i++) {
+      topHtml +=
+        '<div class="top-drink-row">' +
+          '<span class="top-drink-rank">' + ranks[i] + '</span>' +
+          '<span class="top-drink-name">'  + escHtml(drinks[i].name) + '</span>' +
+          '<span class="top-drink-count">' + drinks[i].count + ' 杯</span>' +
+        '</div>';
+    }
+  } else {
+    topHtml = '<div class="empty-state" style="padding:30px 20px"><div class="empty-text">今日暂无数据</div></div>';
+  }
+
+  el.innerHTML =
+    '<div class="order-card">' +
+      '<div class="stats-grid">' +
+        '<div class="stats-grid-item"><div class="stats-grid-val">' + (data.todayOrders || 0) + '</div><div class="stats-grid-label">今日订单</div></div>' +
+        '<div class="stats-grid-item"><div class="stats-grid-val">' + (data.todayRevenue || 0).toLocaleString() + '</div><div class="stats-grid-label">营业额 Ft</div></div>' +
+        '<div class="stats-grid-item"><div class="stats-grid-val">' + (data.avgOrderValue ? data.avgOrderValue.toLocaleString() : '—') + '</div><div class="stats-grid-label">均单价 Ft</div></div>' +
+        '<div class="stats-grid-item"><div class="stats-grid-val">' + (data.studentDiscountOrders || 0) + '</div><div class="stats-grid-label">学生优惠单</div></div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="section-label" style="margin-top:20px">热销饮品 Top 3</div>' +
+    '<div class="order-card">' + topHtml + '</div>';
+}
+
 // ── INIT ──────────────────────────────────────────────────
 document.addEventListener('touchstart', initAudio, { once: true });
 document.addEventListener('click',      initAudio, { once: true });
 
-fetchOrders();
-setInterval(fetchOrders, POLL_INTERVAL);
+document.getElementById('pin-input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') doLogin();
+});
+
+if (adminToken) {
+  document.getElementById('pin-screen').classList.add('hidden');
+  startPolling();
+}
 </script>
 
 </body>
