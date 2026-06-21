@@ -839,15 +839,16 @@ function makeCard(order, isActive) {
   var tagLabel = STATUS_LABELS[order.status]    || order.status;
 
   // Items
+  var BASE_NAMES = { pearl: 'Tapioca Pearls', coconut: 'Coconut Jelly', boba: 'Popping Boba' };
   var items    = order.order_items || [];
   var itemsHtml = '';
   for (var i = 0; i < items.length; i++) {
     var item    = items[i];
     var details = [];
-    if (item.size)       details.push(item.size);
-    if (item.base_choice) details.push(item.base_choice);
-    if (item.sweetness)  details.push(item.sweetness);
-    if (item.ice)        details.push(item.ice);
+    if (item.size)        details.push(item.size);
+    if (item.base_choice) details.push(BASE_NAMES[item.base_choice] || item.base_choice);
+    if (item.sweetness)   details.push(item.sweetness);
+    if (item.ice)         details.push(item.ice);
     var qtyPrefix = item.quantity > 1 ? '×' + item.quantity + '  ' : '';
     itemsHtml +=
       '<div class="item-row">' +
