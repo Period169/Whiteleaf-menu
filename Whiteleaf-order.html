@@ -162,6 +162,7 @@ body::before { content: ''; position: fixed; inset: 0; background-image: radial-
 .submit-btn:hover:not(:disabled) { background: #1e3329; transform: translateY(-1px); }
 .submit-btn:disabled { background: rgba(107,143,113,0.3); color: var(--warm-gray); cursor: not-allowed; transform: none; }
 .submit-note { text-align: center; font-size: 10px; color: var(--warm-gray); letter-spacing: 0.04em; line-height: 1.6; }
+.allergen-notice { background: rgba(196,168,130,0.1); border: 1px solid rgba(196,168,130,0.28); border-radius: 8px; padding: 9px 14px; margin-bottom: 12px; font-size: 11px; color: var(--warm-gray); line-height: 1.6; text-align: center; letter-spacing: 0.02em; }
 
 /* SUCCESS */
 .success-screen { display: none; text-align: center; padding: 60px 20px; }
@@ -389,6 +390,7 @@ body::before { content: ''; position: fixed; inset: 0; background-image: radial-
       </div>
     </div>
 
+    <div class="allergen-notice"><span id="allergen-note"></span></div>
     <button class="submit-btn" id="submit-btn" disabled>Place Order</button>
     <div class="submit-note" id="submit-note">Pay at the counter after placing your order.</div>
 
@@ -511,6 +513,7 @@ const I18N = {
     customTitle:'Customise Your Drink',
     customSlush:'Slush — no customisation needed',
     discountLabel:'Discount',
+    allergenNote:'Allergen information is available. Please ask our staff before ordering.',
   },
   hu: {
     headerSub:'Rendelés leadása', headerDivider:'Rendelés',
@@ -539,6 +542,7 @@ const I18N = {
     customTitle:'Alakítsd kedvedre!',
     customSlush:'Jégkása — nem szabályozható',
     discountLabel:'Kedvezmény',
+    allergenNote:'Allergén információ elérhető. Rendelés előtt kérdezze munkatársunkat.',
   }
 };
 
@@ -636,6 +640,7 @@ function renderAll() {
   document.getElementById('total-label').textContent = t.totalLabel;
   document.getElementById('submit-btn').textContent = t.submitBtn;
   document.getElementById('submit-note').textContent = t.submitNote;
+  document.getElementById('allergen-note').textContent = t.allergenNote;
   document.getElementById('coupon-title').textContent = t.couponTitle;
   document.getElementById('student-label-text').textContent = t.studentLabel;
   document.getElementById('student-note').textContent = t.studentNote;

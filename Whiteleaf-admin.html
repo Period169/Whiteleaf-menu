@@ -594,6 +594,22 @@ body.show-stats   .view-stats   { display: block; }
 
 <div id="toast"></div>
 
+<!-- CANCEL MODAL -->
+<div id="cancel-modal">
+  <div class="cancel-card">
+    <div class="cancel-title">取消原因</div>
+    <label class="cancel-option"><input type="radio" name="cancel-reason" value="缺货"> 缺货</label>
+    <label class="cancel-option"><input type="radio" name="cancel-reason" value="顾客取消"> 顾客取消</label>
+    <label class="cancel-option"><input type="radio" name="cancel-reason" value="重复订单"> 重复订单</label>
+    <label class="cancel-option"><input type="radio" name="cancel-reason" value="测试订单"> 测试订单</label>
+    <label class="cancel-option"><input type="radio" name="cancel-reason" value="其他"> 其他</label>
+    <div class="btn-row" style="margin-top:16px">
+      <button class="btn-primary" style="background:#c0392b" onclick="confirmCancel()">确认取消</button>
+      <button class="btn-secondary" onclick="closeCancelModal()">返回</button>
+    </div>
+  </div>
+</div>
+
 <script>
 var API           = 'https://whiteleaf-backend-production.up.railway.app';
 var POLL_INTERVAL = 10000;
@@ -718,19 +734,43 @@ function processOrders(orders) {
   updateBadge();
 }
 
+// ── CANCEL MODAL ──────────────────────────────────────────
+var cancelTargetId = null;
+
+function cancelOrder(orderId) {
+  cancelTargetId = orderId;
+  document.querySelectorAll('#cancel-modal input[name="cancel-reason"]').forEach(function(r) { r.checked = false; });
+  document.getElementById('cancel-modal').classList.add('show');
+}
+
+function closeCancelModal() {
+  document.getElementById('cancel-modal').classList.remove('show');
+  cancelTargetId = null;
+}
+
+async function confirmCancel() {
+  var selected = document.querySelector('#cancel-modal input[name="cancel-reason"]:checked');
+  if (!selected) { showToast('请选择取消原因'); return; }
+  var reason = selected.value;
+  closeCancelModal();
+  await updateStatus(cancelTargetId, 'cancelled', reason);
+}
+
 // ── STATUS UPDATE ──────────────────────────────────────────
-async function updateStatus(orderId, newStatus) {
+async function updateStatus(orderId, newStatus, cancelReason) {
   var btns = document.querySelectorAll('[data-oid="' + orderId + '"]');
   for (var i = 0; i < btns.length; i++) btns[i].disabled = true;
 
   try {
+    var body = { status: newStatus };
+    if (cancelReason) body.cancelReason = cancelReason;
     var res = await fetch(API + '/api/admin/orders/' + orderId + '/status', {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ' + adminToken
       },
-      body: JSON.stringify({ status: newStatus })
+      body: JSON.stringify(body)
     });
     if (res.status === 401 || res.status === 403) { doLogout(); return; }
     if (!res.ok) throw new Error('HTTP ' + res.status);
@@ -840,6 +880,10 @@ function makeCard(order, isActive) {
   var notesHtml = (order.notes && order.notes.trim())
     ? '<div class="notes-row">备注：' + escHtml(order.notes) + '</div>' : '';
 
+  // Cancel reason
+  var cancelReasonHtml = (order.status === 'cancelled' && order.cancel_reason)
+    ? '<div style="margin-bottom:8px"><span class="cancel-reason-tag">取消原因：' + escHtml(order.cancel_reason) + '</span></div>' : '';
+
   // Member / contact
   var memberHtml = '';
   if (order.member_id) {
@@ -853,17 +897,17 @@ function makeCard(order, isActive) {
     if (order.status === 'pending_confirm') {
       btnsHtml = '<div class="btn-row">' +
         '<button class="btn-primary" data-oid="' + oid + '" onclick="updateStatus(\'' + oid + '\',\'preparing\')">▶ 开始制作</button>' +
-        '<button class="btn-secondary" data-oid="' + oid + '" onclick="updateStatus(\'' + oid + '\',\'cancelled\')">取消</button>' +
+        '<button class="btn-secondary" data-oid="' + oid + '" onclick="cancelOrder(\'' + oid + '\')">取消</button>' +
         '</div>';
     } else if (order.status === 'pending_payment') {
       btnsHtml = '<div class="btn-row">' +
-        '<button class="btn-secondary" style="flex:2;color:#c0392b;border-color:#c0392b" data-oid="' + oid + '" onclick="updateStatus(\'' + oid + '\',\'cancelled\')">取消订单</button>' +
+        '<button class="btn-secondary" style="flex:2;color:#c0392b;border-color:#c0392b" data-oid="' + oid + '" onclick="cancelOrder(\'' + oid + '\')">取消订单</button>' +
         '</div>';
     } else if (order.status === 'accepted' || order.status === 'preparing') {
       // accepted = legacy DB value, treat same as preparing
       btnsHtml = '<div class="btn-row">' +
         '<button class="btn-primary green" data-oid="' + oid + '" onclick="updateStatus(\'' + oid + '\',\'ready\')">🔔 已备好</button>' +
-        '<button class="btn-secondary" data-oid="' + oid + '" onclick="updateStatus(\'' + oid + '\',\'cancelled\')">取消</button>' +
+        '<button class="btn-secondary" data-oid="' + oid + '" onclick="cancelOrder(\'' + oid + '\')">取消</button>' +
         '</div>';
     } else if (order.status === 'ready') {
       btnsHtml = '<div class="btn-row">' +
@@ -897,6 +941,7 @@ function makeCard(order, isActive) {
     toppingsHtml +
     studentDiscHtml +
     notesHtml +
+    cancelReasonHtml +
     btnsHtml +
     printBtn;
 
