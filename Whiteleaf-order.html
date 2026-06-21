@@ -416,8 +416,8 @@ const API = 'https://whiteleaf-backend-production.up.railway.app';
 const PRODUCTS = {
   en: [
     { section:'Pearl Milk Tea', desc:'Choose tapioca pearls or coconut jelly · Small or Large', items:[
-      { id:'pmt-green', name:'Brown Sugar Pearl Milk Tea — Green Tea', zh:'黑糖珍珠奶茶 · 绿茶', prices:{Small:2199,Large:2499}, sizes:['Small','Large'], base:'milk' },
-      { id:'pmt-black', name:'Brown Sugar Pearl Milk Tea — Black Tea', zh:'黑糖珍珠奶茶 · 红茶', prices:{Small:2199,Large:2499}, sizes:['Small','Large'], base:'milk' },
+      { id:'pmt-green', name:'Brown Sugar Pearl Milk Tea — Green Tea', zh:'黑糖珍珠奶茶 · 绿茶', prices:{Small:2199,Large:2499}, sizes:['Small','Large'], base:'pearl-fixed' },
+      { id:'pmt-black', name:'Brown Sugar Pearl Milk Tea — Black Tea', zh:'黑糖珍珠奶茶 · 红茶', prices:{Small:2199,Large:2499}, sizes:['Small','Large'], base:'pearl-fixed' },
       { id:'cmt-green', name:'Coconut Milk Tea — Green Tea', zh:'椰果奶茶 · 绿茶', prices:{Small:2199,Large:2499}, sizes:['Small','Large'], base:'coconut-fixed' },
       { id:'cmt-black', name:'Coconut Milk Tea — Black Tea', zh:'椰果奶茶 · 红茶', prices:{Small:2199,Large:2499}, sizes:['Small','Large'], base:'coconut-fixed' },
     ]},
@@ -444,8 +444,8 @@ const PRODUCTS = {
   ],
   hu: [
     { section:'Tápioka tejes tea', desc:'Tápioka gyöngy vagy kókuszzsele · Kicsi vagy nagy méretben', items:[
-      { id:'pmt-green', name:'Barnacukros tápioka tejes tea — Zöld tea', zh:'黑糖珍珠奶茶 · 绿茶', prices:{Kicsi:2199,Nagy:2499}, sizes:['Kicsi','Nagy'], base:'milk' },
-      { id:'pmt-black', name:'Barnacukros tápioka tejes tea — Fekete tea', zh:'黑糖珍珠奶茶 · 红茶', prices:{Kicsi:2199,Nagy:2499}, sizes:['Kicsi','Nagy'], base:'milk' },
+      { id:'pmt-green', name:'Barnacukros tápioka tejes tea — Zöld tea', zh:'黑糖珍珠奶茶 · 绿茶', prices:{Kicsi:2199,Nagy:2499}, sizes:['Kicsi','Nagy'], base:'pearl-fixed' },
+      { id:'pmt-black', name:'Barnacukros tápioka tejes tea — Fekete tea', zh:'黑糖珍珠奶茶 · 红茶', prices:{Kicsi:2199,Nagy:2499}, sizes:['Kicsi','Nagy'], base:'pearl-fixed' },
       { id:'cmt-green', name:'Kókuszzsele tejes tea — Zöld tea', zh:'椰果奶茶 · 绿茶', prices:{Kicsi:2199,Nagy:2499}, sizes:['Kicsi','Nagy'], base:'coconut-fixed' },
       { id:'cmt-black', name:'Kókuszzsele tejes tea — Fekete tea', zh:'椰果奶茶 · 红茶', prices:{Kicsi:2199,Nagy:2499}, sizes:['Kicsi','Nagy'], base:'coconut-fixed' },
     ]},
@@ -804,18 +804,7 @@ function renderProducts() {
         sub.appendChild(szLabel); sub.appendChild(szGroup);
 
         // Base choice
-        if (item.base === 'milk') {
-          var bLabel = document.createElement('div'); bLabel.className = 'sub-label'; bLabel.style.marginTop='8px'; bLabel.textContent = t.baseLabel;
-          var bGroup = document.createElement('div'); bGroup.className = 'btn-group';
-          [{val:'pearl',lbl:t.basePearl},{val:'coconut',lbl:t.baseCoconut}].forEach(function(opt) {
-            var b = document.createElement('button');
-            b.className = 'sel-btn'+((selectedBases[item.id]||'pearl')===opt.val?' active':'');
-            b.textContent = opt.lbl;
-            b.addEventListener('click', (function(id,v){ return function(e){ e.stopPropagation(); selectedBases[id]=v; renderProducts(); renderSummary(); }; })(item.id,opt.val));
-            bGroup.appendChild(b);
-          });
-          sub.appendChild(bLabel); sub.appendChild(bGroup);
-        } else if (item.base === 'fruittea') {
+        if (item.base === 'fruittea') {
           var bLabel2 = document.createElement('div'); bLabel2.className = 'sub-label'; bLabel2.style.marginTop='8px'; bLabel2.textContent = t.baseLabel;
           var bGroup2 = document.createElement('div'); bGroup2.className = 'btn-group';
           [{val:'boba',lbl:t.baseBoba+' ('+item.bobaFl+')'},{val:'coconut',lbl:t.baseCoconut}].forEach(function(opt) {
@@ -1030,9 +1019,9 @@ function toggleProduct(id) {
   } else {
     var item = findItem(id);
     cart[id] = { name:item.name, zh:item.zh, size:item.sizes[0], qty:1, prices:item.prices, base:item.base, sweetness:I18N[lang].defSweet, ice:I18N[lang].defIce };
-    if (item.base === 'milk')      selectedBases[id] = 'pearl';
-    if (item.base === 'fruittea')  selectedBases[id] = 'boba';
-    if (item.base === 'fruitmilk') selectedBases[id] = 'boba';
+    if (item.base === 'pearl-fixed') selectedBases[id] = 'pearl';
+    if (item.base === 'fruittea')   selectedBases[id] = 'boba';
+    if (item.base === 'fruitmilk')  selectedBases[id] = 'boba';
   }
   renderProducts(); renderCustomizeVisibility(); renderSummary();
 }
