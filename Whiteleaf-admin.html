@@ -761,10 +761,11 @@ async function updateStatus(orderId, newStatus, cancelReason) {
   var btns = document.querySelectorAll('[data-oid="' + orderId + '"]');
   for (var i = 0; i < btns.length; i++) btns[i].disabled = true;
 
+  var patchRes = null;
   try {
     var body = { status: newStatus };
     if (cancelReason) body.cancelReason = cancelReason;
-    var res = await fetch(API + '/api/admin/orders/' + orderId + '/status', {
+    patchRes = await fetch(API + '/api/admin/orders/' + orderId + '/status', {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -772,11 +773,15 @@ async function updateStatus(orderId, newStatus, cancelReason) {
       },
       body: JSON.stringify(body)
     });
-    if (res.status === 401 || res.status === 403) { doLogout(); return; }
-    if (!res.ok) throw new Error('HTTP ' + res.status);
+    if (patchRes.status === 401 || patchRes.status === 403) { doLogout(); return; }
+    if (!patchRes.ok) {
+      var errData = {};
+      try { errData = await patchRes.json(); } catch(_) {}
+      throw new Error('HTTP ' + patchRes.status + (errData.error ? ': ' + errData.error : ''));
+    }
     await fetchOrders();
   } catch(e) {
-    showToast('更新失败，请重试');
+    showToast('更新失败 — ' + e.message);
     for (var j = 0; j < btns.length; j++) btns[j].disabled = false;
   }
 }
