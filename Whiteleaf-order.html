@@ -415,7 +415,7 @@ const API = 'https://whiteleaf-backend-production.up.railway.app';
 // ── DATA ──────────────────────────────────────────────────────────────────────
 const PRODUCTS = {
   en: [
-    { section:'Pearl Milk Tea', desc:'Choose tapioca pearls or coconut jelly · Small or Large', items:[
+    { section:'Pearl Milk Tea', desc:'Tapioca pearls · Coconut jelly · Small or Large', items:[
       { id:'pmt-green', name:'Brown Sugar Pearl Milk Tea — Green Tea', zh:'黑糖珍珠奶茶 · 绿茶', prices:{Small:2199,Large:2499}, sizes:['Small','Large'], base:'pearl-fixed' },
       { id:'pmt-black', name:'Brown Sugar Pearl Milk Tea — Black Tea', zh:'黑糖珍珠奶茶 · 红茶', prices:{Small:2199,Large:2499}, sizes:['Small','Large'], base:'pearl-fixed' },
       { id:'cmt-green', name:'Coconut Milk Tea — Green Tea', zh:'椰果奶茶 · 绿茶', prices:{Small:2199,Large:2499}, sizes:['Small','Large'], base:'coconut-fixed' },
@@ -443,7 +443,7 @@ const PRODUCTS = {
     ]},
   ],
   hu: [
-    { section:'Tápioka tejes tea', desc:'Tápioka gyöngy vagy kókuszzsele · Kicsi vagy nagy méretben', items:[
+    { section:'Tápioka tejes tea', desc:'Tápioka gyöngy · Kókuszzsele · Kicsi vagy nagy méretben', items:[
       { id:'pmt-green', name:'Barnacukros tápioka tejes tea — Zöld tea', zh:'黑糖珍珠奶茶 · 绿茶', prices:{Kicsi:2199,Nagy:2499}, sizes:['Kicsi','Nagy'], base:'pearl-fixed' },
       { id:'pmt-black', name:'Barnacukros tápioka tejes tea — Fekete tea', zh:'黑糖珍珠奶茶 · 红茶', prices:{Kicsi:2199,Nagy:2499}, sizes:['Kicsi','Nagy'], base:'pearl-fixed' },
       { id:'cmt-green', name:'Kókuszzsele tejes tea — Zöld tea', zh:'椰果奶茶 · 绿茶', prices:{Kicsi:2199,Nagy:2499}, sizes:['Kicsi','Nagy'], base:'coconut-fixed' },
@@ -1019,9 +1019,10 @@ function toggleProduct(id) {
   } else {
     var item = findItem(id);
     cart[id] = { name:item.name, zh:item.zh, size:item.sizes[0], qty:1, prices:item.prices, base:item.base, sweetness:I18N[lang].defSweet, ice:I18N[lang].defIce };
-    if (item.base === 'pearl-fixed') selectedBases[id] = 'pearl';
-    if (item.base === 'fruittea')   selectedBases[id] = 'boba';
-    if (item.base === 'fruitmilk')  selectedBases[id] = 'boba';
+    if (item.base === 'pearl-fixed')   selectedBases[id] = 'pearl';
+    if (item.base === 'coconut-fixed') selectedBases[id] = 'coconut';
+    if (item.base === 'fruittea')      selectedBases[id] = 'boba';
+    if (item.base === 'fruitmilk')     selectedBases[id] = 'boba';
   }
   renderProducts(); renderCustomizeVisibility(); renderSummary();
 }
@@ -1176,8 +1177,8 @@ async function doSubmit() {
       baseChoice: selectedBases[id] || null,
       quantity: c.qty,
       unitPrice: c.prices[c.size],
-      sweetness: c.sweetness || I18N[lang].defSweet,
-      ice: c.ice || I18N[lang].defIce
+      sweetness: c.base === 'slush' ? null : (c.sweetness || I18N[lang].defSweet),
+      ice: c.base === 'slush' ? null : (c.ice || I18N[lang].defIce)
     };
   });
 
@@ -1215,15 +1216,8 @@ async function doSubmit() {
     document.getElementById('order-num-label').textContent = I18N[lang].orderNumLabel;
     document.getElementById('new-order-btn').textContent = I18N[lang].newOrderBtn;
 
-    // Refresh member
-    if (token) {
-      await loadMember();
-      if (member) {
-        var pe = document.getElementById('points-earned-display');
-        pe.textContent = '+'+data.pointsEarned+' pts earned';
-        pe.style.display = 'inline-block';
-      }
-    }
+    // Refresh member data after order
+    if (token) await loadMember();
 
     window.scrollTo(0, 0);
   } catch(e) {
