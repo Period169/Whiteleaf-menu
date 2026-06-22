@@ -168,6 +168,7 @@ body::before { content: ''; position: fixed; inset: 0; background-image: radial-
 .success-screen { display: none; text-align: center; padding: 60px 20px; }
 .success-screen.show { display: block; }
 .success-icon { width: 60px; height: 60px; border: 2px solid var(--green-mid); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 26px; }
+.success-icon.cancelled { border-color: var(--warm-gray); color: var(--warm-gray); }
 .success-title { font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--green-dark); letter-spacing: 0.08em; margin-bottom: 10px; }
 .success-desc { font-size: 13px; color: var(--warm-gray); line-height: 1.8; margin-bottom: 28px; }
 .order-num { font-family: 'Cormorant Garamond', serif; font-size: 40px; color: var(--green-dark); letter-spacing: 0.15em; margin-bottom: 6px; }
@@ -175,6 +176,9 @@ body::before { content: ''; position: fixed; inset: 0; background-image: radial-
 .points-earned { display: inline-block; background: rgba(45,74,62,0.08); border: 1px solid rgba(107,143,113,0.25); border-radius: 20px; padding: 6px 16px; font-size: 12px; color: var(--green-dark); margin-bottom: 28px; }
 .new-order-btn { font-family: 'Jost', sans-serif; font-size: 11px; font-weight: 300; letter-spacing: 0.2em; text-transform: uppercase; padding: 10px 26px; border-radius: 20px; border: 1px solid rgba(107,143,113,0.35); background: transparent; color: var(--green-dark); cursor: pointer; transition: all 0.18s; }
 .new-order-btn:hover { background: var(--green-dark); color: var(--cream); }
+.cancel-order-btn { display: none; margin: 14px auto 0; font-family: 'Jost', sans-serif; font-size: 11px; font-weight: 300; letter-spacing: 0.08em; color: var(--warm-gray); background: transparent; border: none; cursor: pointer; text-decoration: underline; transition: color 0.18s; }
+.cancel-order-btn:hover { color: var(--error); }
+.cancel-order-btn:disabled { opacity: 0.45; cursor: not-allowed; }
 
 /* MODAL */
 .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
@@ -398,13 +402,14 @@ body::before { content: ''; position: fixed; inset: 0; background-image: radial-
 
   <!-- SUCCESS -->
   <div class="success-screen" id="success-screen">
-    <div class="success-icon">✓</div>
+    <div class="success-icon" id="success-icon">✓</div>
     <div class="success-title" id="success-title">Order Received</div>
     <div class="success-desc" id="success-desc">Please proceed to the counter to pay.<br>We'll start preparing your drink shortly.</div>
     <div class="order-num" id="order-num-display"></div>
     <div class="order-num-label" id="order-num-label">Order Number</div>
     <div class="points-earned" id="points-earned-display" style="display:none"></div>
     <button class="new-order-btn" id="new-order-btn">New Order</button>
+    <button class="cancel-order-btn" id="cancel-order-btn">Cancel Order</button>
   </div>
 
 </div><!-- /page -->
@@ -514,6 +519,11 @@ const I18N = {
     customSlush:'Slush — no customisation needed',
     discountLabel:'Discount',
     allergenNote:'Allergen information is available. Please ask our staff before ordering.',
+    cancelOrderBtn:'Cancel Order',
+    cancelConfirm:'Cancel this order?',
+    cancelledTitle:'Order Cancelled',
+    cancelledDesc:'Your order has been successfully cancelled.',
+    cancelNotAllowed:'This order is already being prepared and cannot be cancelled.',
   },
   hu: {
     headerSub:'Rendelés leadása', headerDivider:'Rendelés',
@@ -543,6 +553,11 @@ const I18N = {
     customSlush:'Jégkása — nem szabályozható',
     discountLabel:'Kedvezmény',
     allergenNote:'Allergén információ elérhető. Rendelés előtt kérdezze munkatársunkat.',
+    cancelOrderBtn:'Rendelés lemondása',
+    cancelConfirm:'Lemondod a rendelést?',
+    cancelledTitle:'Rendelés lemondva',
+    cancelledDesc:'Rendelésedet sikeresen lemondtuk.',
+    cancelNotAllowed:'A rendelés már elkészítés alatt áll, nem mondható le.',
   }
 };
 
@@ -561,6 +576,7 @@ let studentDiscount = false;
 let selectedCouponId = null;
 let myCoupons = [];
 let activePromos = [];
+let currentOrderId = null;
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async function() {
@@ -612,6 +628,7 @@ function setupListeners() {
   document.getElementById('logout-btn').addEventListener('click', doLogout);
   document.getElementById('submit-btn').addEventListener('click', doSubmit);
   document.getElementById('new-order-btn').addEventListener('click', resetOrder);
+  document.getElementById('cancel-order-btn').addEventListener('click', doCancelOrder);
   document.getElementById('pay-counter').addEventListener('click', function() { setPayment('counter'); });
   document.getElementById('pay-online').addEventListener('click', function() { setPayment('simplepay'); });
   document.getElementById('student-check').addEventListener('change', function() { toggleStudent(this.checked); });
@@ -641,6 +658,7 @@ function renderAll() {
   document.getElementById('submit-btn').textContent = t.submitBtn;
   document.getElementById('submit-note').textContent = t.submitNote;
   document.getElementById('allergen-note').textContent = t.allergenNote;
+  document.getElementById('cancel-order-btn').textContent = t.cancelOrderBtn;
   document.getElementById('coupon-title').textContent = t.couponTitle;
   document.getElementById('student-label-text').textContent = t.studentLabel;
   document.getElementById('student-note').textContent = t.studentNote;
@@ -1207,14 +1225,21 @@ async function doSubmit() {
     if (!r.ok) { showToast('Error: '+(data.error||'Failed')); btn.disabled=false; btn.textContent=origText; return; }
 
     // Show success
+    currentOrderId = data.orderId;
     document.getElementById('order-form').style.display = 'none';
     var s = document.getElementById('success-screen');
     s.classList.add('show');
+    document.getElementById('success-icon').textContent = '✓';
+    document.getElementById('success-icon').classList.remove('cancelled');
     document.getElementById('success-title').textContent = I18N[lang].successTitle;
     document.getElementById('success-desc').textContent = I18N[lang].successDesc;
     document.getElementById('order-num-display').textContent = '#'+data.orderNumber;
     document.getElementById('order-num-label').textContent = I18N[lang].orderNumLabel;
     document.getElementById('new-order-btn').textContent = I18N[lang].newOrderBtn;
+    var cancelBtn = document.getElementById('cancel-order-btn');
+    cancelBtn.textContent = I18N[lang].cancelOrderBtn;
+    cancelBtn.style.display = 'block';
+    cancelBtn.disabled = false;
 
     // Refresh member data after order
     if (token) await loadMember();
@@ -1229,7 +1254,7 @@ async function doSubmit() {
 function resetOrder() {
   cart={}; selectedBases={}; selectedBobaFlavours={}; slushToppings={}; selectedCouponId=null;
   sweetness=I18N[lang].defSweet; ice=I18N[lang].defIce;
-  studentDiscount=false;
+  studentDiscount=false; currentOrderId=null;
   document.getElementById('student-check').checked=false;
   document.getElementById('pay-online').disabled=false;
   document.getElementById('pay-online').style.opacity='';
@@ -1238,8 +1263,36 @@ function resetOrder() {
   document.getElementById('order-form').style.display='block';
   document.getElementById('success-screen').classList.remove('show');
   document.getElementById('points-earned-display').style.display='none';
+  document.getElementById('cancel-order-btn').style.display='none';
   renderAll();
   window.scrollTo(0, 0);
+}
+
+// ── CANCEL ORDER ──────────────────────────────────────────────────────────────
+async function doCancelOrder() {
+  var t = I18N[lang];
+  if (!currentOrderId) return;
+  if (!window.confirm(t.cancelConfirm)) return;
+  var btn = document.getElementById('cancel-order-btn');
+  btn.disabled = true;
+  try {
+    var r = await fetch(API + '/api/orders/' + currentOrderId + '/cancel', { method: 'POST' });
+    var data = await r.json();
+    if (!r.ok) {
+      showToast(t.cancelNotAllowed);
+      btn.style.display = 'none';
+      return;
+    }
+    document.getElementById('success-icon').textContent = '✕';
+    document.getElementById('success-icon').classList.add('cancelled');
+    document.getElementById('success-title').textContent = t.cancelledTitle;
+    document.getElementById('success-desc').textContent = t.cancelledDesc;
+    btn.style.display = 'none';
+    currentOrderId = null;
+  } catch(e) {
+    showToast('Connection error. Please try again.');
+    btn.disabled = false;
+  }
 }
 
 // ── UTILS ─────────────────────────────────────────────────────────────────────
