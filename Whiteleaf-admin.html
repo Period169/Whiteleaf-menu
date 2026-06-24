@@ -388,6 +388,24 @@ body.show-stats   .view-stats   { display: block; }
   letter-spacing: 0.02em;
 }
 
+/* ─── INVITE / VIP / BOOST INFO ────────────────────────── */
+.invite-info-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  padding: 4px 0 8px;
+}
+.invite-chip {
+  font-size: 11px;
+  padding: 2px 9px;
+  border-radius: 10px;
+  display: inline-block;
+}
+.invite-chip.code     { color: var(--green-dark); background: rgba(45,74,62,0.06);    border: 1px solid rgba(45,74,62,0.15); }
+.invite-chip.discount { color: var(--green-mid);  background: rgba(107,143,113,0.08); border: 1px solid rgba(107,143,113,0.2); }
+.invite-chip.boost-yes{ color: #27ae60;            background: rgba(39,174,96,0.07);  border: 1px solid rgba(39,174,96,0.2); }
+.invite-chip.boost-no { color: var(--warm-gray);  background: rgba(0,0,0,0.03);       border: 1px solid #ddd; }
+
 /* ─── PRINT BUTTON ────────────────────────────────────── */
 .btn-print {
   background: transparent;
@@ -766,7 +784,6 @@ async function updateStatus(orderId, newStatus, cancelReason) {
     var body = { status: newStatus };
     if (cancelReason) body.cancelReason = cancelReason;
     var patchUrl = API + '/api/admin/orders/' + orderId + '/status';
-    console.log('[DEBUG updateStatus] orderId=', orderId, '| newStatus=', newStatus, '| URL=', patchUrl);
     patchRes = await fetch(patchUrl, {
       method: 'PATCH',
       headers: {
@@ -884,6 +901,27 @@ function makeCard(order, isActive) {
   var studentDiscHtml = order.student_discount
     ? '<div class="student-disc-row">Student discount  −200 Ft</div>' : '';
 
+  // Invite / VIP / Boost info
+  var inviteInfoHtml = '';
+  var chips = [];
+  if (order.invite_code_used) {
+    chips.push('<span class="invite-chip code">邀请码 ' + escHtml(order.invite_code_used) + '</span>');
+  }
+  if (order.new_user_discount) {
+    chips.push('<span class="invite-chip discount">新人优惠 −' + order.new_user_discount + ' Ft</span>');
+  }
+  if (order.vip_discount) {
+    chips.push('<span class="invite-chip discount">VIP 优惠 −' + order.vip_discount + ' Ft</span>');
+  }
+  if (order.boost_generated === true) {
+    chips.push('<span class="invite-chip boost-yes">✓ 已产生助力</span>');
+  } else if (order.boost_generated === false && order.invite_code_used) {
+    chips.push('<span class="invite-chip boost-no">— 未产生助力</span>');
+  }
+  if (chips.length > 0) {
+    inviteInfoHtml = '<div class="invite-info-row">' + chips.join('') + '</div>';
+  }
+
   // Notes
   var notesHtml = (order.notes && order.notes.trim())
     ? '<div class="notes-row">备注：' + escHtml(order.notes) + '</div>' : '';
@@ -901,7 +939,6 @@ function makeCard(order, isActive) {
   // Action buttons
   var btnsHtml = '';
   if (isActive) {
-    console.log('[DEBUG makeCard] order.id=', order.id, '| order.order_number=', order.order_number, '| full keys=', Object.keys(order));
     var oid = order.order_number;
     if (order.status === 'pending_confirm') {
       btnsHtml = '<div class="btn-row">' +
@@ -949,6 +986,7 @@ function makeCard(order, isActive) {
     '<div class="items-block">' + itemsHtml + '</div>' +
     toppingsHtml +
     studentDiscHtml +
+    inviteInfoHtml +
     notesHtml +
     cancelReasonHtml +
     btnsHtml +
