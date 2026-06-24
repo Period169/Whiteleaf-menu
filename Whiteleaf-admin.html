@@ -752,8 +752,9 @@ async function confirmCancel() {
   var selected = document.querySelector('#cancel-modal input[name="cancel-reason"]:checked');
   if (!selected) { showToast('请选择取消原因'); return; }
   var reason = selected.value;
+  var targetId = cancelTargetId;
   closeCancelModal();
-  await updateStatus(cancelTargetId, 'cancelled', reason);
+  await updateStatus(targetId, 'cancelled', reason);
 }
 
 // ── STATUS UPDATE ──────────────────────────────────────────
