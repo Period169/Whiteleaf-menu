@@ -208,6 +208,31 @@ body::before { content: ''; position: fixed; inset: 0; background-image: radial-
 
 @keyframes fadeDown { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: translateY(0); } }
 @media (max-width: 500px) { .page { padding: 20px 12px 100px; } .brand-name { font-size: 30px; } }
+
+/* VIP SECTION (inside member panel) */
+.vip-section { margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(107,143,113,0.12); }
+.vip-badge { display: inline-block; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; background: rgba(196,168,130,0.15); color: var(--accent); border: 1px solid rgba(196,168,130,0.4); padding: 2px 9px; border-radius: 10px; }
+.vip-expires { font-size: 11px; color: var(--warm-gray); margin-left: 8px; }
+.vip-progress { font-size: 11px; color: var(--warm-gray); margin-top: 5px; }
+.my-invite-row { margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(107,143,113,0.12); display: flex; align-items: center; justify-content: space-between; }
+.my-invite-info { flex: 1; }
+.my-invite-label { font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--warm-gray); margin-bottom: 4px; }
+.my-invite-code { font-family: 'Cormorant Garamond', serif; font-size: 20px; color: var(--green-dark); letter-spacing: 0.18em; }
+.copy-invite-btn { font-family: 'Jost', sans-serif; font-size: 10px; letter-spacing: 0.06em; padding: 5px 13px; border-radius: 12px; border: 1px solid rgba(107,143,113,0.3); background: transparent; color: var(--green-mid); cursor: pointer; white-space: nowrap; transition: all 0.18s; }
+.copy-invite-btn:hover { background: var(--green-dark); color: var(--cream); border-color: var(--green-dark); }
+
+/* INVITE CODE INPUT BOX */
+.invite-box { background: rgba(45,74,62,0.04); border: 1px solid rgba(107,143,113,0.18); border-radius: 10px; padding: 14px 16px; margin-bottom: 20px; }
+.invite-box-title { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--warm-gray); margin-bottom: 9px; }
+.invite-input-row { display: flex; gap: 8px; }
+.invite-text-input { flex: 1; padding: 9px 12px; border: 1px solid rgba(107,143,113,0.25); border-radius: 8px; background: transparent; font-family: 'Cormorant Garamond', serif; font-size: 16px; letter-spacing: 0.18em; color: var(--green-dark); outline: none; text-transform: uppercase; transition: border-color 0.18s; }
+.invite-text-input:focus { border-color: var(--green-mid); }
+.invite-text-input::placeholder { font-family: 'Jost', sans-serif; font-size: 12px; letter-spacing: 0.04em; color: rgba(138,134,128,0.45); text-transform: none; }
+.invite-check-btn { padding: 9px 15px; border-radius: 8px; border: 1px solid rgba(107,143,113,0.3); background: transparent; font-family: 'Jost', sans-serif; font-size: 11px; letter-spacing: 0.08em; color: var(--green-dark); cursor: pointer; white-space: nowrap; transition: all 0.18s; }
+.invite-check-btn:hover { background: var(--green-dark); color: var(--cream); }
+.invite-status { font-size: 11px; margin-top: 7px; line-height: 1.5; min-height: 16px; }
+.invite-status.valid { color: var(--success); }
+.invite-status.invalid { color: var(--error); }
 </style>
 </head>
 <body>
@@ -332,6 +357,24 @@ body::before { content: ''; position: fixed; inset: 0; background-image: radial-
         <div class="stamp-card-title" id="stamp-title">Loyalty Stamps</div>
         <div class="stamp-dots" id="stamp-dots"></div>
       </div>
+
+      <!-- VIP status (shown when vipActive or vipBoostCount > 0) -->
+      <div class="vip-section" id="vip-section" style="display:none">
+        <div>
+          <span class="vip-badge" id="vip-badge-text">VIP</span>
+          <span class="vip-expires" id="vip-expires-text"></span>
+        </div>
+        <div class="vip-progress" id="vip-progress-text"></div>
+      </div>
+
+      <!-- My invite code -->
+      <div class="my-invite-row">
+        <div class="my-invite-info">
+          <div class="my-invite-label" id="my-invite-label">My Invite Code</div>
+          <div class="my-invite-code" id="my-invite-code"></div>
+        </div>
+        <button class="copy-invite-btn" id="copy-invite-btn">Copy</button>
+      </div>
     </div>
 
     <!-- PRODUCTS -->
@@ -365,6 +408,16 @@ body::before { content: ''; position: fixed; inset: 0; background-image: radial-
       <textarea class="notes-input" id="notes-input" rows="2" placeholder="Allergies, special requests..."></textarea>
     </div>
 
+    <!-- INVITE CODE INPUT -->
+    <div class="invite-box">
+      <div class="invite-box-title" id="invite-box-title">Invite Code</div>
+      <div class="invite-input-row">
+        <input class="invite-text-input" id="invite-input" type="text" maxlength="6" placeholder="Friend's code">
+        <button class="invite-check-btn" id="invite-check-btn">Verify</button>
+      </div>
+      <div class="invite-status" id="invite-status"></div>
+    </div>
+
     <!-- SUMMARY -->
     <div class="order-summary">
       <div class="summary-title" id="summary-title">Your Order</div>
@@ -375,8 +428,8 @@ body::before { content: ''; position: fixed; inset: 0; background-image: radial-
       </div>
     </div>
 
-    <!-- STUDENT DISCOUNT -->
-    <div class="student-box">
+    <!-- STUDENT DISCOUNT (hidden — kept for backend compatibility) -->
+    <div class="student-box" style="display:none">
       <label class="student-toggle">
         <input type="checkbox" id="student-check">
         <span class="student-toggle-label" id="student-label-text">Student Discount</span>
@@ -524,6 +577,21 @@ const I18N = {
     cancelledTitle:'Order Cancelled',
     cancelledDesc:'Your order has been successfully cancelled.',
     cancelNotAllowed:'This order is already being prepared and cannot be cancelled.',
+    myInviteLabel:'My Invite Code',
+    inviteBoxTitle:'Invite Code',
+    invitePlaceholder:"Friend's code",
+    inviteVerifyBtn:'Verify',
+    inviteValid:'Valid · Referred by ',
+    inviteSelf:'You cannot use your own invite code',
+    inviteInvalid:'Invalid invite code',
+    vipActiveLabel:'VIP Member',
+    vipExpiresLabel:'Expires',
+    vipProgressLabel:'boosts towards first VIP',
+    vipProgressRenewLabel:'boosts towards renewal',
+    inviteDiscountLabel:'New Member Discount',
+    vipDiscountLabel:'VIP Discount',
+    copyBtn:'Copy',
+    copyDone:'Copied!',
   },
   hu: {
     headerSub:'Rendelés leadása', headerDivider:'Rendelés',
@@ -558,6 +626,21 @@ const I18N = {
     cancelledTitle:'Rendelés lemondva',
     cancelledDesc:'Rendelésedet sikeresen lemondtuk.',
     cancelNotAllowed:'A rendelés már elkészítés alatt áll, nem mondható le.',
+    myInviteLabel:'Meghívókódom',
+    inviteBoxTitle:'Meghívókód',
+    invitePlaceholder:'Barátod kódja',
+    inviteVerifyBtn:'Ellenőrzés',
+    inviteValid:'Érvényes · Meghívó: ',
+    inviteSelf:'Saját kódodat nem használhatod',
+    inviteInvalid:'Érvénytelen meghívókód',
+    vipActiveLabel:'VIP tag',
+    vipExpiresLabel:'Lejár',
+    vipProgressLabel:'lendítés az első VIP-hez',
+    vipProgressRenewLabel:'lendítés a megújításhoz',
+    inviteDiscountLabel:'Új tag kedvezmény',
+    vipDiscountLabel:'VIP kedvezmény',
+    copyBtn:'Másolás',
+    copyDone:'Másolva!',
   }
 };
 
@@ -577,13 +660,28 @@ let selectedCouponId = null;
 let myCoupons = [];
 let activePromos = [];
 let currentOrderId = null;
+let inviteCodeInput = '';
+let inviteValidated = false;
+let inviterName = '';
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async function() {
   setupListeners();
+
+  // Pre-fill invite code from URL ?invite=XXXX
+  var urlInvite = new URLSearchParams(window.location.search).get('invite');
+  if (urlInvite) {
+    var invEl = document.getElementById('invite-input');
+    invEl.value = urlInvite.toUpperCase().slice(0, 6);
+    inviteCodeInput = invEl.value;
+  }
+
   if (token) await loadMember();
   await loadPromos();
   renderAll();
+
+  // Auto-validate URL invite code after member data is loaded
+  if (inviteCodeInput) checkInviteCode();
 });
 
 async function loadMember() {
@@ -632,6 +730,33 @@ function setupListeners() {
   document.getElementById('pay-counter').addEventListener('click', function() { setPayment('counter'); });
   document.getElementById('pay-online').addEventListener('click', function() { setPayment('simplepay'); });
   document.getElementById('student-check').addEventListener('change', function() { toggleStudent(this.checked); });
+  document.getElementById('invite-check-btn').addEventListener('click', checkInviteCode);
+  document.getElementById('invite-input').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') checkInviteCode();
+  });
+  document.getElementById('invite-input').addEventListener('input', function() {
+    this.value = this.value.toUpperCase();
+    if (inviteValidated) {
+      inviteValidated = false; inviterName = '';
+      document.getElementById('invite-status').textContent = '';
+      document.getElementById('invite-status').className = 'invite-status';
+      renderSummary();
+    }
+  });
+  document.getElementById('copy-invite-btn').addEventListener('click', function() {
+    if (!member || !member.referralCode) return;
+    var code = member.referralCode;
+    var btn = this;
+    var t = I18N[lang];
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(code).then(function() {
+        btn.textContent = t.copyDone;
+        setTimeout(function() { btn.textContent = t.copyBtn; }, 1500);
+      }).catch(function() { showToast(code); });
+    } else {
+      showToast(code);
+    }
+  });
 }
 
 function setLang(l) {
@@ -672,6 +797,10 @@ function renderAll() {
   document.getElementById('stat-balance-label').textContent = t.balanceLabel;
   document.getElementById('stamp-title').textContent = t.stampTitle;
   document.getElementById('member-btn-text').textContent = member ? (member.name || t.signedIn) : t.signIn;
+  document.getElementById('invite-box-title').textContent = t.inviteBoxTitle;
+  document.getElementById('invite-input').placeholder = t.invitePlaceholder;
+  document.getElementById('invite-check-btn').textContent = t.inviteVerifyBtn;
+  document.getElementById('copy-invite-btn').textContent = t.copyBtn;
 
   renderSweetness(); renderIce();
   renderProducts();
@@ -724,6 +853,29 @@ function renderMemberPanel() {
     d.className = 'stamp-dot' + (i < count ? ' filled' : '');
     dots.appendChild(d);
   }
+
+  // VIP section
+  var t = I18N[lang];
+  var vipSection = document.getElementById('vip-section');
+  var showVip = member.vipActive || (member.vipBoostCount > 0);
+  vipSection.style.display = showVip ? 'block' : 'none';
+  if (showVip) {
+    if (member.vipActive) {
+      document.getElementById('vip-badge-text').textContent = t.vipActiveLabel;
+      var expDate = member.vipExpiresAt ? new Date(member.vipExpiresAt).toLocaleDateString() : '';
+      document.getElementById('vip-expires-text').textContent = expDate ? t.vipExpiresLabel + ': ' + expDate : '';
+      document.getElementById('vip-progress-text').textContent =
+        (member.vipBoostCount || 0) + '/' + (member.vipThreshold || 2) + ' ' + t.vipProgressRenewLabel;
+    } else {
+      document.getElementById('vip-badge-text').textContent = (member.vipBoostCount || 0) + '/' + (member.vipThreshold || 5);
+      document.getElementById('vip-expires-text').textContent = '';
+      document.getElementById('vip-progress-text').textContent = t.vipProgressLabel;
+    }
+  }
+
+  // My invite code
+  document.getElementById('my-invite-label').textContent = t.myInviteLabel;
+  document.getElementById('my-invite-code').textContent = member.referralCode || '';
 
   var memberBtn = document.getElementById('member-btn');
   memberBtn.classList.add('logged-in');
@@ -1013,7 +1165,7 @@ function renderSummary() {
     }
   }
 
-  // Student discount
+  // Student discount (UI hidden; kept for backward compat)
   var studentDisc = 0;
   if (studentDiscount) {
     studentDisc = 200;
@@ -1023,7 +1175,28 @@ function renderSummary() {
     sdRow.appendChild(sdn); sdRow.appendChild(sdp); content.appendChild(sdRow);
   }
 
-  var total = Math.max(0, subtotal - discount - studentDisc);
+  // New member discount estimate (requires valid invite code + first-time member)
+  var estimatedNewUserDisc = 0;
+  var isEstimatedNewUser = !!(member && member.totalStamps === 0);
+  if (inviteValidated && inviteCodeInput && isEstimatedNewUser) {
+    estimatedNewUserDisc = 200;
+    var niRow = document.createElement('div'); niRow.className = 'summary-row discount';
+    var nin = document.createElement('span'); nin.className = 'summary-row-name'; nin.textContent = t.inviteDiscountLabel;
+    var nip = document.createElement('span'); nip.className = 'summary-row-price'; nip.textContent = '−200 Ft';
+    niRow.appendChild(nin); niRow.appendChild(nip); content.appendChild(niRow);
+  }
+
+  // VIP discount estimate (backend confirms daily limit)
+  var estimatedVipDisc = 0;
+  if (member && member.vipActive) {
+    estimatedVipDisc = 200;
+    var vdRow = document.createElement('div'); vdRow.className = 'summary-row discount';
+    var vdn = document.createElement('span'); vdn.className = 'summary-row-name'; vdn.textContent = t.vipDiscountLabel;
+    var vdp = document.createElement('span'); vdp.className = 'summary-row-price'; vdp.textContent = '−200 Ft';
+    vdRow.appendChild(vdn); vdRow.appendChild(vdp); content.appendChild(vdRow);
+  }
+
+  var total = Math.max(0, subtotal - discount - studentDisc - estimatedNewUserDisc - estimatedVipDisc);
   totalEl.style.display = 'flex';
   totalAmt.textContent = total.toLocaleString()+' Ft';
   submitBtn.disabled = false;
@@ -1177,6 +1350,52 @@ function showMemberOptions() {
   showToast((member.name||'Member')+' · '+member.points+' pts · '+member.stampCount+'/8 stamps');
 }
 
+async function checkInviteCode() {
+  var input = document.getElementById('invite-input');
+  var statusEl = document.getElementById('invite-status');
+  var code = input.value.trim().toUpperCase();
+  var t = I18N[lang];
+
+  if (!code || code.length < 4) {
+    inviteValidated = false; inviterName = ''; inviteCodeInput = '';
+    statusEl.textContent = ''; statusEl.className = 'invite-status';
+    renderSummary(); return;
+  }
+
+  input.value = code;
+  inviteCodeInput = code;
+  statusEl.textContent = '...';
+  statusEl.className = 'invite-status';
+
+  try {
+    var headers = {};
+    if (token) headers['Authorization'] = 'Bearer ' + token;
+    var r = await fetch(API + '/api/invite/check/' + encodeURIComponent(code), { headers: headers });
+    var data = await r.json();
+
+    if (data.valid) {
+      inviteValidated = true;
+      inviterName = data.referrerName || '';
+      statusEl.textContent = t.inviteValid + inviterName;
+      statusEl.className = 'invite-status valid';
+    } else if (data.reason === 'self') {
+      inviteValidated = false; inviterName = '';
+      statusEl.textContent = t.inviteSelf;
+      statusEl.className = 'invite-status invalid';
+    } else {
+      inviteValidated = false; inviterName = '';
+      statusEl.textContent = t.inviteInvalid;
+      statusEl.className = 'invite-status invalid';
+    }
+  } catch(e) {
+    inviteValidated = false;
+    statusEl.textContent = 'Connection error';
+    statusEl.className = 'invite-status invalid';
+  }
+
+  renderSummary();
+}
+
 // ── SUBMIT ────────────────────────────────────────────────────────────────────
 async function doSubmit() {
   var btn = document.getElementById('submit-btn');
@@ -1214,6 +1433,7 @@ async function doSubmit() {
     studentDiscount: studentDiscount === true
   };
   if (selectedCouponId) payload.couponId = selectedCouponId;
+  if (inviteValidated && inviteCodeInput) payload.inviteCodeUsed = inviteCodeInput;
 
   try {
     var r = await fetch(API+'/api/orders', {
@@ -1255,6 +1475,10 @@ function resetOrder() {
   cart={}; selectedBases={}; selectedBobaFlavours={}; slushToppings={}; selectedCouponId=null;
   sweetness=I18N[lang].defSweet; ice=I18N[lang].defIce;
   studentDiscount=false; currentOrderId=null;
+  inviteCodeInput=''; inviteValidated=false; inviterName='';
+  document.getElementById('invite-input').value='';
+  document.getElementById('invite-status').textContent='';
+  document.getElementById('invite-status').className='invite-status';
   document.getElementById('student-check').checked=false;
   document.getElementById('pay-online').disabled=false;
   document.getElementById('pay-online').style.opacity='';
