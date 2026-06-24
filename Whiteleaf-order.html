@@ -1225,7 +1225,7 @@ async function doSubmit() {
     if (!r.ok) { showToast('Error: '+(data.error||'Failed')); btn.disabled=false; btn.textContent=origText; return; }
 
     // Show success
-    currentOrderId = data.orderId;
+    currentOrderId = data.orderNumber;
     document.getElementById('order-form').style.display = 'none';
     var s = document.getElementById('success-screen');
     s.classList.add('show');

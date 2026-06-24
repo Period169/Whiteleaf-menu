@@ -765,7 +765,9 @@ async function updateStatus(orderId, newStatus, cancelReason) {
   try {
     var body = { status: newStatus };
     if (cancelReason) body.cancelReason = cancelReason;
-    patchRes = await fetch(API + '/api/admin/orders/' + orderId + '/status', {
+    var patchUrl = API + '/api/admin/orders/' + orderId + '/status';
+    console.log('[DEBUG updateStatus] orderId=', orderId, '| newStatus=', newStatus, '| URL=', patchUrl);
+    patchRes = await fetch(patchUrl, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -899,7 +901,8 @@ function makeCard(order, isActive) {
   // Action buttons
   var btnsHtml = '';
   if (isActive) {
-    var oid = order.id;
+    console.log('[DEBUG makeCard] order.id=', order.id, '| order.order_number=', order.order_number, '| full keys=', Object.keys(order));
+    var oid = order.order_number;
     if (order.status === 'pending_confirm') {
       btnsHtml = '<div class="btn-row">' +
         '<button class="btn-primary" data-oid="' + oid + '" onclick="updateStatus(\'' + oid + '\',\'preparing\')">▶ 开始制作</button>' +
