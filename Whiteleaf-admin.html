@@ -753,6 +753,7 @@ async function confirmCancel() {
   if (!selected) { showToast('请选择取消原因'); return; }
   var reason = selected.value;
   var targetId = cancelTargetId;
+  alert('[DEBUG]\ncancelTargetId: ' + cancelTargetId + '\ntargetId: ' + targetId + '\nreason: ' + reason + '\nURL: ' + API + '/api/admin/orders/' + targetId + '/status');
   closeCancelModal();
   await updateStatus(targetId, 'cancelled', reason);
 }
