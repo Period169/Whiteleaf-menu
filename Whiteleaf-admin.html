@@ -735,26 +735,24 @@ function processOrders(orders) {
 }
 
 // ── CANCEL MODAL ──────────────────────────────────────────
-var cancelTargetId = null;
-
 function cancelOrder(orderId) {
-  cancelTargetId = orderId;
-  document.querySelectorAll('#cancel-modal input[name="cancel-reason"]').forEach(function(r) { r.checked = false; });
-  document.getElementById('cancel-modal').classList.add('show');
+  var modal = document.getElementById('cancel-modal');
+  modal.dataset.targetId = orderId;
+  modal.querySelectorAll('input[name="cancel-reason"]').forEach(function(r) { r.checked = false; });
+  modal.classList.add('show');
 }
 
 function closeCancelModal() {
   document.getElementById('cancel-modal').classList.remove('show');
-  cancelTargetId = null;
 }
 
 async function confirmCancel() {
   var selected = document.querySelector('#cancel-modal input[name="cancel-reason"]:checked');
   if (!selected) { showToast('请选择取消原因'); return; }
   var reason = selected.value;
-  var targetId = cancelTargetId;
-  alert('[DEBUG]\ncancelTargetId: ' + cancelTargetId + '\ntargetId: ' + targetId + '\nreason: ' + reason + '\nURL: ' + API + '/api/admin/orders/' + targetId + '/status');
-  closeCancelModal();
+  var modal = document.getElementById('cancel-modal');
+  var targetId = modal.dataset.targetId;
+  modal.classList.remove('show');
   await updateStatus(targetId, 'cancelled', reason);
 }
 
