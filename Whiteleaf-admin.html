@@ -337,13 +337,16 @@ html, body {
 .nav-btn.active { background: rgba(255,255,255,0.18); opacity: 1; }
 
 /* ─── VIEW TOGGLE ──────────────────────────────────────── */
-.view-active  { display: block; }
-.view-history { display: none; }
-.view-stats   { display: none; }
-body.show-history .view-active  { display: none; }
-body.show-history .view-history { display: block; }
-body.show-stats   .view-active  { display: none; }
-body.show-stats   .view-stats   { display: block; }
+.view-active   { display: block; }
+.view-history  { display: none; }
+.view-stats    { display: none; }
+.view-settings { display: none; }
+body.show-history  .view-active   { display: none; }
+body.show-history  .view-history  { display: block; }
+body.show-stats    .view-active   { display: none; }
+body.show-stats    .view-stats    { display: block; }
+body.show-settings .view-active   { display: none; }
+body.show-settings .view-settings { display: block; }
 
 /* ─── STATS DETAIL ─────────────────────────────────────── */
 .stats-grid {
@@ -508,6 +511,70 @@ body.show-stats   .view-stats   { display: block; }
   padding: 2px 8px; border-radius: 8px; margin-top: 5px;
 }
 
+/* ─── SETTINGS ─────────────────────────────────────────── */
+.settings-section {
+  background: #fff;
+  border-radius: 16px;
+  padding: 18px 20px;
+  margin-bottom: 14px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+}
+.settings-section-title {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--green-dark);
+  margin-bottom: 14px;
+  font-weight: 500;
+}
+.settings-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+.settings-row:last-child { border-bottom: none; }
+.settings-label {
+  flex: 1;
+  font-size: 13px;
+  color: var(--charcoal);
+}
+.settings-label small {
+  display: block;
+  font-size: 10px;
+  color: var(--warm-gray);
+  margin-top: 2px;
+  letter-spacing: 0.03em;
+}
+.settings-input {
+  width: 80px;
+  padding: 7px 10px;
+  border: 1px solid rgba(107,143,113,0.25);
+  border-radius: 8px;
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 14px;
+  text-align: right;
+  color: var(--charcoal);
+  background: var(--cream);
+  outline: none;
+}
+.settings-input:focus { border-color: var(--green-mid); }
+.settings-save-btn {
+  padding: 7px 14px;
+  background: var(--green-dark);
+  color: var(--cream);
+  border: none;
+  border-radius: 8px;
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 12px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  white-space: nowrap;
+}
+.settings-save-btn:active { opacity: 0.75; }
+.settings-save-btn.saved  { background: #27ae60; }
+
 /* ─── TOAST ────────────────────────────────────────────── */
 #toast {
   position: fixed;
@@ -601,13 +668,70 @@ body.show-stats   .view-stats   { display: block; }
       </div>
     </div>
   </div>
+
+  <div class="view-settings">
+    <div class="section-label">系统参数</div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">VIP</div>
+      <div class="settings-row">
+        <div class="settings-label">首次获得 VIP 所需助力次数<small>vip_initial_threshold</small></div>
+        <input class="settings-input" id="s-vip_initial_threshold" type="number" min="1">
+        <button class="settings-save-btn" onclick="saveSetting('vip_initial_threshold')">保存</button>
+      </div>
+      <div class="settings-row">
+        <div class="settings-label">VIP 续期所需助力次数<small>vip_renewal_threshold</small></div>
+        <input class="settings-input" id="s-vip_renewal_threshold" type="number" min="1">
+        <button class="settings-save-btn" onclick="saveSetting('vip_renewal_threshold')">保存</button>
+      </div>
+      <div class="settings-row">
+        <div class="settings-label">VIP 有效期（天）<small>vip_validity_days</small></div>
+        <input class="settings-input" id="s-vip_validity_days" type="number" min="1">
+        <button class="settings-save-btn" onclick="saveSetting('vip_validity_days')">保存</button>
+      </div>
+      <div class="settings-row">
+        <div class="settings-label">VIP 每日优惠金额（Ft）<small>vip_daily_discount</small></div>
+        <input class="settings-input" id="s-vip_daily_discount" type="number" min="0">
+        <button class="settings-save-btn" onclick="saveSetting('vip_daily_discount')">保存</button>
+      </div>
+      <div class="settings-row">
+        <div class="settings-label">VIP 每日可用次数<small>vip_daily_limit</small></div>
+        <input class="settings-input" id="s-vip_daily_limit" type="number" min="1">
+        <button class="settings-save-btn" onclick="saveSetting('vip_daily_limit')">保存</button>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">新人</div>
+      <div class="settings-row">
+        <div class="settings-label">首单优惠金额（Ft）<small>new_user_discount</small></div>
+        <input class="settings-input" id="s-new_user_discount" type="number" min="0">
+        <button class="settings-save-btn" onclick="saveSetting('new_user_discount')">保存</button>
+      </div>
+      <div class="settings-row">
+        <div class="settings-label">首单最低消费（Ft）<small>new_user_min_order</small></div>
+        <input class="settings-input" id="s-new_user_min_order" type="number" min="0">
+        <button class="settings-save-btn" onclick="saveSetting('new_user_min_order')">保存</button>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">助力</div>
+      <div class="settings-row">
+        <div class="settings-label">同一用户助力冷却时间（天）<small>boost_cooldown_days</small></div>
+        <input class="settings-input" id="s-boost_cooldown_days" type="number" min="1">
+        <button class="settings-save-btn" onclick="saveSetting('boost_cooldown_days')">保存</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- BOTTOM NAV -->
 <div class="bottom-nav">
-  <button class="nav-btn active" id="nav-active"  onclick="showView('active')">📋 进行中</button>
-  <button class="nav-btn"        id="nav-history" onclick="showView('history')">📜 历史</button>
-  <button class="nav-btn"        id="nav-stats"   onclick="showView('stats')">📊 统计</button>
+  <button class="nav-btn active" id="nav-active"   onclick="showView('active')">📋 进行中</button>
+  <button class="nav-btn"        id="nav-history"  onclick="showView('history')">📜 历史</button>
+  <button class="nav-btn"        id="nav-stats"    onclick="showView('stats')">📊 统计</button>
+  <button class="nav-btn"        id="nav-settings" onclick="showView('settings')">⚙️ 设置</button>
 </div>
 
 <div id="toast"></div>
@@ -1125,12 +1249,15 @@ function updateBadge() {
 }
 
 function showView(v) {
-  document.getElementById('nav-active').classList.toggle('active',  v === 'active');
-  document.getElementById('nav-history').classList.toggle('active', v === 'history');
-  document.getElementById('nav-stats').classList.toggle('active',   v === 'stats');
-  document.body.classList.toggle('show-history', v === 'history');
-  document.body.classList.toggle('show-stats',   v === 'stats');
-  if (v === 'stats') fetchStats();
+  document.getElementById('nav-active').classList.toggle('active',   v === 'active');
+  document.getElementById('nav-history').classList.toggle('active',  v === 'history');
+  document.getElementById('nav-stats').classList.toggle('active',    v === 'stats');
+  document.getElementById('nav-settings').classList.toggle('active', v === 'settings');
+  document.body.classList.toggle('show-history',  v === 'history');
+  document.body.classList.toggle('show-stats',    v === 'stats');
+  document.body.classList.toggle('show-settings', v === 'settings');
+  if (v === 'stats')    fetchStats();
+  if (v === 'settings') loadSettings();
 }
 
 function showToast(msg) {
@@ -1237,6 +1364,48 @@ function renderStats(data) {
     '</div>' +
     '<div class="section-label" style="margin-top:20px">热销饮品 Top 3</div>' +
     '<div class="order-card">' + topHtml + '</div>';
+}
+
+// ── SETTINGS ──────────────────────────────────────────────
+async function loadSettings() {
+  try {
+    var res = await fetch(API + '/api/admin/rules', {
+      headers: { 'Authorization': 'Bearer ' + adminToken }
+    });
+    if (!res.ok) { showToast('加载设置失败'); return; }
+    var rules = await res.json();
+    for (var i = 0; i < rules.length; i++) {
+      var el = document.getElementById('s-' + rules[i].key);
+      if (el) el.value = rules[i].value;
+    }
+  } catch(e) {
+    showToast('加载设置失败');
+  }
+}
+
+async function saveSetting(key) {
+  var el = document.getElementById('s-' + key);
+  if (!el) return;
+  var value = parseInt(el.value, 10);
+  if (isNaN(value) || value < 0) { showToast('请输入有效数字'); return; }
+  try {
+    var res = await fetch(API + '/api/admin/rules/' + key, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + adminToken
+      },
+      body: JSON.stringify({ value: value })
+    });
+    if (!res.ok) throw new Error('Failed');
+    var btn = el.nextElementSibling;
+    var orig = btn.textContent;
+    btn.classList.add('saved');
+    btn.textContent = '已保存 ✓';
+    setTimeout(function() { btn.classList.remove('saved'); btn.textContent = orig; }, 1800);
+  } catch(e) {
+    showToast('保存失败');
+  }
 }
 
 // ── INIT ──────────────────────────────────────────────────
