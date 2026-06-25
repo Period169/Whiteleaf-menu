@@ -529,26 +529,41 @@ body.show-settings .view-settings { display: block; }
 }
 .settings-row {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 10px;
-  padding: 10px 0;
+  padding: 12px 0;
   border-bottom: 1px solid rgba(0,0,0,0.05);
 }
 .settings-row:last-child { border-bottom: none; }
+.settings-row-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  padding-top: 2px;
+}
 .settings-label {
   flex: 1;
   font-size: 13px;
   color: var(--charcoal);
 }
-.settings-label small {
+.settings-desc {
+  display: block;
+  font-size: 11px;
+  color: var(--warm-gray);
+  margin-top: 4px;
+  line-height: 1.55;
+  font-weight: 300;
+}
+.settings-range {
   display: block;
   font-size: 10px;
-  color: var(--warm-gray);
-  margin-top: 2px;
-  letter-spacing: 0.03em;
+  color: var(--green-mid);
+  margin-top: 3px;
+  letter-spacing: 0.02em;
 }
 .settings-input {
-  width: 80px;
+  width: 84px;
   padding: 7px 10px;
   border: 1px solid rgba(107,143,113,0.25);
   border-radius: 8px;
@@ -558,8 +573,10 @@ body.show-settings .view-settings { display: block; }
   color: var(--charcoal);
   background: var(--cream);
   outline: none;
+  transition: border-color 0.15s;
 }
 .settings-input:focus { border-color: var(--green-mid); }
+.settings-input.error { border-color: #e74c3c; background: rgba(231,76,60,0.04); }
 .settings-save-btn {
   padding: 7px 14px;
   background: var(--green-dark);
@@ -569,11 +586,62 @@ body.show-settings .view-settings { display: block; }
   font-family: 'Noto Sans SC', sans-serif;
   font-size: 12px;
   cursor: pointer;
-  transition: opacity 0.15s;
+  transition: background 0.15s, opacity 0.15s;
   white-space: nowrap;
 }
 .settings-save-btn:active { opacity: 0.75; }
 .settings-save-btn.saved  { background: #27ae60; }
+
+/* Restore defaults */
+.restore-defaults-section {
+  border: 1px solid rgba(192,57,43,0.18);
+  border-radius: 16px;
+  padding: 18px 20px;
+  margin-bottom: 14px;
+  background: rgba(231,76,60,0.02);
+}
+.restore-defaults-desc {
+  font-size: 12px;
+  color: var(--warm-gray);
+  line-height: 1.6;
+  margin-bottom: 14px;
+}
+.restore-defaults-btn {
+  width: 100%;
+  padding: 12px;
+  background: transparent;
+  color: #c0392b;
+  border: 1px solid rgba(192,57,43,0.3);
+  border-radius: 10px;
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s;
+  letter-spacing: 0.04em;
+}
+.restore-defaults-btn:active { background: rgba(192,57,43,0.06); }
+
+/* Settings confirm modal */
+#settings-confirm-modal {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5); z-index: 210;
+  align-items: center; justify-content: center; padding: 20px;
+}
+#settings-confirm-modal.show { display: flex; }
+.sc-card {
+  background: #fff; border-radius: 16px; padding: 24px;
+  width: 100%; max-width: 320px;
+  animation: popIn 0.25s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+.sc-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 20px; color: var(--green-dark); margin-bottom: 16px;
+}
+.sc-body { font-size: 13px; color: var(--charcoal); line-height: 1.9; margin-bottom: 20px; }
+.sc-key   { font-size: 14px; font-weight: 500; color: var(--charcoal); margin-bottom: 4px; }
+.sc-from  { color: var(--warm-gray); }
+.sc-to    { color: var(--green-dark); font-weight: 500; }
+.sc-note  { font-size: 11px; color: var(--warm-gray); margin-top: 10px; border-top: 1px solid rgba(0,0,0,0.06); padding-top: 10px; }
 
 /* ─── TOAST ────────────────────────────────────────────── */
 #toast {
@@ -672,56 +740,123 @@ body.show-settings .view-settings { display: block; }
   <div class="view-settings">
     <div class="section-label">系统参数</div>
 
+    <!-- VIP 参数 -->
     <div class="settings-section">
       <div class="settings-section-title">VIP</div>
+
       <div class="settings-row">
-        <div class="settings-label">首次获得 VIP 所需助力次数<small>vip_initial_threshold</small></div>
-        <input class="settings-input" id="s-vip_initial_threshold" type="number" min="1">
-        <button class="settings-save-btn" onclick="saveSetting('vip_initial_threshold')">保存</button>
+        <div class="settings-label">
+          首次获得 VIP 所需助力次数
+          <span class="settings-desc">新用户累计获得此次数的助力后，正式获得 VIP 资格。修改后下一笔完成订单即生效。</span>
+          <span class="settings-range">建议范围：1 ~ 50 次</span>
+        </div>
+        <div class="settings-row-right">
+          <input class="settings-input" id="s-vip_initial_threshold" type="number" min="1" max="50" step="1">
+          <button class="settings-save-btn" onclick="saveSetting('vip_initial_threshold')">保存</button>
+        </div>
       </div>
+
       <div class="settings-row">
-        <div class="settings-label">VIP 续期所需助力次数<small>vip_renewal_threshold</small></div>
-        <input class="settings-input" id="s-vip_renewal_threshold" type="number" min="1">
-        <button class="settings-save-btn" onclick="saveSetting('vip_renewal_threshold')">保存</button>
+        <div class="settings-label">
+          VIP 续期所需助力次数
+          <span class="settings-desc">VIP 到期后，再次获得 VIP 所需的助力次数（通常低于首次门槛）。</span>
+          <span class="settings-range">建议范围：1 ~ 50 次</span>
+        </div>
+        <div class="settings-row-right">
+          <input class="settings-input" id="s-vip_renewal_threshold" type="number" min="1" max="50" step="1">
+          <button class="settings-save-btn" onclick="saveSetting('vip_renewal_threshold')">保存</button>
+        </div>
       </div>
+
       <div class="settings-row">
-        <div class="settings-label">VIP 有效期（天）<small>vip_validity_days</small></div>
-        <input class="settings-input" id="s-vip_validity_days" type="number" min="1">
-        <button class="settings-save-btn" onclick="saveSetting('vip_validity_days')">保存</button>
+        <div class="settings-label">
+          VIP 有效期
+          <span class="settings-desc">获得或续期 VIP 后的有效天数，从达标当日起计算。到期前续期将在原到期日基础上顺延。</span>
+          <span class="settings-range">建议范围：1 ~ 365 天</span>
+        </div>
+        <div class="settings-row-right">
+          <input class="settings-input" id="s-vip_validity_days" type="number" min="1" max="365" step="1">
+          <button class="settings-save-btn" onclick="saveSetting('vip_validity_days')">保存</button>
+        </div>
       </div>
+
       <div class="settings-row">
-        <div class="settings-label">VIP 每日优惠金额（Ft）<small>vip_daily_discount</small></div>
-        <input class="settings-input" id="s-vip_daily_discount" type="number" min="0">
-        <button class="settings-save-btn" onclick="saveSetting('vip_daily_discount')">保存</button>
+        <div class="settings-label">
+          VIP 每日优惠金额
+          <span class="settings-desc">VIP 会员在一个自然日内首次下单可享受的折扣金额（Ft）。</span>
+          <span class="settings-range">建议范围：0 ~ 1000 Ft</span>
+        </div>
+        <div class="settings-row-right">
+          <input class="settings-input" id="s-vip_daily_discount" type="number" min="0" max="1000" step="1">
+          <button class="settings-save-btn" onclick="saveSetting('vip_daily_discount')">保存</button>
+        </div>
       </div>
+
       <div class="settings-row">
-        <div class="settings-label">VIP 每日可用次数<small>vip_daily_limit</small></div>
-        <input class="settings-input" id="s-vip_daily_limit" type="number" min="1">
-        <button class="settings-save-btn" onclick="saveSetting('vip_daily_limit')">保存</button>
+        <div class="settings-label">
+          VIP 每日可用次数
+          <span class="settings-desc">同一会员每个自然日内最多使用 VIP 折扣的次数。通常设为 1。</span>
+          <span class="settings-range">建议范围：1 ~ 10 次</span>
+        </div>
+        <div class="settings-row-right">
+          <input class="settings-input" id="s-vip_daily_limit" type="number" min="1" max="10" step="1">
+          <button class="settings-save-btn" onclick="saveSetting('vip_daily_limit')">保存</button>
+        </div>
       </div>
     </div>
 
+    <!-- 新人参数 -->
     <div class="settings-section">
       <div class="settings-section-title">新人</div>
+
       <div class="settings-row">
-        <div class="settings-label">首单优惠金额（Ft）<small>new_user_discount</small></div>
-        <input class="settings-input" id="s-new_user_discount" type="number" min="0">
-        <button class="settings-save-btn" onclick="saveSetting('new_user_discount')">保存</button>
+        <div class="settings-label">
+          首单优惠金额
+          <span class="settings-desc">新用户首次下单时，使用邀请码可获得的折扣金额（Ft）。</span>
+          <span class="settings-range">建议范围：0 ~ 1000 Ft</span>
+        </div>
+        <div class="settings-row-right">
+          <input class="settings-input" id="s-new_user_discount" type="number" min="0" max="1000" step="1">
+          <button class="settings-save-btn" onclick="saveSetting('new_user_discount')">保存</button>
+        </div>
       </div>
+
       <div class="settings-row">
-        <div class="settings-label">首单最低消费（Ft）<small>new_user_min_order</small></div>
-        <input class="settings-input" id="s-new_user_min_order" type="number" min="0">
-        <button class="settings-save-btn" onclick="saveSetting('new_user_min_order')">保存</button>
+        <div class="settings-label">
+          首单最低消费金额
+          <span class="settings-desc">订单金额须达到此金额，才能触发新人折扣，同时也是产生助力的最低门槛。</span>
+          <span class="settings-range">建议范围：0 ~ 10000 Ft</span>
+        </div>
+        <div class="settings-row-right">
+          <input class="settings-input" id="s-new_user_min_order" type="number" min="0" max="10000" step="1">
+          <button class="settings-save-btn" onclick="saveSetting('new_user_min_order')">保存</button>
+        </div>
       </div>
     </div>
 
+    <!-- 助力参数 -->
     <div class="settings-section">
       <div class="settings-section-title">助力</div>
+
       <div class="settings-row">
-        <div class="settings-label">同一用户助力冷却时间（天）<small>boost_cooldown_days</small></div>
-        <input class="settings-input" id="s-boost_cooldown_days" type="number" min="1">
-        <button class="settings-save-btn" onclick="saveSetting('boost_cooldown_days')">保存</button>
+        <div class="settings-label">
+          同一用户助力冷却时间
+          <span class="settings-desc">同一位助力者对同一位受益人，两次有效助力之间必须间隔的天数，防止刷助力。</span>
+          <span class="settings-range">建议范围：1 ~ 365 天</span>
+        </div>
+        <div class="settings-row-right">
+          <input class="settings-input" id="s-boost_cooldown_days" type="number" min="1" max="365" step="1">
+          <button class="settings-save-btn" onclick="saveSetting('boost_cooldown_days')">保存</button>
+        </div>
       </div>
+    </div>
+
+    <!-- 恢复默认 -->
+    <div class="restore-defaults-section">
+      <div class="restore-defaults-desc">
+        恢复默认设置将把以上所有参数重置为系统初始值：VIP 首次门槛 5 次、续期 2 次、有效期 90 天、每日优惠 200 Ft、每日 1 次；新人优惠 200 Ft、最低消费 1500 Ft；助力冷却 90 天。
+      </div>
+      <button class="restore-defaults-btn" onclick="restoreDefaults()">恢复默认设置 (Restore Defaults)</button>
     </div>
   </div>
 </div>
@@ -735,6 +870,18 @@ body.show-settings .view-settings { display: block; }
 </div>
 
 <div id="toast"></div>
+
+<!-- SETTINGS CONFIRM MODAL -->
+<div id="settings-confirm-modal">
+  <div class="sc-card">
+    <div class="sc-title" id="sc-title">确认修改</div>
+    <div class="sc-body" id="sc-body"></div>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="confirmSettingsAction()">确定</button>
+      <button class="btn-secondary" onclick="closeSettingsConfirm()">取消</button>
+    </div>
+  </div>
+</div>
 
 <!-- CANCEL MODAL -->
 <div id="cancel-modal">
@@ -1367,6 +1514,17 @@ function renderStats(data) {
 }
 
 // ── SETTINGS ──────────────────────────────────────────────
+var SETTINGS_CONFIG = {
+  vip_initial_threshold: { label: '首次获得 VIP 所需助力次数', unit: '次',  min: 1, max: 50,    def: 5    },
+  vip_renewal_threshold: { label: 'VIP 续期所需助力次数',      unit: '次',  min: 1, max: 50,    def: 2    },
+  vip_validity_days:     { label: 'VIP 有效期',                unit: '天',  min: 1, max: 365,   def: 90   },
+  vip_daily_discount:    { label: 'VIP 每日优惠金额',          unit: 'Ft',  min: 0, max: 1000,  def: 200  },
+  vip_daily_limit:       { label: 'VIP 每日可用次数',          unit: '次',  min: 1, max: 10,    def: 1    },
+  new_user_discount:     { label: '新人首单优惠金额',           unit: 'Ft',  min: 0, max: 1000,  def: 200  },
+  new_user_min_order:    { label: '首单最低消费金额',           unit: 'Ft',  min: 0, max: 10000, def: 1500 },
+  boost_cooldown_days:   { label: '助力冷却时间',              unit: '天',  min: 1, max: 365,   def: 90   }
+};
+
 async function loadSettings() {
   try {
     var res = await fetch(API + '/api/admin/rules', {
@@ -1376,18 +1534,48 @@ async function loadSettings() {
     var rules = await res.json();
     for (var i = 0; i < rules.length; i++) {
       var el = document.getElementById('s-' + rules[i].key);
-      if (el) el.value = rules[i].value;
+      if (el) {
+        el.value = rules[i].value;
+        el.dataset.loadedValue = rules[i].value;
+        el.classList.remove('error');
+      }
     }
   } catch(e) {
     showToast('加载设置失败');
   }
 }
 
-async function saveSetting(key) {
+function saveSetting(key) {
+  var cfg = SETTINGS_CONFIG[key];
+  if (!cfg) return;
   var el = document.getElementById('s-' + key);
   if (!el) return;
+
   var value = parseInt(el.value, 10);
-  if (isNaN(value) || value < 0) { showToast('请输入有效数字'); return; }
+  el.classList.remove('error');
+
+  if (isNaN(value) || value < cfg.min || value > cfg.max) {
+    el.classList.add('error');
+    showToast('请输入 ' + cfg.min + ' ~ ' + cfg.max + ' 之间的整数');
+    return;
+  }
+
+  var oldVal = el.dataset.loadedValue !== undefined ? parseInt(el.dataset.loadedValue, 10) : null;
+  var oldDisplay = (oldVal !== null && !isNaN(oldVal)) ? oldVal + ' ' + cfg.unit : '—';
+  var newDisplay = value + ' ' + cfg.unit;
+
+  var bodyHtml =
+    '<div class="sc-key">' + cfg.label + '</div>' +
+    '<div class="sc-from">从：' + oldDisplay + '</div>' +
+    '<div class="sc-to">改为：' + newDisplay + '</div>' +
+    '<div class="sc-note">修改后立即生效，无需重启。</div>';
+
+  openSettingsConfirm('确认修改', bodyHtml, function() {
+    doSaveSetting(key, value);
+  });
+}
+
+async function doSaveSetting(key, value) {
   try {
     var res = await fetch(API + '/api/admin/rules/' + key, {
       method: 'PATCH',
@@ -1398,13 +1586,75 @@ async function saveSetting(key) {
       body: JSON.stringify({ value: value })
     });
     if (!res.ok) throw new Error('Failed');
-    var btn = el.nextElementSibling;
-    var orig = btn.textContent;
-    btn.classList.add('saved');
-    btn.textContent = '已保存 ✓';
-    setTimeout(function() { btn.classList.remove('saved'); btn.textContent = orig; }, 1800);
+    var el = document.getElementById('s-' + key);
+    if (el) { el.dataset.loadedValue = value; el.classList.remove('error'); }
+    var btn = el ? el.parentElement.querySelector('.settings-save-btn') : null;
+    if (btn) {
+      btn.classList.add('saved');
+      btn.textContent = '已保存 ✓';
+      setTimeout(function() { btn.classList.remove('saved'); btn.textContent = '保存'; }, 2000);
+    }
   } catch(e) {
-    showToast('保存失败');
+    showToast('保存失败，请重试');
+  }
+}
+
+var _scOnOk = null;
+
+function openSettingsConfirm(title, bodyHtml, onOk) {
+  _scOnOk = onOk;
+  document.getElementById('sc-title').textContent = title;
+  document.getElementById('sc-body').innerHTML = bodyHtml;
+  document.getElementById('settings-confirm-modal').classList.add('show');
+}
+
+function closeSettingsConfirm() {
+  document.getElementById('settings-confirm-modal').classList.remove('show');
+  _scOnOk = null;
+}
+
+function confirmSettingsAction() {
+  closeSettingsConfirm();
+  if (_scOnOk) _scOnOk();
+}
+
+function restoreDefaults() {
+  var lines = '';
+  var keys = Object.keys(SETTINGS_CONFIG);
+  for (var i = 0; i < keys.length; i++) {
+    var cfg = SETTINGS_CONFIG[keys[i]];
+    lines += '<div class="sc-from">' + cfg.label + '：→ <strong>' + cfg.def + ' ' + cfg.unit + '</strong></div>';
+  }
+  var bodyHtml = lines + '<div class="sc-note">所有参数将同时恢复为默认值，立即生效。</div>';
+  openSettingsConfirm('恢复默认设置', bodyHtml, doRestoreDefaults);
+}
+
+async function doRestoreDefaults() {
+  var keys = Object.keys(SETTINGS_CONFIG);
+  var failed = [];
+  for (var i = 0; i < keys.length; i++) {
+    var k   = keys[i];
+    var def = SETTINGS_CONFIG[k].def;
+    try {
+      var res = await fetch(API + '/api/admin/rules/' + k, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + adminToken
+        },
+        body: JSON.stringify({ value: def })
+      });
+      if (!res.ok) { failed.push(k); continue; }
+      var el = document.getElementById('s-' + k);
+      if (el) { el.value = def; el.dataset.loadedValue = def; el.classList.remove('error'); }
+    } catch(e) {
+      failed.push(k);
+    }
+  }
+  if (failed.length > 0) {
+    showToast('部分参数恢复失败：' + failed.length + ' 个');
+  } else {
+    showToast('已恢复所有默认值 ✓');
   }
 }
 
