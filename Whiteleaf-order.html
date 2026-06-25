@@ -233,6 +233,29 @@ body::before { content: ''; position: fixed; inset: 0; background-image: radial-
 .invite-status { font-size: 11px; margin-top: 7px; line-height: 1.5; min-height: 16px; }
 .invite-status.valid { color: var(--success); }
 .invite-status.invalid { color: var(--error); }
+
+/* TOP BAR RIGHT GROUP */
+.top-bar-right { display: flex; align-items: center; gap: 6px; }
+.menu-btn { font-family: 'Jost', sans-serif; font-size: 18px; line-height: 1; padding: 4px 11px; border-radius: 20px; border: 1px solid rgba(107,143,113,0.3); background: transparent; color: var(--green-dark); cursor: pointer; transition: all 0.2s; }
+.menu-btn:hover { background: rgba(107,143,113,0.08); }
+
+/* DRAWER OVERLAY */
+.drawer-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 150; display: none; }
+.drawer-overlay.open { display: block; }
+
+/* MEMBER DRAWER */
+.member-drawer { position: fixed; top: 0; right: 0; width: min(320px, 90vw); height: 100%; background: var(--cream); z-index: 151; transform: translateX(100%); transition: transform 0.28s cubic-bezier(0.4,0,0.2,1); overflow-y: auto; -webkit-overflow-scrolling: touch; display: flex; flex-direction: column; box-shadow: -4px 0 24px rgba(0,0,0,0.1); }
+.member-drawer.open { transform: translateX(0); }
+.drawer-hdr { position: sticky; top: 0; background: var(--cream); z-index: 1; display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; border-bottom: 1px solid rgba(107,143,113,0.15); }
+.drawer-hdr-title { font-family: 'Cormorant Garamond', serif; font-size: 18px; color: var(--green-dark); letter-spacing: 0.06em; }
+.drawer-close-btn { width: 28px; height: 28px; border-radius: 50%; border: 1px solid rgba(107,143,113,0.25); background: transparent; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--warm-gray); flex-shrink: 0; }
+.drawer-guest { padding: 32px 16px; text-align: center; }
+.drawer-guest-msg { font-size: 13px; color: var(--warm-gray); line-height: 1.7; margin-bottom: 20px; }
+.drawer-signin-btn { font-family: 'Jost', sans-serif; font-size: 12px; font-weight: 300; letter-spacing: 0.1em; padding: 11px 28px; border-radius: 20px; border: 1px solid var(--green-dark); background: var(--green-dark); color: var(--cream); cursor: pointer; transition: all 0.2s; }
+.drawer-signin-btn:hover { background: #1e3329; }
+.member-drawer .member-panel { background: transparent; border: none; border-radius: 0; margin-bottom: 0; padding: 16px; border-bottom: 1px solid rgba(107,143,113,0.1); }
+.member-drawer .stamp-card { background: rgba(45,74,62,0.03); }
+.member-drawer .coupon-box { background: transparent; border-left: none; border-right: none; border-top: 1px solid rgba(196,168,130,0.2); border-bottom: none; border-radius: 0; margin: 0; padding: 14px 16px; }
 </style>
 </head>
 <body>
@@ -245,9 +268,12 @@ body::before { content: ''; position: fixed; inset: 0; background-image: radial-
     <button class="lang-btn active" id="btn-en">English</button>
     <button class="lang-btn" id="btn-hu">Magyar</button>
   </div>
-  <button class="member-btn" id="member-btn">
-    <span id="member-btn-text">Sign In</span>
-  </button>
+  <div class="top-bar-right">
+    <button class="member-btn" id="member-btn">
+      <span id="member-btn-text">Sign In</span>
+    </button>
+    <button class="menu-btn" id="menu-btn">☰</button>
+  </div>
 </div>
 
 <!-- AUTH MODAL -->
@@ -309,6 +335,73 @@ body::before { content: ''; position: fixed; inset: 0; background-image: radial-
   </div>
 </div>
 
+<!-- DRAWER OVERLAY -->
+<div class="drawer-overlay" id="drawer-overlay"></div>
+
+<!-- MEMBER DRAWER -->
+<div class="member-drawer" id="member-drawer">
+  <div class="drawer-hdr">
+    <span class="drawer-hdr-title" id="drawer-title">Member Centre</span>
+    <button class="drawer-close-btn" id="drawer-close">✕</button>
+  </div>
+
+  <!-- Guest: not logged in -->
+  <div class="drawer-guest" id="drawer-guest" style="display:none">
+    <div class="drawer-guest-msg" id="drawer-guest-msg">Sign in to view your membership details.</div>
+    <button class="drawer-signin-btn" id="drawer-signin-btn">Sign In / Register</button>
+  </div>
+
+  <!-- Member panel (moved from main page) -->
+  <div class="member-panel" id="member-panel">
+    <div class="member-panel-top">
+      <div class="member-name" id="panel-name"></div>
+      <span class="member-logout" id="logout-btn">Sign out</span>
+    </div>
+    <div class="member-stats">
+      <div class="member-stat">
+        <div class="member-stat-val" id="panel-points">0</div>
+        <div class="member-stat-label" id="stat-points-label">Points</div>
+      </div>
+      <div class="member-stat">
+        <div class="member-stat-val" id="panel-coupons">0</div>
+        <div class="member-stat-label" id="stat-coupons-label">Coupons</div>
+      </div>
+      <div class="member-stat">
+        <div class="member-stat-val" id="panel-balance">0</div>
+        <div class="member-stat-label" id="stat-balance-label">Ft Balance</div>
+      </div>
+    </div>
+    <div class="stamp-card">
+      <div class="stamp-card-title" id="stamp-title">Loyalty Stamps</div>
+      <div class="stamp-dots" id="stamp-dots"></div>
+    </div>
+
+    <!-- VIP status -->
+    <div class="vip-section" id="vip-section" style="display:none">
+      <div>
+        <span class="vip-badge" id="vip-badge-text">VIP</span>
+        <span class="vip-expires" id="vip-expires-text"></span>
+      </div>
+      <div class="vip-progress" id="vip-progress-text"></div>
+    </div>
+
+    <!-- My invite code -->
+    <div class="my-invite-row">
+      <div class="my-invite-info">
+        <div class="my-invite-label" id="my-invite-label">My Invite Code</div>
+        <div class="my-invite-code" id="my-invite-code"></div>
+      </div>
+      <button class="copy-invite-btn" id="copy-invite-btn">Copy</button>
+    </div>
+  </div>
+
+  <!-- Coupons (moved from main page) -->
+  <div class="coupon-box" id="coupon-box">
+    <div class="coupon-title" id="coupon-title">Your Coupons</div>
+    <div id="coupon-list"></div>
+  </div>
+</div>
+
 <!-- MAIN PAGE -->
 <div class="page">
   <div id="order-form">
@@ -333,50 +426,6 @@ body::before { content: ''; position: fixed; inset: 0; background-image: radial-
       <div class="header-divider"><span id="header-divider-text">Order</span></div>
     </div>
 
-    <!-- MEMBER PANEL -->
-    <div class="member-panel" id="member-panel">
-      <div class="member-panel-top">
-        <div class="member-name" id="panel-name"></div>
-        <span class="member-logout" id="logout-btn">Sign out</span>
-      </div>
-      <div class="member-stats">
-        <div class="member-stat">
-          <div class="member-stat-val" id="panel-points">0</div>
-          <div class="member-stat-label" id="stat-points-label">Points</div>
-        </div>
-        <div class="member-stat">
-          <div class="member-stat-val" id="panel-coupons">0</div>
-          <div class="member-stat-label" id="stat-coupons-label">Coupons</div>
-        </div>
-        <div class="member-stat">
-          <div class="member-stat-val" id="panel-balance">0</div>
-          <div class="member-stat-label" id="stat-balance-label">Ft Balance</div>
-        </div>
-      </div>
-      <div class="stamp-card">
-        <div class="stamp-card-title" id="stamp-title">Loyalty Stamps</div>
-        <div class="stamp-dots" id="stamp-dots"></div>
-      </div>
-
-      <!-- VIP status (shown when vipActive or vipBoostCount > 0) -->
-      <div class="vip-section" id="vip-section" style="display:none">
-        <div>
-          <span class="vip-badge" id="vip-badge-text">VIP</span>
-          <span class="vip-expires" id="vip-expires-text"></span>
-        </div>
-        <div class="vip-progress" id="vip-progress-text"></div>
-      </div>
-
-      <!-- My invite code -->
-      <div class="my-invite-row">
-        <div class="my-invite-info">
-          <div class="my-invite-label" id="my-invite-label">My Invite Code</div>
-          <div class="my-invite-code" id="my-invite-code"></div>
-        </div>
-        <button class="copy-invite-btn" id="copy-invite-btn">Copy</button>
-      </div>
-    </div>
-
     <!-- PRODUCTS -->
     <div id="products-container"></div>
 
@@ -394,12 +443,6 @@ body::before { content: ''; position: fixed; inset: 0; background-image: radial-
       <div id="customize-title"></div>
       <div id="sweet-label"></div><div id="sweetness-group"></div>
       <div id="ice-label"></div><div id="ice-group"></div>
-    </div>
-
-    <!-- COUPONS -->
-    <div class="coupon-box" id="coupon-box">
-      <div class="coupon-title" id="coupon-title">Your Coupons</div>
-      <div id="coupon-list"></div>
     </div>
 
     <!-- NOTES -->
@@ -592,6 +635,10 @@ const I18N = {
     vipDiscountLabel:'VIP Discount',
     copyBtn:'Copy',
     copyDone:'Copied!',
+    memberCentre:'Member Centre',
+    drawerGuestMsg:'Sign in to view your membership details.',
+    drawerSignInBtn:'Sign In / Register',
+    drawerSignOut:'Sign Out',
   },
   hu: {
     headerSub:'Rendelés leadása', headerDivider:'Rendelés',
@@ -641,6 +688,10 @@ const I18N = {
     vipDiscountLabel:'VIP kedvezmény',
     copyBtn:'Másolás',
     copyDone:'Másolva!',
+    memberCentre:'Tagközpont',
+    drawerGuestMsg:'Jelentkezz be a tagságod megtekintéséhez.',
+    drawerSignInBtn:'Bejelentkezés / Regisztráció',
+    drawerSignOut:'Kijelentkezés',
   }
 };
 
@@ -757,6 +808,24 @@ function setupListeners() {
       showToast(code);
     }
   });
+  document.getElementById('menu-btn').addEventListener('click', openDrawer);
+  document.getElementById('drawer-close').addEventListener('click', closeDrawer);
+  document.getElementById('drawer-overlay').addEventListener('click', closeDrawer);
+  document.getElementById('drawer-signin-btn').addEventListener('click', function() {
+    closeDrawer();
+    openAuthModal();
+  });
+}
+
+function openDrawer() {
+  document.getElementById('member-drawer').classList.add('open');
+  document.getElementById('drawer-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeDrawer() {
+  document.getElementById('member-drawer').classList.remove('open');
+  document.getElementById('drawer-overlay').classList.remove('open');
+  document.body.style.overflow = '';
 }
 
 function setLang(l) {
@@ -801,6 +870,10 @@ function renderAll() {
   document.getElementById('invite-input').placeholder = t.invitePlaceholder;
   document.getElementById('invite-check-btn').textContent = t.inviteVerifyBtn;
   document.getElementById('copy-invite-btn').textContent = t.copyBtn;
+  document.getElementById('drawer-title').textContent = t.memberCentre;
+  document.getElementById('drawer-guest-msg').textContent = t.drawerGuestMsg;
+  document.getElementById('drawer-signin-btn').textContent = t.drawerSignInBtn;
+  document.getElementById('logout-btn').textContent = t.drawerSignOut;
 
   renderSweetness(); renderIce();
   renderProducts();
@@ -837,8 +910,14 @@ function renderIce() {
 
 function renderMemberPanel() {
   var panel = document.getElementById('member-panel');
-  if (!member) { panel.classList.remove('show'); return; }
+  var guestSection = document.getElementById('drawer-guest');
+  if (!member) {
+    panel.classList.remove('show');
+    if (guestSection) guestSection.style.display = 'block';
+    return;
+  }
   panel.classList.add('show');
+  if (guestSection) guestSection.style.display = 'none';
   document.getElementById('panel-name').textContent = member.name || member.email || member.phone || 'Member';
   document.getElementById('panel-points').textContent = member.points || 0;
   document.getElementById('panel-coupons').textContent = member.couponCount || 0;
@@ -1291,13 +1370,11 @@ async function doLogin() {
     var data = await r.json();
     if (!r.ok) { showError(err, data.error||'Login failed'); return; }
     token = data.token;
-    member = data.member;
-    myCoupons = [];
     localStorage.setItem('wl_token', token);
-    await loadCoupons();
+    await loadMember();
     closeAuthModal();
     renderAll();
-    showToast('Welcome back, '+(member.name||'Member')+'!');
+    showToast('Welcome back, '+(member&&member.name||'Member')+'!');
   } catch(e) { showError(err,'Connection error'); }
   finally { btn.disabled=false; btn.textContent='Sign In'; }
 }
@@ -1325,10 +1402,8 @@ async function doRegister() {
     var data = await r.json();
     if (!r.ok) { showError(err, data.error||'Registration failed'); return; }
     token = data.token;
-    member = data.member;
-    myCoupons = [];
     localStorage.setItem('wl_token', token);
-    await loadCoupons();
+    await loadMember();
     closeAuthModal();
     renderAll();
     showToast('Welcome! You received a 500 Ft welcome coupon 🎉');
@@ -1342,12 +1417,13 @@ function doLogout() {
   document.getElementById('member-btn').classList.remove('logged-in');
   var dot = document.getElementById('member-btn').querySelector('.member-dot');
   if (dot) dot.remove();
+  closeDrawer();
   renderAll();
   showToast('Signed out');
 }
 
 function showMemberOptions() {
-  showToast((member.name||'Member')+' · '+member.points+' pts · '+member.stampCount+'/8 stamps');
+  openDrawer();
 }
 
 async function checkInviteCode() {
