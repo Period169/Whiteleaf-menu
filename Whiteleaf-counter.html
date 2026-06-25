@@ -6,335 +6,351 @@
 <title>White Leaf — Counter POS</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
 <style>
-* { margin:0; padding:0; box-sizing:border-box; }
-html, body { height:100%; overflow:hidden; background:#edeae3;
-  font-family:'Jost',sans-serif; font-weight:300; color:#1a1a1a; user-select:none; }
-
-/* ─── PIN SCREEN ──────────────────────────────────────────────────────────── */
-#pin-screen {
-  position:fixed; inset:0; background:#2d4a3e;
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
-  z-index:9999;
+/* ── Reset & Root ────────────────────────────────────────────────────────── */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+:root {
+  --g-dark:  #2d4a3e;
+  --g-mid:   #6b8f71;
+  --g-light: #a8c5a0;
+  --cream:   #f5f2ec;
+  --bg:      #edeae3;
+  --white:   #ffffff;
+  --ink:     #1a1a1a;
+  --gray:    #8a8680;
+  --accent:  #c4a882;
+  --border:  rgba(107,143,113,0.16);
+  --red:     #e05555;
+  --green:   #27ae60;
 }
-.pin-logo { font-family:'Cormorant Garamond',serif; font-size:44px; font-weight:300;
-  color:#f5f2ec; letter-spacing:0.12em; margin-bottom:4px; }
-.pin-sub { font-size:10px; letter-spacing:0.32em; text-transform:uppercase;
-  color:rgba(168,197,160,0.65); margin-bottom:44px; }
-.pin-input { background:rgba(255,255,255,0.09); border:1px solid rgba(168,197,160,0.28);
-  border-radius:10px; padding:15px 22px; font-family:'Jost',sans-serif; font-size:22px;
-  color:#f5f2ec; text-align:center; letter-spacing:0.25em; outline:none; width:260px;
-  margin-bottom:14px; transition:border-color 0.18s; }
-.pin-input:focus { border-color:rgba(168,197,160,0.6); }
-.pin-input::placeholder { color:rgba(245,242,236,0.28); letter-spacing:0.08em; font-size:14px; }
-.pin-btn { background:#a8c5a0; color:#2d4a3e; border:none; border-radius:10px;
-  padding:15px 40px; font-family:'Jost',sans-serif; font-size:13px; font-weight:500;
-  letter-spacing:0.18em; text-transform:uppercase; cursor:pointer;
-  transition:all 0.18s; width:260px; margin-bottom:14px; }
-.pin-btn:hover:not(:disabled) { background:#f5f2ec; }
-.pin-btn:disabled { opacity:0.45; cursor:not-allowed; }
-.pin-error { font-size:12px; color:#e8928a; min-height:18px; text-align:center; letter-spacing:0.04em; }
+html, body { height:100%; overflow:hidden; background:var(--g-dark);
+  font-family:'Jost',sans-serif; font-weight:300; color:var(--ink); }
 
-/* ─── TOP BAR ─────────────────────────────────────────────────────────────── */
-.pos-topbar { height:54px; background:#2d4a3e; display:flex; align-items:center;
-  justify-content:space-between; padding:0 20px; flex-shrink:0; }
-.pos-logo { display:flex; align-items:center; gap:12px; }
-.pos-logo-name { font-family:'Cormorant Garamond',serif; font-size:22px; font-weight:300;
-  color:#f5f2ec; letter-spacing:0.1em; }
-.pos-badge { font-family:'Jost',sans-serif; font-size:9px; font-weight:400;
-  letter-spacing:0.22em; text-transform:uppercase; background:rgba(168,197,160,0.22);
-  color:#a8c5a0; padding:3px 10px; border-radius:10px; }
-.pos-logout { background:transparent; border:1px solid rgba(168,197,160,0.28);
-  color:rgba(245,242,236,0.65); font-family:'Jost',sans-serif; font-size:11px;
-  letter-spacing:0.12em; padding:7px 16px; border-radius:8px; cursor:pointer; transition:all 0.18s; }
-.pos-logout:hover { background:rgba(168,197,160,0.15); color:#f5f2ec; border-color:rgba(168,197,160,0.5); }
+/* ── PIN Screen ──────────────────────────────────────────────────────────── */
+#pin-screen {
+  position:fixed; inset:0; z-index:9999; background:var(--g-dark);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+}
+.pin-logo { font-family:'Cormorant Garamond',serif; font-size:46px; font-weight:300;
+  color:var(--cream); letter-spacing:0.12em; margin-bottom:4px; }
+.pin-sub  { font-size:10px; letter-spacing:0.32em; text-transform:uppercase;
+  color:rgba(168,197,160,.6); margin-bottom:48px; }
+.pin-input { width:260px; background:rgba(255,255,255,.09);
+  border:1px solid rgba(168,197,160,.28); border-radius:10px;
+  padding:15px 22px; font-family:'Jost',sans-serif; font-size:22px;
+  color:var(--cream); text-align:center; letter-spacing:0.25em;
+  outline:none; transition:border-color .2s; margin-bottom:14px; }
+.pin-input:focus { border-color:rgba(168,197,160,.7); }
+.pin-input::placeholder { color:rgba(245,242,236,.25); font-size:14px; letter-spacing:.08em; }
+.pin-btn  { width:260px; background:var(--g-light); color:var(--g-dark);
+  border:none; border-radius:10px; padding:15px; font-family:'Jost',sans-serif;
+  font-size:13px; font-weight:500; letter-spacing:.18em; text-transform:uppercase;
+  cursor:pointer; transition:all .18s; margin-bottom:14px; }
+.pin-btn:hover:not(:disabled) { background:var(--cream); }
+.pin-btn:disabled { opacity:.4; cursor:not-allowed; }
+.pin-error { font-size:12px; color:#e8928a; min-height:18px; text-align:center; }
 
-/* ─── LAYOUT ──────────────────────────────────────────────────────────────── */
-#pos-app { height:100%; display:flex; flex-direction:column; display:none; }
-#pos-app.visible { display:flex; }
-.pos-body { flex:1; display:flex; overflow:hidden; min-height:0; }
+/* ── App Shell ───────────────────────────────────────────────────────────── */
+#pos-app { height:100%; display:none; flex-direction:column; }
+#pos-app.on { display:flex; }
 
-/* ─── MENU PANEL (left 60%) ───────────────────────────────────────────────── */
-.menu-panel { flex:0 0 60%; display:flex; flex-direction:column;
-  background:#f5f2ec; border-right:1px solid rgba(107,143,113,0.18); overflow:hidden; }
+/* Top bar */
+.topbar { height:52px; background:var(--g-dark); flex-shrink:0;
+  display:flex; align-items:center; justify-content:space-between; padding:0 18px; }
+.topbar-logo { display:flex; align-items:center; gap:12px; }
+.topbar-name { font-family:'Cormorant Garamond',serif; font-size:21px;
+  color:var(--cream); letter-spacing:.1em; }
+.topbar-badge { font-size:9px; letter-spacing:.22em; text-transform:uppercase;
+  background:rgba(168,197,160,.2); color:var(--g-light); padding:3px 10px; border-radius:10px; }
+.topbar-logout { background:transparent; border:1px solid rgba(168,197,160,.28);
+  color:rgba(245,242,236,.65); font-size:11px; letter-spacing:.12em;
+  padding:6px 14px; border-radius:7px; cursor:pointer; transition:all .18s; }
+.topbar-logout:hover { background:rgba(168,197,160,.15); color:var(--cream); }
 
-/* Category tabs */
-.cat-tabs { display:flex; border-bottom:1px solid rgba(107,143,113,0.15);
-  flex-shrink:0; background:#edeae3; }
-.cat-tab { flex:1; padding:14px 8px; border:none; background:transparent;
-  font-family:'Jost',sans-serif; font-size:12px; font-weight:300;
-  letter-spacing:0.06em; color:#8a8680; cursor:pointer; transition:all 0.18s;
-  border-bottom:2px solid transparent; margin-bottom:-1px; }
-.cat-tab:hover { color:#2d4a3e; background:rgba(107,143,113,0.07); }
-.cat-tab.active { color:#2d4a3e; font-weight:500; border-bottom-color:#2d4a3e;
-  background:#f5f2ec; }
+/* ── 3-Column Body ───────────────────────────────────────────────────────── */
+.pos-body { flex:1; display:grid;
+  grid-template-columns:156px 1fr 328px; min-height:0; overflow:hidden; }
 
-/* Browse view */
-#browse-view { display:flex; flex-direction:column; flex:1; min-height:0; }
-.product-grid { flex:1; overflow-y:auto; padding:14px;
-  display:grid; grid-template-columns:repeat(3,1fr); gap:10px; align-content:start; }
-.product-btn { background:#fff; border:1.5px solid rgba(107,143,113,0.2);
-  border-radius:12px; padding:14px 13px; cursor:pointer; transition:all 0.18s;
+/* ── Category Sidebar (col 1) ────────────────────────────────────────────── */
+.cat-col { background:var(--g-dark); display:flex; flex-direction:column;
+  overflow-y:auto; padding:10px 0 20px; border-right:1px solid rgba(168,197,160,.1); }
+.cat-item { padding:16px 18px; cursor:pointer; border-left:3px solid transparent;
+  transition:all .16s; user-select:none; }
+.cat-item:hover { background:rgba(168,197,160,.1); }
+.cat-item.active { background:rgba(168,197,160,.16); border-left-color:var(--g-light); }
+.cat-name { font-size:13px; color:rgba(245,242,236,.65); line-height:1.35;
+  transition:color .16s; }
+.cat-item:hover .cat-name, .cat-item.active .cat-name { color:var(--cream); }
+.cat-item.active .cat-name { font-weight:400; }
+.cat-cnt { font-size:10px; color:rgba(168,197,160,.45); margin-top:3px; }
+
+/* ── Product Panel (col 2) ───────────────────────────────────────────────── */
+.prod-panel { background:var(--cream); display:flex; flex-direction:column;
+  overflow:hidden; min-width:0; }
+.prod-header { padding:13px 18px 10px; border-bottom:1px solid var(--border);
+  background:var(--bg); flex-shrink:0; }
+.prod-header-title { font-family:'Cormorant Garamond',serif; font-size:19px;
+  color:var(--g-dark); letter-spacing:.06em; }
+.prod-header-desc { font-size:11px; color:var(--gray); margin-top:3px; }
+.prod-grid { flex:1; overflow-y:auto; padding:13px;
+  display:grid; grid-template-columns:repeat(3,1fr); gap:9px; align-content:start; }
+
+/* Product button */
+.prod-btn { background:var(--white); border:1.5px solid var(--border);
+  border-radius:12px; padding:14px 13px 12px; cursor:pointer;
+  transition:border-color .14s, box-shadow .14s, transform .1s;
   text-align:left; min-height:88px; display:flex; flex-direction:column;
   justify-content:space-between; }
-.product-btn:hover { border-color:#6b8f71; box-shadow:0 2px 14px rgba(45,74,62,0.09); transform:translateY(-1px); }
-.pb-name { font-family:'Cormorant Garamond',serif; font-size:14px; font-weight:400;
-  color:#1a1a1a; line-height:1.35; }
-.pb-zh { font-size:10px; color:#8a8680; margin-top:3px; }
-.pb-price { font-size:12px; color:#2d4a3e; font-weight:400; margin-top:8px;
-  letter-spacing:0.02em; }
+.prod-btn:hover  { border-color:var(--g-mid); box-shadow:0 3px 14px rgba(45,74,62,.1); transform:translateY(-1px); }
+.prod-btn:active { transform:scale(.97); border-color:var(--g-dark); background:rgba(45,74,62,.04); transition:transform .07s; }
+.pb-name { font-family:'Cormorant Garamond',serif; font-size:14px;
+  color:var(--ink); line-height:1.35; }
+.pb-zh   { font-size:10px; color:var(--gray); margin-top:3px; }
+.pb-price{ font-size:12px; color:var(--g-dark); font-weight:400; margin-top:9px; }
 
-/* Customize view */
-#customize-view { display:none; flex-direction:column; flex:1; min-height:0; }
-.cust-topbar { display:flex; align-items:center; gap:14px; padding:12px 16px;
-  border-bottom:1px solid rgba(107,143,113,0.15); background:#edeae3; flex-shrink:0; }
-.back-btn { background:transparent; border:1.5px solid rgba(107,143,113,0.3);
-  color:#2d4a3e; border-radius:8px; padding:8px 16px; cursor:pointer;
-  font-family:'Jost',sans-serif; font-size:12px; letter-spacing:0.1em; transition:all 0.18s; flex-shrink:0; }
-.back-btn:hover { background:#2d4a3e; color:#f5f2ec; border-color:#2d4a3e; }
-.cust-product-name { font-family:'Cormorant Garamond',serif; font-size:18px;
-  color:#2d4a3e; letter-spacing:0.04em; line-height:1.3; }
-.cust-body { flex:1; overflow-y:auto; padding:18px 16px; min-height:0; }
-.cust-section { margin-bottom:22px; }
-.cust-label { font-size:10px; letter-spacing:0.22em; text-transform:uppercase;
-  color:#8a8680; margin-bottom:10px; display:block; }
-.cust-btns { display:flex; flex-wrap:wrap; gap:8px; }
-.cust-opt { padding:10px 18px; border:1.5px solid rgba(107,143,113,0.25);
-  border-radius:8px; background:transparent; font-family:'Jost',sans-serif;
-  font-size:13px; color:#8a8680; cursor:pointer; transition:all 0.18s; min-width:90px; text-align:center; }
-.cust-opt:hover { border-color:#6b8f71; color:#2d4a3e; }
-.cust-opt.sel { background:#2d4a3e; color:#f5f2ec; border-color:#2d4a3e; }
-.cust-opt .opt-sub { font-size:10px; opacity:0.75; display:block; margin-top:3px; }
-.topping-row { display:flex; align-items:center; justify-content:space-between;
-  padding:12px 14px; border:1.5px solid rgba(107,143,113,0.2);
-  border-radius:10px; cursor:pointer; transition:all 0.18s; margin-bottom:8px; }
-.topping-row:hover { border-color:#6b8f71; }
-.topping-row.sel { border-color:#2d4a3e; background:rgba(45,74,62,0.04); }
-.tp-name { font-size:14px; color:#1a1a1a; font-family:'Cormorant Garamond',serif; }
-.tp-right { display:flex; align-items:center; gap:10px; }
-.tp-price { font-size:12px; color:#8a8680; }
-.tp-check { width:22px; height:22px; border-radius:50%; border:1.5px solid rgba(107,143,113,0.3);
-  display:flex; align-items:center; justify-content:center; font-size:12px; color:transparent;
-  transition:all 0.15s; flex-shrink:0; }
-.topping-row.sel .tp-check { background:#2d4a3e; border-color:#2d4a3e; color:#f5f2ec; }
-.cust-footer { padding:14px 16px; border-top:1px solid rgba(107,143,113,0.15);
-  background:#f5f2ec; flex-shrink:0; display:flex; align-items:center; gap:12px; }
-.qty-ctrl { display:flex; align-items:center; gap:0; background:#edeae3; border-radius:10px;
-  overflow:hidden; border:1px solid rgba(107,143,113,0.2); flex-shrink:0; }
-.qty-btn { background:transparent; border:none; font-size:20px; color:#2d4a3e;
-  cursor:pointer; width:40px; height:50px; display:flex; align-items:center;
-  justify-content:center; transition:background 0.15s; }
-.qty-btn:hover { background:rgba(45,74,62,0.1); }
-.qty-num { font-family:'Cormorant Garamond',serif; font-size:20px; color:#2d4a3e;
-  min-width:32px; text-align:center; padding:0 4px; }
-.add-cart-btn { flex:1; background:#2d4a3e; color:#f5f2ec; border:none;
+/* ── Cart Panel (col 3) ──────────────────────────────────────────────────── */
+.cart-panel { background:var(--white); display:flex; flex-direction:column;
+  border-left:1px solid var(--border); overflow:hidden; min-width:0; }
+
+.cart-head { padding:12px 15px; border-bottom:1px solid rgba(107,143,113,.1);
+  display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+.cart-head-left { display:flex; align-items:baseline; gap:8px; }
+.cart-title { font-family:'Cormorant Garamond',serif; font-size:18px;
+  color:var(--g-dark); letter-spacing:.08em; }
+.cart-badge { font-size:11px; color:var(--gray); }
+.cart-clear { background:transparent; border:1px solid rgba(196,168,130,.3);
+  color:#bbb; border-radius:6px; padding:5px 10px;
+  font-size:11px; cursor:pointer; transition:all .16s; }
+.cart-clear:hover { border-color:var(--red); color:var(--red); }
+
+.cart-list  { flex:1; overflow-y:auto; min-height:0; }
+.cart-empty { padding:52px 16px; text-align:center; color:#ccc; font-size:13px; }
+
+/* Cart Item */
+.ci { padding:10px 15px; border-bottom:1px solid rgba(107,143,113,.07);
+  display:flex; gap:8px; align-items:flex-start; transition:background .14s; }
+.ci:hover { background:rgba(45,74,62,.02); }
+.ci-info  { flex:1; min-width:0; }
+.ci-name  { font-family:'Cormorant Garamond',serif; font-size:14px;
+  color:var(--ink); line-height:1.3; }
+.ci-detail{ font-size:11px; color:var(--gray); margin-top:3px; line-height:1.55; }
+.ci-qty-row { display:flex; align-items:center; gap:5px; margin-top:7px; }
+.ci-qb { width:22px; height:22px; border-radius:50%;
+  border:1px solid rgba(107,143,113,.28); background:transparent;
+  color:var(--g-dark); font-size:15px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; transition:all .14s; }
+.ci-qb:hover { background:var(--g-dark); color:var(--cream); }
+.ci-qn { font-size:13px; color:var(--ink); min-width:16px; text-align:center; }
+.ci-right { display:flex; flex-direction:column; align-items:flex-end; gap:5px; flex-shrink:0; }
+.ci-price { font-family:'Cormorant Garamond',serif; font-size:15px;
+  color:var(--g-dark); white-space:nowrap; }
+.ci-acts  { display:flex; gap:2px; }
+.ci-edit, .ci-del { background:transparent; border:none; cursor:pointer;
+  padding:4px 5px; border-radius:5px; font-size:15px; transition:all .14s; }
+.ci-edit { color:#ccc; } .ci-edit:hover { color:var(--g-mid); background:rgba(107,143,113,.1); }
+.ci-del  { color:#ccc; } .ci-del:hover  { color:var(--red);    background:rgba(224,85,85,.08); }
+
+/* Cart Footer */
+.cart-foot { border-top:2px solid rgba(107,143,113,.12); padding:11px 15px 13px; flex-shrink:0; }
+.cf-row  { display:flex; justify-content:space-between; font-size:13px; color:var(--gray); padding:3px 0; }
+.cf-disc { display:none; justify-content:space-between; font-size:13px;
+  color:var(--green); padding:3px 0; }
+.cf-disc.on { display:flex; }
+.cf-total { display:flex; justify-content:space-between; align-items:baseline;
+  border-top:1px solid rgba(107,143,113,.12); margin:8px 0 11px; padding-top:9px; }
+.cf-tlbl  { font-size:10px; letter-spacing:.15em; text-transform:uppercase; color:var(--gray); }
+.cf-tval  { font-family:'Cormorant Garamond',serif; font-size:28px; color:var(--g-dark); }
+.cf-student { display:flex; align-items:center; justify-content:space-between; margin-bottom:9px; }
+.cf-slbl  { display:flex; align-items:center; gap:7px; cursor:pointer; font-size:12px; color:var(--ink); }
+.cf-slbl input { width:15px; height:15px; accent-color:var(--g-dark); cursor:pointer; }
+.cf-sbadge { font-size:10px; color:var(--green); background:rgba(39,174,96,.08);
+  border:1px solid rgba(39,174,96,.25); padding:2px 7px; border-radius:10px; display:none; }
+.cf-sbadge.on { display:inline-block; }
+.cf-notes { width:100%; border:1px solid rgba(107,143,113,.2); border-radius:8px;
+  padding:8px 11px; font-family:'Jost',sans-serif; font-size:12px; color:var(--ink);
+  outline:none; transition:border-color .18s; margin-bottom:9px; user-select:text; }
+.cf-notes:focus { border-color:var(--g-mid); }
+.cf-notes::placeholder { color:rgba(138,134,128,.35); }
+.cf-pay  { display:flex; gap:7px; margin-bottom:9px; }
+.cf-pbtn { flex:1; padding:10px; border:1.5px solid rgba(107,143,113,.2);
+  border-radius:9px; background:transparent; font-size:13px; color:var(--gray);
+  cursor:pointer; transition:all .16s; text-align:center; }
+.cf-pbtn:hover { border-color:var(--g-mid); color:var(--g-dark); }
+.cf-pbtn.on { border-color:var(--g-dark); background:rgba(45,74,62,.07); color:var(--g-dark); font-weight:500; }
+.cf-submit { width:100%; background:var(--g-dark); color:var(--cream); border:none;
   border-radius:10px; padding:16px; font-family:'Cormorant Garamond',serif;
-  font-size:18px; letter-spacing:0.06em; cursor:pointer; transition:all 0.18s; }
-.add-cart-btn:hover:not(:disabled) { background:#1e3329; }
-.add-cart-btn:disabled { background:rgba(107,143,113,0.3); color:#8a8680; cursor:not-allowed; }
+  font-size:19px; letter-spacing:.08em; cursor:pointer; transition:all .18s; }
+.cf-submit:hover:not(:disabled) { background:#1e3329; }
+.cf-submit:disabled { background:rgba(107,143,113,.26); color:#aaa; cursor:not-allowed; }
 
-/* ─── CART PANEL (right 40%) ──────────────────────────────────────────────── */
-.cart-panel { flex:0 0 40%; display:flex; flex-direction:column;
-  background:#fff; overflow:hidden; min-height:0; }
-.cart-header { display:flex; align-items:center; justify-content:space-between;
-  padding:13px 18px; border-bottom:1px solid rgba(107,143,113,0.12); flex-shrink:0; }
-.cart-header-left { display:flex; align-items:baseline; gap:10px; }
-.cart-label { font-family:'Cormorant Garamond',serif; font-size:18px; color:#2d4a3e; letter-spacing:0.08em; }
-.cart-count { font-size:11px; color:#8a8680; }
-.clear-btn { background:transparent; border:1px solid rgba(196,168,130,0.35);
-  color:#aaa; border-radius:6px; padding:5px 12px; cursor:pointer;
-  font-family:'Jost',sans-serif; font-size:11px; transition:all 0.18s; }
-.clear-btn:hover { border-color:#e74c3c; color:#e74c3c; }
-.cart-list { flex:1; overflow-y:auto; min-height:0; }
-.cart-empty { padding:44px 20px; text-align:center; color:#ccc; font-size:13px; }
-.cart-item { padding:11px 18px; border-bottom:1px solid rgba(107,143,113,0.08);
-  display:flex; gap:10px; align-items:flex-start; }
-.cart-item-info { flex:1; min-width:0; }
-.cart-item-name { font-family:'Cormorant Garamond',serif; font-size:15px;
-  color:#1a1a1a; line-height:1.3; }
-.cart-item-detail { font-size:11px; color:#8a8680; margin-top:3px; line-height:1.6; }
-.cart-item-right { display:flex; flex-direction:column; align-items:flex-end;
-  gap:6px; flex-shrink:0; }
-.cart-item-price { font-family:'Cormorant Garamond',serif; font-size:15px;
-  color:#2d4a3e; white-space:nowrap; }
-.cart-item-qty { display:flex; align-items:center; gap:6px; }
-.ci-qty-btn { background:transparent; border:1px solid rgba(107,143,113,0.25);
-  color:#2d4a3e; width:22px; height:22px; border-radius:50%; cursor:pointer;
-  font-size:14px; display:flex; align-items:center; justify-content:center;
-  transition:all 0.15s; flex-shrink:0; }
-.ci-qty-btn:hover { background:#2d4a3e; color:#f5f2ec; }
-.ci-qty-num { font-size:13px; color:#1a1a1a; min-width:16px; text-align:center; }
-.cart-remove { background:transparent; border:none; color:#ddd; cursor:pointer;
-  font-size:20px; line-height:1; padding:0 2px; transition:color 0.15s; }
-.cart-remove:hover { color:#e74c3c; }
+/* Cart header pulse feedback */
+@keyframes cart-flash {
+  0%   { background:rgba(45,74,62,.12); }
+  100% { background:var(--white); }
+}
+.cart-head.flash { animation:cart-flash .35s ease-out; }
 
-/* Cart footer */
-.cart-footer { border-top:2px solid rgba(107,143,113,0.12); flex-shrink:0; padding:12px 18px 16px; }
-.subtotal-row { display:flex; justify-content:space-between; font-size:13px;
-  color:#8a8680; padding:4px 0; }
-.discount-row { display:flex; justify-content:space-between; font-size:13px;
-  color:#27ae60; padding:4px 0; display:none; }
-.discount-row.show { display:flex; }
-.total-row { display:flex; justify-content:space-between; align-items:baseline;
-  border-top:1px solid rgba(107,143,113,0.15); margin-top:8px; padding-top:10px; margin-bottom:12px; }
-.total-label { font-size:12px; letter-spacing:0.14em; text-transform:uppercase; color:#8a8680; }
-.total-val { font-family:'Cormorant Garamond',serif; font-size:26px; color:#2d4a3e; }
-.student-row { display:flex; align-items:center; justify-content:space-between;
-  padding:8px 0; border-top:1px solid rgba(107,143,113,0.1); margin-bottom:8px; }
-.student-chk-label { display:flex; align-items:center; gap:8px; cursor:pointer;
-  font-size:13px; color:#1a1a1a; }
-.student-chk-label input[type=checkbox] { width:17px; height:17px;
-  accent-color:#2d4a3e; cursor:pointer; flex-shrink:0; }
-.student-badge { font-size:11px; color:#27ae60; background:rgba(39,174,96,0.08);
-  border:1px solid rgba(39,174,96,0.25); padding:2px 8px; border-radius:12px;
-  display:none; }
-.student-badge.show { display:inline-block; }
-.notes-inp { width:100%; border:1px solid rgba(107,143,113,0.22); border-radius:8px;
-  padding:9px 12px; font-family:'Jost',sans-serif; font-size:12px; color:#1a1a1a;
-  outline:none; transition:border-color 0.18s; margin-bottom:10px; user-select:text; }
-.notes-inp:focus { border-color:#6b8f71; }
-.notes-inp::placeholder { color:rgba(138,134,128,0.4); }
-.pay-toggle { display:flex; gap:8px; margin-bottom:12px; }
-.pay-opt { flex:1; padding:12px; border:1.5px solid rgba(107,143,113,0.22);
-  border-radius:10px; background:transparent; font-family:'Jost',sans-serif;
-  font-size:13px; color:#8a8680; cursor:pointer; transition:all 0.18s; text-align:center; }
-.pay-opt:hover { border-color:#6b8f71; color:#2d4a3e; }
-.pay-opt.active { border-color:#2d4a3e; background:rgba(45,74,62,0.06); color:#2d4a3e; font-weight:500; }
-.submit-btn { width:100%; background:#2d4a3e; color:#f5f2ec; border:none;
-  border-radius:10px; padding:17px; font-family:'Cormorant Garamond',serif;
-  font-size:19px; letter-spacing:0.08em; cursor:pointer; transition:all 0.2s; }
-.submit-btn:hover:not(:disabled) { background:#1e3329; }
-.submit-btn:disabled { background:rgba(107,143,113,0.28); color:#aaa; cursor:not-allowed; }
+/* ── Customization Modal ─────────────────────────────────────────────────── */
+#cust-modal { position:fixed; inset:0; background:rgba(0,0,0,.48); z-index:400;
+  display:none; align-items:center; justify-content:center; padding:16px; }
+#cust-modal.on { display:flex; }
+.modal-card { background:var(--white); border-radius:16px;
+  max-width:520px; width:100%; max-height:90vh;
+  display:flex; flex-direction:column; overflow:hidden;
+  box-shadow:0 24px 60px rgba(0,0,0,.22); }
+.modal-hd { padding:16px 20px 13px; border-bottom:1px solid var(--border);
+  display:flex; align-items:flex-start; justify-content:space-between;
+  gap:12px; flex-shrink:0; }
+.modal-pname { font-family:'Cormorant Garamond',serif; font-size:20px;
+  color:var(--g-dark); letter-spacing:.04em; line-height:1.3; }
+.modal-pzh   { font-size:11px; color:var(--gray); margin-top:3px; }
+.modal-x { background:transparent; border:none; color:#bbb; cursor:pointer;
+  font-size:22px; line-height:1; padding:2px 4px; flex-shrink:0; margin-top:1px;
+  transition:color .15s; }
+.modal-x:hover { color:var(--ink); }
+.modal-body { flex:1; overflow-y:auto; padding:16px 20px; }
+.msec  { margin-bottom:20px; }
+.mlbl  { font-size:10px; letter-spacing:.22em; text-transform:uppercase;
+  color:var(--gray); display:block; margin-bottom:10px; }
+.mopts { display:flex; flex-wrap:wrap; gap:7px; }
+.mopt  { padding:10px 16px; border:1.5px solid rgba(107,143,113,.22);
+  border-radius:8px; background:transparent; font-family:'Jost',sans-serif;
+  font-size:13px; color:var(--gray); cursor:pointer; transition:all .15s; min-width:70px; text-align:center; }
+.mopt:hover { border-color:var(--g-mid); color:var(--g-dark); }
+.mopt.on { background:var(--g-dark); color:var(--cream); border-color:var(--g-dark); }
+.mopt .msub { font-size:10px; display:block; margin-top:2px; opacity:.72; }
+.mincl { font-size:13px; color:var(--g-mid); padding:8px 2px; }
+.mtopping { display:flex; align-items:center; justify-content:space-between;
+  padding:12px 14px; border:1.5px solid rgba(107,143,113,.18); border-radius:10px;
+  cursor:pointer; transition:all .15s; margin-bottom:8px; }
+.mtopping:hover { border-color:var(--g-mid); }
+.mtopping.on { border-color:var(--g-dark); background:rgba(45,74,62,.04); }
+.mt-name { font-family:'Cormorant Garamond',serif; font-size:15px; color:var(--ink); }
+.mt-right { display:flex; align-items:center; gap:10px; }
+.mt-price { font-size:12px; color:var(--gray); }
+.mt-chk   { width:22px; height:22px; border-radius:50%;
+  border:1.5px solid rgba(107,143,113,.28); display:flex; align-items:center;
+  justify-content:center; font-size:12px; color:transparent; transition:all .15s; }
+.mtopping.on .mt-chk { background:var(--g-dark); border-color:var(--g-dark); color:var(--cream); }
+.modal-ft { border-top:1px solid var(--border); padding:13px 20px;
+  display:flex; align-items:center; gap:11px; flex-shrink:0; background:var(--white); }
+.mf-qty  { display:flex; align-items:center; background:var(--bg);
+  border-radius:10px; border:1px solid rgba(107,143,113,.18); overflow:hidden; flex-shrink:0; }
+.mf-qb   { background:transparent; border:none; font-size:22px; color:var(--g-dark);
+  cursor:pointer; width:40px; height:48px; display:flex; align-items:center;
+  justify-content:center; transition:background .14s; }
+.mf-qb:hover { background:rgba(45,74,62,.1); }
+.mf-qn   { font-family:'Cormorant Garamond',serif; font-size:20px; color:var(--g-dark);
+  min-width:32px; text-align:center; }
+.mf-add  { flex:1; background:var(--g-dark); color:var(--cream); border:none;
+  border-radius:10px; padding:14px 12px; font-family:'Cormorant Garamond',serif;
+  font-size:16px; letter-spacing:.05em; cursor:pointer; transition:all .18s; white-space:nowrap; }
+.mf-add:hover { background:#1e3329; }
 
-/* ─── SUCCESS SCREEN ──────────────────────────────────────────────────────── */
-#success-screen { position:fixed; inset:0; background:rgba(45,74,62,0.96);
+/* ── Success Overlay ─────────────────────────────────────────────────────── */
+#success-screen { position:fixed; inset:0; background:rgba(45,74,62,.96);
   display:none; align-items:center; justify-content:center; z-index:500; }
-#success-screen.show { display:flex; }
-.success-card { background:#f5f2ec; border-radius:20px; padding:44px 52px;
-  text-align:center; max-width:400px; width:90%; }
-.success-icon { width:66px; height:66px; border:2px solid #6b8f71; border-radius:50%;
-  display:flex; align-items:center; justify-content:center; font-size:30px;
-  color:#2d4a3e; margin:0 auto 22px; }
-.success-lbl { font-size:10px; letter-spacing:0.3em; text-transform:uppercase;
-  color:#8a8680; margin-bottom:14px; }
-.success-num { font-family:'Cormorant Garamond',serif; font-size:56px; font-weight:300;
-  color:#2d4a3e; letter-spacing:0.1em; line-height:1; }
-.success-num-lbl { font-size:9px; letter-spacing:0.3em; text-transform:uppercase;
-  color:#8a8680; margin-top:4px; margin-bottom:20px; }
-.success-pay { display:inline-block; font-size:13px; color:#2d4a3e;
-  background:rgba(45,74,62,0.08); border:1px solid rgba(107,143,113,0.3);
-  padding:6px 18px; border-radius:20px; margin-bottom:30px; }
-.new-order-btn { background:#2d4a3e; color:#f5f2ec; border:none; border-radius:10px;
-  padding:15px 44px; font-family:'Cormorant Garamond',serif; font-size:17px;
-  letter-spacing:0.08em; cursor:pointer; transition:all 0.18s; }
-.new-order-btn:hover { background:#1e3329; }
+#success-screen.on { display:flex; }
+.scard { background:var(--cream); border-radius:20px; padding:44px 52px;
+  text-align:center; max-width:380px; width:90%; }
+.sicon { width:64px; height:64px; border:2px solid var(--g-mid); border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:28px; color:var(--g-dark); margin:0 auto 20px; }
+.slbl  { font-size:10px; letter-spacing:.3em; text-transform:uppercase; color:var(--gray); margin-bottom:12px; }
+.snum  { font-family:'Cormorant Garamond',serif; font-size:54px; font-weight:300;
+  color:var(--g-dark); letter-spacing:.1em; line-height:1; }
+.snumlbl { font-size:9px; letter-spacing:.28em; text-transform:uppercase;
+  color:var(--gray); margin-top:4px; margin-bottom:18px; }
+.spay  { display:inline-block; font-size:13px; color:var(--g-dark);
+  background:rgba(45,74,62,.08); border:1px solid rgba(107,143,113,.28);
+  padding:6px 18px; border-radius:20px; margin-bottom:28px; }
+.snew  { background:var(--g-dark); color:var(--cream); border:none;
+  border-radius:10px; padding:14px 42px; font-family:'Cormorant Garamond',serif;
+  font-size:17px; letter-spacing:.08em; cursor:pointer; transition:all .18s; }
+.snew:hover { background:#1e3329; }
 
-/* ─── TOAST ───────────────────────────────────────────────────────────────── */
-#toast { position:fixed; bottom:30px; left:50%; transform:translateX(-50%);
-  background:#1a1a1a; color:#f5f2ec; padding:10px 22px; border-radius:8px;
-  font-size:13px; letter-spacing:0.06em; opacity:0; transition:opacity 0.3s;
-  z-index:9000; pointer-events:none; white-space:nowrap; }
+/* ── Toast ───────────────────────────────────────────────────────────────── */
+#toast { position:fixed; bottom:28px; left:50%; transform:translateX(-50%);
+  background:var(--ink); color:var(--cream); padding:10px 22px;
+  border-radius:8px; font-size:13px; letter-spacing:.06em;
+  opacity:0; transition:opacity .28s; z-index:9000;
+  pointer-events:none; white-space:nowrap; max-width:90vw; }
 </style>
 </head>
 <body>
 
-<!-- ── PIN SCREEN ──────────────────────────────────────────────────────────── -->
+<!-- ── PIN Screen ─────────────────────────────────────────────────────────── -->
 <div id="pin-screen">
   <div class="pin-logo">White Leaf</div>
   <div class="pin-sub">Counter POS</div>
-  <input class="pin-input" id="pin-input" type="password" inputmode="numeric"
+  <input id="pin-inp" class="pin-input" type="password" inputmode="numeric"
          placeholder="Enter PIN" maxlength="8" autocomplete="off">
-  <button class="pin-btn" id="pin-btn" onclick="doLogin()">Sign In</button>
-  <div class="pin-error" id="pin-error"></div>
+  <button id="pin-btn" class="pin-btn" onclick="doLogin()">Sign In</button>
+  <div id="pin-err" class="pin-error"></div>
 </div>
 
-<!-- ── POS APP ─────────────────────────────────────────────────────────────── -->
+<!-- ── POS App ────────────────────────────────────────────────────────────── -->
 <div id="pos-app">
 
   <!-- Top bar -->
-  <div class="pos-topbar">
-    <div class="pos-logo">
-      <span class="pos-logo-name">White Leaf</span>
-      <span class="pos-badge">Counter POS</span>
+  <div class="topbar">
+    <div class="topbar-logo">
+      <span class="topbar-name">White Leaf</span>
+      <span class="topbar-badge">Counter POS</span>
     </div>
-    <button class="pos-logout" onclick="doLogout()">Sign Out</button>
+    <button class="topbar-logout" onclick="doLogout()">Sign Out</button>
   </div>
 
-  <!-- Body -->
+  <!-- Body: 3 columns -->
   <div class="pos-body">
 
-    <!-- ── LEFT: MENU PANEL ──────────────────────────────────────────────── -->
-    <div class="menu-panel">
+    <!-- Col 1: Category Sidebar -->
+    <div class="cat-col" id="cat-col"></div>
 
-      <!-- Category tabs -->
-      <div class="cat-tabs" id="cat-tabs"></div>
-
-      <!-- Browse view -->
-      <div id="browse-view">
-        <div class="product-grid" id="product-grid"></div>
+    <!-- Col 2: Product Panel -->
+    <div class="prod-panel">
+      <div class="prod-header" id="prod-header">
+        <div class="prod-header-title" id="prod-title"></div>
+        <div class="prod-header-desc"  id="prod-desc"></div>
       </div>
-
-      <!-- Customize view -->
-      <div id="customize-view">
-        <div class="cust-topbar">
-          <button class="back-btn" onclick="showBrowse()">← Back</button>
-          <div class="cust-product-name" id="cust-product-name"></div>
-        </div>
-        <div class="cust-body" id="cust-body"></div>
-        <div class="cust-footer">
-          <div class="qty-ctrl">
-            <button class="qty-btn" onclick="changeQty(-1)">−</button>
-            <span class="qty-num" id="qty-num">1</span>
-            <button class="qty-btn" onclick="changeQty(1)">+</button>
-          </div>
-          <button class="add-cart-btn" id="add-cart-btn" onclick="addToCart()">Add to Order</button>
-        </div>
-      </div>
+      <div class="prod-grid" id="prod-grid"></div>
     </div>
 
-    <!-- ── RIGHT: CART PANEL ─────────────────────────────────────────────── -->
+    <!-- Col 3: Cart -->
     <div class="cart-panel">
-      <div class="cart-header">
-        <div class="cart-header-left">
-          <span class="cart-label">Order</span>
-          <span class="cart-count" id="cart-count"></span>
+      <div class="cart-head" id="cart-head">
+        <div class="cart-head-left">
+          <span class="cart-title">Order</span>
+          <span class="cart-badge" id="cart-badge"></span>
         </div>
-        <button class="clear-btn" onclick="clearCart()">Clear All</button>
+        <button class="cart-clear" onclick="clearCart()">Clear All</button>
       </div>
-
       <div class="cart-list" id="cart-list">
         <div class="cart-empty">Select items from the menu</div>
       </div>
-
-      <div class="cart-footer">
-        <div class="subtotal-row">
-          <span>Subtotal</span>
-          <span id="subtotal-val">0 Ft</span>
+      <div class="cart-foot">
+        <div class="cf-row">
+          <span>Subtotal</span><span id="cf-sub">0 Ft</span>
         </div>
-        <div class="discount-row" id="discount-row">
-          <span>Student Discount</span>
-          <span>−200 Ft</span>
+        <div class="cf-disc" id="cf-disc">
+          <span>Student Discount</span><span>−200 Ft</span>
         </div>
-        <div class="total-row">
-          <span class="total-label">Total</span>
-          <span class="total-val" id="total-val">0 Ft</span>
+        <div class="cf-total">
+          <span class="cf-tlbl">Total</span>
+          <span class="cf-tval" id="cf-total">0 Ft</span>
         </div>
-
-        <div class="student-row">
-          <label class="student-chk-label">
-            <input type="checkbox" id="student-check" onchange="toggleStudent()">
-            Student Discount (ID required)
+        <div class="cf-student">
+          <label class="cf-slbl">
+            <input type="checkbox" id="student-chk" onchange="toggleStudent()">
+            Student Discount
           </label>
-          <span class="student-badge" id="student-badge">−200 Ft</span>
+          <span class="cf-sbadge" id="student-badge">−200 Ft</span>
         </div>
-
-        <input type="text" class="notes-inp" id="order-notes" placeholder="Staff notes (optional)">
-
-        <div class="pay-toggle">
-          <button class="pay-opt active" id="pay-cash" onclick="setPayment('cash')">💵 Cash</button>
-          <button class="pay-opt" id="pay-card" onclick="setPayment('card')">💳 Card</button>
+        <input id="order-notes" class="cf-notes" type="text" placeholder="Staff notes (optional)">
+        <div class="cf-pay">
+          <button class="cf-pbtn on" id="pay-cash" onclick="setPay('cash')">💵 Cash</button>
+          <button class="cf-pbtn"    id="pay-card" onclick="setPay('card')">💳 Card</button>
         </div>
-
-        <button class="submit-btn" id="submit-btn" onclick="submitOrder()" disabled>
+        <button class="cf-submit" id="cf-submit" onclick="submitOrder()" disabled>
           Place Order
         </button>
       </div>
@@ -342,15 +358,37 @@ html, body { height:100%; overflow:hidden; background:#edeae3;
   </div>
 </div>
 
-<!-- ── SUCCESS SCREEN ──────────────────────────────────────────────────────── -->
+<!-- ── Customization Modal ────────────────────────────────────────────────── -->
+<div id="cust-modal" onclick="modalBgClick(event)">
+  <div class="modal-card">
+    <div class="modal-hd">
+      <div>
+        <div class="modal-pname" id="m-pname"></div>
+        <div class="modal-pzh"   id="m-pzh"></div>
+      </div>
+      <button class="modal-x" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body" id="m-body"></div>
+    <div class="modal-ft">
+      <div class="mf-qty">
+        <button class="mf-qb" onclick="mQty(-1)">−</button>
+        <span   class="mf-qn" id="m-qty">1</span>
+        <button class="mf-qb" onclick="mQty(+1)">+</button>
+      </div>
+      <button class="mf-add" id="m-add" onclick="commitItem()"></button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Success Screen ─────────────────────────────────────────────────────── -->
 <div id="success-screen">
-  <div class="success-card">
-    <div class="success-icon">✓</div>
-    <div class="success-lbl">Order Placed</div>
-    <div class="success-num" id="success-num"></div>
-    <div class="success-num-lbl">Order Number</div>
-    <div class="success-pay" id="success-pay"></div>
-    <button class="new-order-btn" onclick="newOrder()">New Order</button>
+  <div class="scard">
+    <div class="sicon">✓</div>
+    <div class="slbl">Order Placed</div>
+    <div class="snum"    id="s-num"></div>
+    <div class="snumlbl">Order Number</div>
+    <div class="spay"    id="s-pay"></div>
+    <button class="snew" onclick="newOrder()">New Order</button>
   </div>
 </div>
 
@@ -360,358 +398,407 @@ html, body { height:100%; overflow:hidden; background:#edeae3;
 <script>
 'use strict';
 
-const API = 'https://whiteleaf-backend-production.up.railway.app';
+/* ── Constants ────────────────────────────────────────────────────────────── */
+var API = 'https://whiteleaf-backend-production.up.railway.app';
 
-// ── MENU DATA ────────────────────────────────────────────────────────────────
-var MENU_CATS = [
-  {
-    id: 'pmt', name: 'Pearl Milk Tea',
-    items: [
-      { id:'pmt-green', name:'Brown Sugar PMT — Green Tea',   nameZh:'黑糖珍珠奶茶·绿茶', prices:{Small:2199,Large:2499}, base:'pearl-fixed' },
-      { id:'pmt-black', name:'Brown Sugar PMT — Black Tea',   nameZh:'黑糖珍珠奶茶·红茶', prices:{Small:2199,Large:2499}, base:'pearl-fixed' },
-      { id:'cmt-green', name:'Coconut Milk Tea — Green Tea',  nameZh:'椰果奶茶·绿茶',     prices:{Small:2199,Large:2499}, base:'coconut-fixed' },
-      { id:'cmt-black', name:'Coconut Milk Tea — Black Tea',  nameZh:'椰果奶茶·红茶',     prices:{Small:2199,Large:2499}, base:'coconut-fixed' },
-    ]
-  },
-  {
-    id: 'ft', name: 'Fruit Tea',
-    items: [
-      { id:'ft-straw', name:'Strawberry Fruit Tea',    nameZh:'草莓果茶',   prices:{Small:2199,Large:2499}, base:'fruittea' },
-      { id:'ft-pass',  name:'Passion Fruit Tea',       nameZh:'百香果茶',   prices:{Small:2199,Large:2499}, base:'fruittea' },
-      { id:'ft-mango', name:'Mango Fruit Tea',         nameZh:'芒果果茶',   prices:{Small:2199,Large:2499}, base:'fruittea' },
-      { id:'ft-lych',  name:'Lychee Fruit Tea',        nameZh:'荔枝果茶',   prices:{Small:2199,Large:2499}, base:'fruittea' },
-      { id:'ft-peach', name:'Peach Fruit Tea',         nameZh:'桃子果茶',   prices:{Small:2199,Large:2499}, base:'fruittea' },
-      { id:'ft-grape', name:'Grape Fruit Tea',         nameZh:'葡萄果茶',   prices:{Small:2199,Large:2499}, base:'fruittea' },
-    ]
-  },
-  {
-    id: 'fmt', name: 'Fruit Milk Tea',
-    items: [
-      { id:'fmt-straw', name:'Strawberry Milk Tea',    nameZh:'草莓奶茶',   prices:{Small:2399,Large:2699}, base:'fruitmilk' },
-      { id:'fmt-mango', name:'Mango Milk Tea',         nameZh:'芒果奶茶',   prices:{Small:2399,Large:2699}, base:'fruitmilk' },
-      { id:'fmt-pass',  name:'Passion Fruit Milk Tea', nameZh:'百香果奶茶', prices:{Small:2399,Large:2699}, base:'fruitmilk' },
-    ]
-  },
-  {
-    id: 'sl', name: 'Fruit Slush',
-    items: [
-      { id:'sl-straw', name:'Strawberry Slush',    nameZh:'草莓冰沙',   prices:{Large:2599}, base:'slush' },
-      { id:'sl-pass',  name:'Passion Fruit Slush', nameZh:'百香果冰沙', prices:{Large:2599}, base:'slush' },
-      { id:'sl-mango', name:'Mango Slush',         nameZh:'芒果冰沙',   prices:{Large:2599}, base:'slush' },
-      { id:'sl-lych',  name:'Lychee Slush',        nameZh:'荔枝冰沙',   prices:{Large:2599}, base:'slush' },
-      { id:'sl-peach', name:'Peach Slush',         nameZh:'桃子冰沙',   prices:{Large:2599}, base:'slush' },
-    ]
-  }
+var MENU = [
+  { id:'pmt', name:'Pearl Milk Tea', desc:'Tapioca pearls or coconut jelly · Small or Large',
+    items:[
+      { id:'pmt-green', name:'Brown Sugar PMT — Green Tea',  zh:'黑糖珍珠奶茶·绿茶', prices:{Small:2199,Large:2499}, base:'pearl-fixed' },
+      { id:'pmt-black', name:'Brown Sugar PMT — Black Tea',  zh:'黑糖珍珠奶茶·红茶', prices:{Small:2199,Large:2499}, base:'pearl-fixed' },
+      { id:'cmt-green', name:'Coconut Milk Tea — Green Tea', zh:'椰果奶茶·绿茶',     prices:{Small:2199,Large:2499}, base:'coconut-fixed' },
+      { id:'cmt-black', name:'Coconut Milk Tea — Black Tea', zh:'椰果奶茶·红茶',     prices:{Small:2199,Large:2499}, base:'coconut-fixed' },
+    ]},
+  { id:'ft', name:'Fruit Tea', desc:'Choose popping boba or coconut jelly · Small or Large',
+    items:[
+      { id:'ft-straw', name:'Strawberry Fruit Tea',    zh:'草莓果茶',   prices:{Small:2199,Large:2499}, base:'fruittea' },
+      { id:'ft-pass',  name:'Passion Fruit Tea',       zh:'百香果茶',   prices:{Small:2199,Large:2499}, base:'fruittea' },
+      { id:'ft-mango', name:'Mango Fruit Tea',         zh:'芒果果茶',   prices:{Small:2199,Large:2499}, base:'fruittea' },
+      { id:'ft-lych',  name:'Lychee Fruit Tea',        zh:'荔枝果茶',   prices:{Small:2199,Large:2499}, base:'fruittea' },
+      { id:'ft-peach', name:'Peach Fruit Tea',         zh:'桃子果茶',   prices:{Small:2199,Large:2499}, base:'fruittea' },
+      { id:'ft-grape', name:'Grape Fruit Tea',         zh:'葡萄果茶',   prices:{Small:2199,Large:2499}, base:'fruittea' },
+    ]},
+  { id:'fmt', name:'Fruit Milk Tea', desc:'Choose popping boba or coconut jelly · Small or Large',
+    items:[
+      { id:'fmt-straw', name:'Strawberry Milk Tea',    zh:'草莓奶茶',   prices:{Small:2399,Large:2699}, base:'fruitmilk' },
+      { id:'fmt-mango', name:'Mango Milk Tea',         zh:'芒果奶茶',   prices:{Small:2399,Large:2699}, base:'fruitmilk' },
+      { id:'fmt-pass',  name:'Passion Fruit Milk Tea', zh:'百香果奶茶', prices:{Small:2399,Large:2699}, base:'fruitmilk' },
+    ]},
+  { id:'sl', name:'Fruit Slush', desc:'Blended iced slush · Large only · 2,599 Ft',
+    items:[
+      { id:'sl-straw', name:'Strawberry Slush',    zh:'草莓冰沙',   prices:{Large:2599}, base:'slush' },
+      { id:'sl-pass',  name:'Passion Fruit Slush', zh:'百香果冰沙', prices:{Large:2599}, base:'slush' },
+      { id:'sl-mango', name:'Mango Slush',         zh:'芒果冰沙',   prices:{Large:2599}, base:'slush' },
+      { id:'sl-lych',  name:'Lychee Slush',        zh:'荔枝冰沙',   prices:{Large:2599}, base:'slush' },
+      { id:'sl-peach', name:'Peach Slush',         zh:'桃子冰沙',   prices:{Large:2599}, base:'slush' },
+    ]},
 ];
 
-var SLUSH_TOPPINGS = [
+var SLUSH_TPS = [
   { id:'tp-pearl',   name:'Tapioca Pearls', price:300 },
   { id:'tp-coconut', name:'Coconut Jelly',  price:300 },
   { id:'tp-boba',    name:'Popping Boba',   price:300 },
 ];
 
-// ── STATE ────────────────────────────────────────────────────────────────────
-var counterToken = localStorage.getItem('wl_counter_token') || '';
-var cart = [];
-var currentCat = 0;
-var studentDiscountOn = false;
-var paymentType = 'cash';
+/* ── App State ────────────────────────────────────────────────────────────── */
+var token       = localStorage.getItem('wl_counter_token') || '';
+var cart        = [];
+var curCat      = 0;
+var studentOn   = false;
+var payType     = 'cash';
 
-// Customization
-var custProduct = null;
-var custSize = '';
-var custSweetness = '50%';
-var custIce = 'Normal';
-var custBase = '';           // 'popping-boba' or 'coconut-jelly'
-var custSlushToppings = {};  // { id: true/false }
-var custQty = 1;
+// Modal state
+var mProd       = null;   // product being configured
+var mEditIdx    = -1;     // -1 = new item, ≥0 = editing cart[mEditIdx]
+var mSize       = '';
+var mSweet      = '50%';
+var mIce        = 'Normal';
+var mBase       = '';     // 'popping-boba' | 'coconut-jelly'
+var mSlushTops  = {};     // { 'tp-pearl': true }
+var mQtyVal     = 1;
 
-// ── AUTH ─────────────────────────────────────────────────────────────────────
+/* ── Auth ─────────────────────────────────────────────────────────────────── */
 async function doLogin() {
-  var pin = document.getElementById('pin-input').value.trim();
-  var errEl = document.getElementById('pin-error');
-  var btn = document.getElementById('pin-btn');
-  if (!pin) { errEl.textContent = 'Please enter PIN'; return; }
-  btn.disabled = true; errEl.textContent = '';
+  var pin   = document.getElementById('pin-inp').value.trim();
+  var err   = document.getElementById('pin-err');
+  var btn   = document.getElementById('pin-btn');
+  if (!pin) { err.textContent = 'Please enter PIN'; return; }
+  btn.disabled = true; err.textContent = '';
   try {
-    var res = await fetch(API + '/api/admin/login', {
+    var r    = await fetch(API + '/api/admin/login', {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({ pin: pin })
+      body: JSON.stringify({ pin: pin })
     });
-    var data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Login failed');
-    counterToken = data.token;
-    localStorage.setItem('wl_counter_token', counterToken);
-    enterPOS();
+    var data = await r.json();
+    if (!r.ok) throw new Error(data.error || 'Incorrect PIN');
+    token = data.token;
+    localStorage.setItem('wl_counter_token', token);
+    launchPOS();
   } catch(e) {
-    errEl.textContent = 'Incorrect PIN — please try again';
-    document.getElementById('pin-input').value = '';
-    document.getElementById('pin-input').focus();
-  } finally {
-    btn.disabled = false;
-  }
+    err.textContent = 'Incorrect PIN — please try again';
+    document.getElementById('pin-inp').value = '';
+    document.getElementById('pin-inp').focus();
+  } finally { btn.disabled = false; }
 }
 
 function doLogout() {
-  counterToken = '';
-  localStorage.removeItem('wl_counter_token');
-  document.getElementById('pos-app').classList.remove('visible');
+  token = ''; localStorage.removeItem('wl_counter_token');
+  document.getElementById('pos-app').classList.remove('on');
   document.getElementById('pin-screen').style.display = 'flex';
-  document.getElementById('pin-input').value = '';
-  document.getElementById('pin-error').textContent = '';
+  document.getElementById('pin-inp').value = '';
+  document.getElementById('pin-err').textContent = '';
 }
 
-function enterPOS() {
+function launchPOS() {
   document.getElementById('pin-screen').style.display = 'none';
-  document.getElementById('pos-app').classList.add('visible');
-  initPOS();
+  document.getElementById('pos-app').classList.add('on');
+  resetState();
+  renderCats();
+  selectCat(0);
 }
 
-// Auto-login if saved token is still valid
-(async function autoLogin() {
-  if (!counterToken) return;
+// Auto-login if stored token valid
+(async function() {
+  if (!token) return;
   try {
-    var res = await fetch(API + '/api/admin/orders?limit=1', {
-      headers:{ 'Authorization':'Bearer ' + counterToken }
+    var r = await fetch(API + '/api/admin/orders?limit=1', {
+      headers:{ 'Authorization':'Bearer ' + token }
     });
-    if (res.ok) {
-      enterPOS();
-    } else {
-      localStorage.removeItem('wl_counter_token');
-      counterToken = '';
-    }
-  } catch(e) { /* network error, show PIN */ }
+    if (r.ok) { launchPOS(); }
+    else { localStorage.removeItem('wl_counter_token'); token = ''; }
+  } catch(e) {}
 })();
 
-// ── INIT ─────────────────────────────────────────────────────────────────────
-function initPOS() {
-  cart = []; studentDiscountOn = false; paymentType = 'cash'; currentCat = 0; custQty = 1;
-  renderCatTabs();
-  renderProducts();
-  renderCart();
-  showBrowse();
-  document.getElementById('student-check').checked = false;
+/* ── POS Init ─────────────────────────────────────────────────────────────── */
+function resetState() {
+  cart = []; studentOn = false; payType = 'cash'; mQtyVal = 1;
+  document.getElementById('student-chk').checked = false;
   document.getElementById('order-notes').value = '';
-  document.getElementById('pay-cash').classList.add('active');
-  document.getElementById('pay-card').classList.remove('active');
+  document.getElementById('pay-cash').classList.add('on');
+  document.getElementById('pay-card').classList.remove('on');
 }
 
-// ── CATEGORY / PRODUCT RENDERING ─────────────────────────────────────────────
-function renderCatTabs() {
-  document.getElementById('cat-tabs').innerHTML = MENU_CATS.map(function(cat, i) {
-    return '<button class="cat-tab' + (i === currentCat ? ' active' : '') +
-      '" onclick="selectCat(' + i + ')">' + cat.name + '</button>';
+/* ── Category Rendering ───────────────────────────────────────────────────── */
+function renderCats() {
+  document.getElementById('cat-col').innerHTML = MENU.map(function(cat, i) {
+    return '<div class="cat-item' + (i === curCat ? ' active' : '') +
+      '" onclick="selectCat(' + i + ')">' +
+      '<div class="cat-name">' + cat.name + '</div>' +
+      '<div class="cat-cnt">' + cat.items.length + ' drinks</div>' +
+      '</div>';
   }).join('');
 }
 
 function selectCat(i) {
-  currentCat = i;
-  renderCatTabs();
-  renderProducts();
-  showBrowse();
+  curCat = i;
+  renderCats();
+  var cat = MENU[i];
+  document.getElementById('prod-title').textContent = cat.name;
+  document.getElementById('prod-desc').textContent  = cat.desc;
+  renderProds(cat.items);
 }
 
-function renderProducts() {
-  var items = MENU_CATS[currentCat].items;
-  document.getElementById('product-grid').innerHTML = items.map(function(p) {
-    var sizes = Object.keys(p.prices);
-    var prices = Object.values(p.prices);
-    var priceStr = prices.length === 1
-      ? fmt(prices[0])
-      : fmt(Math.min.apply(null, prices)) + ' – ' + fmt(Math.max.apply(null, prices));
-    return '<button class="product-btn" onclick="startCustomize(\'' + p.id + '\')">' +
+/* ── Product Rendering ────────────────────────────────────────────────────── */
+function renderProds(items) {
+  document.getElementById('prod-grid').innerHTML = items.map(function(p) {
+    var vals = Object.values(p.prices);
+    var lo   = Math.min.apply(null, vals), hi = Math.max.apply(null, vals);
+    var prStr = lo === hi ? fmt(lo) : fmt(lo) + ' – ' + fmt(hi);
+    return '<button class="prod-btn" onclick="openModal(\'' + p.id + '\')">' +
       '<div><div class="pb-name">' + p.name + '</div>' +
-      '<div class="pb-zh">' + p.nameZh + '</div></div>' +
-      '<div class="pb-price">' + priceStr + ' Ft</div>' +
+      '<div class="pb-zh">'   + p.zh   + '</div></div>' +
+      '<div class="pb-price">' + prStr + ' Ft</div>' +
       '</button>';
   }).join('');
 }
 
-// ── CUSTOMIZATION ─────────────────────────────────────────────────────────────
-function startCustomize(productId) {
-  var items = MENU_CATS[currentCat].items;
-  custProduct = null;
-  for (var i = 0; i < items.length; i++) {
-    if (items[i].id === productId) { custProduct = items[i]; break; }
-  }
-  if (!custProduct) return;
-
-  var sizes = Object.keys(custProduct.prices);
-  custSize = sizes[sizes.length - 1]; // default to largest (Large)
-  custSweetness = '50%';
-  custIce = 'Normal';
-  custBase = (custProduct.base === 'fruittea' || custProduct.base === 'fruitmilk') ? 'popping-boba' : '';
-  custSlushToppings = {};
-  custQty = 1;
-
-  document.getElementById('cust-product-name').textContent = custProduct.name;
-  document.getElementById('qty-num').textContent = '1';
-  renderCustBody();
-  showCustomize();
+/* ── Modal: Open / Close ──────────────────────────────────────────────────── */
+function findProd(id) {
+  for (var c = 0; c < MENU.length; c++)
+    for (var p = 0; p < MENU[c].items.length; p++)
+      if (MENU[c].items[p].id === id) return MENU[c].items[p];
+  return null;
 }
 
-function renderCustBody() {
-  var p = custProduct;
+function openModal(productId) {
+  mProd     = findProd(productId);
+  mEditIdx  = -1;
+  if (!mProd) return;
+
+  // Defaults
+  var sizes = Object.keys(mProd.prices);
+  mSize     = sizes[sizes.length - 1];   // prefer Large
+  mSweet    = '50%';
+  mIce      = 'Normal';
+  mBase     = (mProd.base === 'fruittea' || mProd.base === 'fruitmilk') ? 'popping-boba' : '';
+  mSlushTops = {};
+  mQtyVal   = 1;
+
+  renderModal();
+  document.getElementById('cust-modal').classList.add('on');
+}
+
+function openModalEdit(idx) {
+  var item  = cart[idx];
+  mProd     = findProd(item.productId);
+  mEditIdx  = idx;
+  if (!mProd) return;
+
+  mSize      = item.size;
+  mSweet     = item.sweetness || '50%';
+  mIce       = item.ice       || 'Normal';
+  mBase      = item.baseChoice;
+  mSlushTops = {};
+  item.paidToppings.forEach(function(t) { mSlushTops[t.id] = true; });
+  mQtyVal    = item.quantity;
+
+  renderModal();
+  document.getElementById('cust-modal').classList.add('on');
+}
+
+function closeModal() {
+  document.getElementById('cust-modal').classList.remove('on');
+}
+
+function modalBgClick(e) {
+  if (e.target === document.getElementById('cust-modal')) closeModal();
+}
+
+/* ── Modal: Render Body ───────────────────────────────────────────────────── */
+function renderModal() {
+  var p = mProd;
+  document.getElementById('m-pname').textContent = p.name;
+  document.getElementById('m-pzh').textContent   = p.zh;
+  document.getElementById('m-qty').textContent   = mQtyVal;
+
   var html = '';
 
-  // Size selector (only when multiple sizes available)
+  // Size
   var sizes = Object.keys(p.prices);
   if (sizes.length > 1) {
-    html += '<div class="cust-section"><span class="cust-label">Size</span><div class="cust-btns">';
+    html += '<div class="msec"><span class="mlbl">Size</span><div class="mopts">';
     sizes.forEach(function(sz) {
-      html += '<button class="cust-opt' + (sz === custSize ? ' sel' : '') +
-        '" onclick="setSize(\'' + sz + '\')">' + sz +
-        '<span class="opt-sub">' + fmt(p.prices[sz]) + ' Ft</span></button>';
+      html += '<button class="mopt' + (sz === mSize ? ' on' : '') +
+        '" onclick="mSetSize(\'' + sz + '\')">' + sz +
+        '<span class="msub">' + fmt(p.prices[sz]) + ' Ft</span></button>';
     });
     html += '</div></div>';
   }
 
   // Sweetness + Ice (not for slush)
   if (p.base !== 'slush') {
-    html += '<div class="cust-section"><span class="cust-label">Sweetness</span><div class="cust-btns">';
+    html += '<div class="msec"><span class="mlbl">Sweetness</span><div class="mopts">';
     ['0%','30%','50%','70%','100%'].forEach(function(sw) {
-      html += '<button class="cust-opt' + (sw === custSweetness ? ' sel' : '') +
-        '" onclick="setSw(\'' + sw + '\')">' + sw + '</button>';
+      html += '<button class="mopt' + (sw === mSweet ? ' on' : '') +
+        '" onclick="mSetSweet(\'' + sw + '\')">' + sw + '</button>';
     });
     html += '</div></div>';
 
-    html += '<div class="cust-section"><span class="cust-label">Ice</span><div class="cust-btns">';
+    html += '<div class="msec"><span class="mlbl">Ice Level</span><div class="mopts">';
     ['No Ice','Less Ice','Normal','Extra Ice'].forEach(function(ic) {
-      html += '<button class="cust-opt' + (ic === custIce ? ' sel' : '') +
-        '" onclick="setIce(\'' + ic + '\')">' + ic + '</button>';
+      html += '<button class="mopt' + (ic === mIce ? ' on' : '') +
+        '" onclick="mSetIce(\'' + ic + '\')">' + ic + '</button>';
     });
     html += '</div></div>';
   }
 
-  // Base choice: Popping Boba vs Coconut Jelly (for fruittea / fruitmilk)
+  // Base choice for fruit tea / milk tea
   if (p.base === 'fruittea' || p.base === 'fruitmilk') {
-    html += '<div class="cust-section"><span class="cust-label">Base Topping — Included Free</span><div class="cust-btns">';
+    html += '<div class="msec"><span class="mlbl">Base Topping — Included</span><div class="mopts">';
     [['popping-boba','Popping Boba'],['coconut-jelly','Coconut Jelly']].forEach(function(pair) {
-      html += '<button class="cust-opt' + (custBase === pair[0] ? ' sel' : '') +
-        '" onclick="setBase(\'' + pair[0] + '\')" style="min-width:130px">' + pair[1] + '</button>';
+      html += '<button class="mopt' + (mBase === pair[0] ? ' on' : '') +
+        '" style="min-width:128px" onclick="mSetBase(\'' + pair[0] + '\')">' + pair[1] + '</button>';
     });
     html += '</div></div>';
   }
 
-  // Fixed base notice (pearl / coconut milk tea)
+  // Fixed base notice
   if (p.base === 'pearl-fixed') {
-    html += '<div class="cust-section"><span class="cust-label">Included</span>' +
-      '<div style="font-size:13px;color:#6b8f71;padding:8px 2px">🧋 Tapioca Pearls (included)</div></div>';
+    html += '<div class="msec"><span class="mlbl">Included</span>' +
+      '<div class="mincl">Tapioca Pearls — included</div></div>';
   }
   if (p.base === 'coconut-fixed') {
-    html += '<div class="cust-section"><span class="cust-label">Included</span>' +
-      '<div style="font-size:13px;color:#6b8f71;padding:8px 2px">🥥 Coconut Jelly (included)</div></div>';
+    html += '<div class="msec"><span class="mlbl">Included</span>' +
+      '<div class="mincl">Coconut Jelly — included</div></div>';
   }
 
-  // Paid add-ons for slush
+  // Paid toppings for slush
   if (p.base === 'slush') {
-    html += '<div class="cust-section"><span class="cust-label">Add-Ons (+300 Ft each)</span>';
-    SLUSH_TOPPINGS.forEach(function(tp) {
-      var sel = !!custSlushToppings[tp.id];
-      html += '<div class="topping-row' + (sel ? ' sel' : '') + '" onclick="toggleSlushTp(\'' + tp.id + '\')">' +
-        '<span class="tp-name">' + tp.name + '</span>' +
-        '<div class="tp-right"><span class="tp-price">+' + fmt(tp.price) + ' Ft</span>' +
-        '<div class="tp-check">' + (sel ? '✓' : '') + '</div></div></div>';
+    html += '<div class="msec"><span class="mlbl">Add-ons (+300 Ft each)</span>';
+    SLUSH_TPS.forEach(function(tp) {
+      var sel = !!mSlushTops[tp.id];
+      html += '<div class="mtopping' + (sel ? ' on' : '') +
+        '" onclick="mToggleTp(\'' + tp.id + '\')">' +
+        '<span class="mt-name">' + tp.name + '</span>' +
+        '<div class="mt-right"><span class="mt-price">+' + fmt(tp.price) + ' Ft</span>' +
+        '<div class="mt-chk">' + (sel ? '✓' : '') + '</div></div></div>';
     });
     html += '</div>';
   }
 
-  document.getElementById('cust-body').innerHTML = html;
+  document.getElementById('m-body').innerHTML = html;
+  updateModalBtn();
 }
 
-function setSize(sz) { custSize = sz; renderCustBody(); }
-function setSw(sw)   { custSweetness = sw; renderCustBody(); }
-function setIce(ic)  { custIce = ic; renderCustBody(); }
-function setBase(b)  { custBase = b; renderCustBody(); }
-function toggleSlushTp(id) { custSlushToppings[id] = !custSlushToppings[id]; renderCustBody(); }
-
-function changeQty(delta) {
-  custQty = Math.max(1, Math.min(20, custQty + delta));
-  document.getElementById('qty-num').textContent = custQty;
+function mSetSize(sz)  { mSize = sz;  renderModal(); }
+function mSetSweet(sw) { mSweet = sw; renderModal(); }
+function mSetIce(ic)   { mIce = ic;   renderModal(); }
+function mSetBase(b)   { mBase = b;   renderModal(); }
+function mToggleTp(id) { mSlushTops[id] = !mSlushTops[id]; renderModal(); }
+function mQty(d) {
+  mQtyVal = Math.max(1, Math.min(20, mQtyVal + d));
+  document.getElementById('m-qty').textContent = mQtyVal;
+  updateModalBtn();
 }
 
-function addToCart() {
-  if (!custProduct) return;
+function getTpTotal() {
+  var t = 0;
+  if (mProd && mProd.base === 'slush')
+    SLUSH_TPS.forEach(function(tp) { if (mSlushTops[tp.id]) t += tp.price; });
+  return t;
+}
 
-  var p = custProduct;
-  var basePrice = p.prices[custSize];
+function updateModalBtn() {
+  var unitPrice = mProd.prices[mSize] + getTpTotal();
+  var total = unitPrice * mQtyVal;
+  var isEdit = mEditIdx >= 0;
+  document.getElementById('m-add').textContent =
+    (isEdit ? 'Update — ' : 'Add to Order — ') + fmt(total) + ' Ft';
+}
 
-  // Determine baseChoice string and free topping
+/* ── Modal: Commit (Add or Update) ───────────────────────────────────────── */
+function commitItem() {
+  var p = mProd;
+
+  // Resolve baseChoice
   var baseChoice = p.base;
-  var freeTopping = null;
+  var freeTop    = null;
   if (p.base === 'pearl-fixed') {
-    freeTopping = { id:'tp-pearl', name:'Tapioca Pearls', price:0, isFree:true };
+    freeTop = { id:'tp-pearl',   name:'Tapioca Pearls', price:0, isFree:true };
   } else if (p.base === 'coconut-fixed') {
-    freeTopping = { id:'tp-coconut', name:'Coconut Jelly', price:0, isFree:true };
+    freeTop = { id:'tp-coconut', name:'Coconut Jelly',  price:0, isFree:true };
   } else if (p.base === 'fruittea' || p.base === 'fruitmilk') {
-    baseChoice = custBase;
-    freeTopping = custBase === 'popping-boba'
-      ? { id:'tp-boba', name:'Popping Boba', price:0, isFree:true }
+    baseChoice = mBase;
+    freeTop = mBase === 'popping-boba'
+      ? { id:'tp-boba',    name:'Popping Boba',  price:0, isFree:true }
       : { id:'tp-coconut', name:'Coconut Jelly', price:0, isFree:true };
   }
 
   // Paid slush toppings
-  var paidToppings = [];
-  var toppingTotal = 0;
+  var paidTops = [], tpTotal = 0;
   if (p.base === 'slush') {
-    SLUSH_TOPPINGS.forEach(function(tp) {
-      if (custSlushToppings[tp.id]) {
-        paidToppings.push({ id:tp.id, name:tp.name, price:tp.price, isFree:false });
-        toppingTotal += tp.price;
-      }
+    SLUSH_TPS.forEach(function(tp) {
+      if (mSlushTops[tp.id]) { paidTops.push({ id:tp.id, name:tp.name, price:tp.price, isFree:false }); tpTotal += tp.price; }
     });
   }
 
-  cart.push({
-    uid: Date.now() + '' + Math.random(),
-    productId: p.id,
-    name: p.name,
-    nameZh: p.nameZh,
-    size: custSize,
-    sweetness: p.base !== 'slush' ? custSweetness : null,
-    ice: p.base !== 'slush' ? custIce : null,
-    baseChoice: baseChoice,
-    freeTopping: freeTopping,
-    paidToppings: paidToppings,
-    unitPrice: basePrice,
-    toppingPrice: toppingTotal,
-    quantity: custQty
-  });
+  var newItem = {
+    uid:          Date.now() + '' + Math.random(),
+    productId:    p.id,
+    name:         p.name,
+    nameZh:       p.zh,
+    size:         mSize,
+    sweetness:    p.base !== 'slush' ? mSweet : null,
+    ice:          p.base !== 'slush' ? mIce   : null,
+    baseChoice:   baseChoice,
+    freeTop:      freeTop,
+    paidToppings: paidTops,
+    tpTotal:      tpTotal,
+    unitPrice:    p.prices[mSize],
+    quantity:     mQtyVal
+  };
 
+  if (mEditIdx >= 0) {
+    cart.splice(mEditIdx, 1, newItem);
+  } else {
+    cart.push(newItem);
+    // Flash cart header to confirm addition
+    var h = document.getElementById('cart-head');
+    h.classList.remove('flash');
+    void h.offsetWidth;
+    h.classList.add('flash');
+  }
+
+  closeModal();
   renderCart();
-  showBrowse();
 }
 
-// ── CART ─────────────────────────────────────────────────────────────────────
+/* ── Cart ─────────────────────────────────────────────────────────────────── */
 function renderCart() {
   var list = document.getElementById('cart-list');
   if (cart.length === 0) {
     list.innerHTML = '<div class="cart-empty">Select items from the menu</div>';
-    document.getElementById('cart-count').textContent = '';
+    document.getElementById('cart-badge').textContent = '';
   } else {
-    var totalItems = cart.reduce(function(s, it) { return s + it.quantity; }, 0);
-    document.getElementById('cart-count').textContent = totalItems + (totalItems === 1 ? ' item' : ' items');
+    var totalQty = cart.reduce(function(s, it) { return s + it.quantity; }, 0);
+    document.getElementById('cart-badge').textContent =
+      totalQty + (totalQty === 1 ? ' item' : ' items');
+
     list.innerHTML = cart.map(function(item, idx) {
-      var details = [];
-      if (item.size) details.push(item.size);
-      if (item.sweetness) details.push(item.sweetness);
-      if (item.ice) details.push(item.ice);
-      if (item.freeTopping) details.push(item.freeTopping.name);
-      item.paidToppings.forEach(function(t) { details.push('+' + t.name); });
-      var lineTotal = (item.unitPrice + item.toppingPrice) * item.quantity;
-      return '<div class="cart-item">' +
-        '<div class="cart-item-info">' +
-          '<div class="cart-item-name">' + item.name + '</div>' +
-          '<div class="cart-item-detail">' + details.join(' · ') + '</div>' +
-        '</div>' +
-        '<div class="cart-item-right">' +
-          '<div class="cart-item-price">' + fmt(lineTotal) + ' Ft</div>' +
-          '<div class="cart-item-qty">' +
-            '<button class="ci-qty-btn" onclick="changeCartQty(' + idx + ',-1)">−</button>' +
-            '<span class="ci-qty-num">' + item.quantity + '</span>' +
-            '<button class="ci-qty-btn" onclick="changeCartQty(' + idx + ',1)">+</button>' +
+      var parts = [];
+      if (item.size) parts.push(item.size);
+      if (item.sweetness) parts.push(item.sweetness);
+      if (item.ice) parts.push(item.ice);
+      if (item.freeTop) parts.push(item.freeTop.name);
+      item.paidToppings.forEach(function(t) { parts.push('+' + t.name); });
+      var lineTotal = (item.unitPrice + item.tpTotal) * item.quantity;
+
+      return '<div class="ci">' +
+        '<div class="ci-info">' +
+          '<div class="ci-name">' + item.name + '</div>' +
+          '<div class="ci-detail">' + parts.join(' · ') + '</div>' +
+          '<div class="ci-qty-row">' +
+            '<button class="ci-qb" onclick="cartQty(' + idx + ',-1)">−</button>' +
+            '<span class="ci-qn">' + item.quantity + '</span>' +
+            '<button class="ci-qb" onclick="cartQty(' + idx + ',1)">+</button>' +
           '</div>' +
-          '<button class="cart-remove" onclick="removeItem(' + idx + ')" title="Remove">×</button>' +
+        '</div>' +
+        '<div class="ci-right">' +
+          '<div class="ci-price">' + fmt(lineTotal) + ' Ft</div>' +
+          '<div class="ci-acts">' +
+            '<button class="ci-edit" onclick="openModalEdit(' + idx + ')" title="Edit">✏</button>' +
+            '<button class="ci-del"  onclick="removeItem(' + idx + ')"   title="Remove">×</button>' +
+          '</div>' +
         '</div>' +
       '</div>';
     }).join('');
@@ -719,8 +806,10 @@ function renderCart() {
   updateTotals();
 }
 
-function changeCartQty(idx, delta) {
-  cart[idx].quantity = Math.max(1, Math.min(20, cart[idx].quantity + delta));
+function cartQty(idx, d) {
+  var newQty = cart[idx].quantity + d;
+  if (newQty < 1) { removeItem(idx); return; }
+  cart[idx].quantity = Math.min(20, newQty);
   renderCart();
 }
 
@@ -732,156 +821,126 @@ function removeItem(idx) {
 function clearCart() {
   if (cart.length === 0) return;
   if (!confirm('Clear all items from this order?')) return;
-  cart = [];
-  studentDiscountOn = false;
-  document.getElementById('student-check').checked = false;
+  cart = []; studentOn = false;
+  document.getElementById('student-chk').checked = false;
   renderCart();
 }
 
 function updateTotals() {
-  var subtotal = cart.reduce(function(s, it) {
-    return s + (it.unitPrice + it.toppingPrice) * it.quantity;
-  }, 0);
-  var studentDisc = (studentDiscountOn && subtotal > 0) ? 200 : 0;
-  var total = Math.max(0, subtotal - studentDisc);
-
-  document.getElementById('subtotal-val').textContent = fmt(subtotal) + ' Ft';
-  document.getElementById('total-val').textContent = fmt(total) + ' Ft';
-
-  var discRow = document.getElementById('discount-row');
-  if (studentDisc > 0) discRow.classList.add('show'); else discRow.classList.remove('show');
-
-  var badge = document.getElementById('student-badge');
-  if (studentDiscountOn) badge.classList.add('show'); else badge.classList.remove('show');
-
-  document.getElementById('submit-btn').disabled = cart.length === 0;
+  var sub    = cart.reduce(function(s, it) { return s + (it.unitPrice + it.tpTotal) * it.quantity; }, 0);
+  var disc   = (studentOn && sub > 0) ? 200 : 0;
+  var total  = Math.max(0, sub - disc);
+  document.getElementById('cf-sub').textContent   = fmt(sub) + ' Ft';
+  document.getElementById('cf-total').textContent = fmt(total) + ' Ft';
+  var dr = document.getElementById('cf-disc');
+  if (disc) dr.classList.add('on'); else dr.classList.remove('on');
+  var sb = document.getElementById('student-badge');
+  if (studentOn) sb.classList.add('on'); else sb.classList.remove('on');
+  document.getElementById('cf-submit').disabled = cart.length === 0;
 }
 
 function toggleStudent() {
-  studentDiscountOn = document.getElementById('student-check').checked;
+  studentOn = document.getElementById('student-chk').checked;
   updateTotals();
 }
 
-function setPayment(type) {
-  paymentType = type;
-  document.getElementById('pay-cash').classList.toggle('active', type === 'cash');
-  document.getElementById('pay-card').classList.toggle('active', type === 'card');
+function setPay(type) {
+  payType = type;
+  document.getElementById('pay-cash').classList.toggle('on', type === 'cash');
+  document.getElementById('pay-card').classList.toggle('on', type === 'card');
 }
 
-// ── SUBMIT ORDER ─────────────────────────────────────────────────────────────
+/* ── Submit Order ─────────────────────────────────────────────────────────── */
 async function submitOrder() {
   if (cart.length === 0) return;
-  var btn = document.getElementById('submit-btn');
+  var btn = document.getElementById('cf-submit');
   btn.disabled = true;
-  var origText = btn.textContent;
   btn.textContent = 'Placing…';
 
-  // Build items for API
-  var items = cart.map(function(item) {
+  // Build items array
+  var items = cart.map(function(it) {
     return {
-      productId: item.productId,
-      name: item.name,
-      nameZh: item.nameZh,
-      size: item.size,
-      baseChoice: item.baseChoice,
+      productId:   it.productId,
+      name:        it.name,
+      nameZh:      it.nameZh,
+      size:        it.size,
+      baseChoice:  it.baseChoice,
       bobaFlavour: null,
-      quantity: item.quantity,
-      unitPrice: item.unitPrice,
-      sweetness: item.sweetness,
-      ice: item.ice,
-      isFree: false
+      quantity:    it.quantity,
+      unitPrice:   it.unitPrice,
+      sweetness:   it.sweetness,
+      ice:         it.ice,
+      isFree:      false
     };
   });
 
-  // Only paid toppings in the API toppings array
+  // Paid toppings only (free base inclusions are in baseChoice on each item)
   var toppings = [];
-  cart.forEach(function(item) {
-    item.paidToppings.forEach(function(t) { toppings.push(t); });
-  });
+  cart.forEach(function(it) { it.paidToppings.forEach(function(t) { toppings.push(t); }); });
 
-  // Prepend payment type to notes
-  var staffNote = document.getElementById('order-notes').value.trim();
-  var notes = '[' + (paymentType === 'cash' ? 'Cash' : 'Card') + ']' + (staffNote ? ' ' + staffNote : '');
-
-  var payload = {
-    items: items,
-    toppings: toppings,
-    sweetness: null,
-    ice: null,
-    notes: notes,
-    paymentMethod: 'counter',
-    lang: 'en',
-    studentDiscount: studentDiscountOn
-  };
+  var note = document.getElementById('order-notes').value.trim();
+  var notes = '[' + (payType === 'cash' ? 'Cash' : 'Card') + ']' + (note ? ' ' + note : '');
 
   try {
-    var res = await fetch(API + '/api/orders', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + counterToken
-      },
-      body: JSON.stringify(payload)
+    var r = await fetch(API + '/api/orders', {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer ' + token },
+      body: JSON.stringify({
+        items:          items,
+        toppings:       toppings,
+        sweetness:      null,
+        ice:            null,
+        notes:          notes,
+        paymentMethod:  'counter',
+        lang:           'en',
+        studentDiscount: studentOn
+      })
     });
-    if (res.status === 401 || res.status === 403) { doLogout(); return; }
-    var data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Failed to place order');
+    if (r.status === 401 || r.status === 403) { doLogout(); return; }
+    var data = await r.json();
+    if (!r.ok) throw new Error(data.error || 'Request failed');
     showSuccess(data.orderNumber);
   } catch(e) {
-    showToast('Order failed: ' + e.message);
-    btn.disabled = false;
-    btn.textContent = origText;
+    showToast('Failed: ' + e.message);
+    btn.disabled  = false;
+    btn.textContent = 'Place Order';
   }
 }
 
 function showSuccess(orderNumber) {
-  document.getElementById('success-num').textContent = '#' + orderNumber;
-  document.getElementById('success-pay').textContent =
-    paymentType === 'cash' ? '💵 Paid by Cash' : '💳 Paid by Card';
-  document.getElementById('success-screen').classList.add('show');
+  document.getElementById('s-num').textContent =
+    '#' + orderNumber;
+  document.getElementById('s-pay').textContent =
+    payType === 'cash' ? '💵 Paid by Cash' : '💳 Paid by Card';
+  document.getElementById('success-screen').classList.add('on');
 }
 
 function newOrder() {
-  document.getElementById('success-screen').classList.remove('show');
-  cart = []; studentDiscountOn = false; paymentType = 'cash'; custQty = 1;
-  document.getElementById('student-check').checked = false;
-  document.getElementById('order-notes').value = '';
-  document.getElementById('pay-cash').classList.add('active');
-  document.getElementById('pay-card').classList.remove('active');
-  renderProducts();
+  document.getElementById('success-screen').classList.remove('on');
+  resetState();
   renderCart();
-  showBrowse();
+  // stay on current category
 }
 
-// ── VIEW SWITCHING ────────────────────────────────────────────────────────────
-function showBrowse() {
-  document.getElementById('browse-view').style.display = 'flex';
-  document.getElementById('browse-view').style.flexDirection = 'column';
-  document.getElementById('customize-view').style.display = 'none';
-}
-
-function showCustomize() {
-  document.getElementById('browse-view').style.display = 'none';
-  document.getElementById('customize-view').style.display = 'flex';
-  document.getElementById('customize-view').style.flexDirection = 'column';
-}
-
-// ── UTILS ─────────────────────────────────────────────────────────────────────
+/* ── Utils ────────────────────────────────────────────────────────────────── */
 function fmt(n) {
-  return Number(n).toLocaleString('hu-HU');
+  try { return Number(n).toLocaleString('hu-HU'); }
+  catch(e) { return String(Number(n)).replace(/\B(?=(\d{3})+(?!\d))/g,' '); }
 }
 
 function showToast(msg) {
   var t = document.getElementById('toast');
-  t.textContent = msg;
-  t.style.opacity = '1';
+  t.textContent = msg; t.style.opacity = '1';
   clearTimeout(t._t);
-  t._t = setTimeout(function() { t.style.opacity = '0'; }, 3000);
+  t._t = setTimeout(function() { t.style.opacity = '0'; }, 3200);
 }
 
-// PIN enter key
-document.getElementById('pin-input').addEventListener('keydown', function(e) {
+/* ── Keyboard ─────────────────────────────────────────────────────────────── */
+document.getElementById('pin-inp').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') doLogin();
+});
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeModal();
 });
 </script>
 </body>
