@@ -615,7 +615,7 @@ function openModal(productId) {
 
   // Defaults
   var sizes = Object.keys(mProd.prices);
-  mSize     = sizes[sizes.length - 1];   // prefer Large
+  mSize     = sizes[0];   // default Small (slush has only Large, stays correct)
   mSweet    = '50%';
   mIce      = 'Normal';
   mBase     = (mProd.base === 'fruittea' || mProd.base === 'fruitmilk') ? 'popping-boba' : '';
