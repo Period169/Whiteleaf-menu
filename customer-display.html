@@ -80,6 +80,21 @@ html, body {
   margin-top: 10px;
 }
 
+/* ── Debug status bar ────────────────────────────────────────────────────── */
+#dbg-bar {
+  position: fixed;
+  bottom: 0; right: 0;
+  padding: 6px 14px;
+  font-size: 11px;
+  font-family: monospace;
+  color: #aaa;
+  background: rgba(255,255,255,.85);
+  border-top-left-radius: 6px;
+  pointer-events: none;
+  z-index: 999;
+}
+#dbg-bar.live { color: #27ae60; }
+
 /* ── Totals footer ────────────────────────────────────────────────────────── */
 #totals {
   flex-shrink: 0;
@@ -130,6 +145,7 @@ html, body {
   <div id="items"></div>
   <div id="totals"></div>
 </div>
+<div id="dbg-bar">⚪ waiting for POS…</div>
 
 <script>
 'use strict';
@@ -199,14 +215,32 @@ function render(data) {
   elTotals.innerHTML = tHtml;
 }
 
+console.log('[DISPLAY] origin:', window.location.origin);
+console.log('[DISPLAY] BroadcastChannel:', ch ? 'OK — wl_customer_display' : 'NOT SUPPORTED');
+
+function dbgStatus(msg, live) {
+  var el = document.getElementById('dbg-bar');
+  if (!el) return;
+  el.textContent = msg;
+  el.className = live ? 'live' : '';
+}
+
 if (ch) {
   ch.onmessage = function(e) {
+    console.log('[DISPLAY] channel message:', e.data);
     if (e.data && e.data.type === 'cart') {
-      console.log('[DISPLAY received]', e.data);
+      var ts = new Date().toLocaleTimeString('en-GB', { hour12: false });
+      var n  = e.data.items ? e.data.items.length : 0;
+      console.log('[DISPLAY received]', n, 'item(s) at', ts, e.data);
+      dbgStatus('● LIVE — ' + n + ' item(s) — ' + ts, true);
       render(e.data);
     }
   };
+  console.log('[DISPLAY] sending request to POS…');
+  dbgStatus('⚪ requesting from POS…', false);
   ch.postMessage({ type: 'request' });
+} else {
+  dbgStatus('✗ BroadcastChannel not supported', false);
 }
 </script>
 </body>

@@ -500,6 +500,8 @@ button, a, label, .cat-item, .prod-btn, .mtopping, .ci-qb, .ci-edit, .ci-del {
 
 /* ── Constants ────────────────────────────────────────────────────────────── */
 var API = 'https://whiteleaf-backend-production.up.railway.app';
+console.log('[POS] origin:', window.location.origin);
+console.log('[POS] BroadcastChannel:', typeof BroadcastChannel !== 'undefined' ? 'supported' : 'NOT SUPPORTED');
 
 var MENU = [
   { id:'pmt', name:'Pearl Milk Tea', desc:'Tapioca pearls or coconut jelly · Small or Large',
@@ -548,6 +550,7 @@ var studentOn   = false;
 var payType     = 'cash';
 var displayChannel = typeof BroadcastChannel !== 'undefined'
   ? new BroadcastChannel('wl_customer_display') : null;
+console.log('[POS] displayChannel:', displayChannel ? 'OK — wl_customer_display' : 'null (BroadcastChannel not supported)');
 
 // Modal state
 var mProd       = null;   // product being configured
@@ -1071,8 +1074,11 @@ async function submitOrder() {
   var note = document.getElementById('order-notes').value.trim();
   var notes = '[' + (payType === 'cash' ? 'Cash' : 'Card') + ']' + (note ? ' ' + note : '');
 
+  var orderUrl = API + '/api/orders';
+  console.log('[ORDER] POST', orderUrl);
+  console.log('[ORDER] token present:', !!token, '| token prefix:', token ? token.slice(0,20) + '…' : 'none');
   try {
-    var r = await fetch(API + '/api/orders', {
+    var r = await fetch(orderUrl, {
       method:'POST',
       headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer ' + token },
       body: JSON.stringify({
@@ -1086,11 +1092,18 @@ async function submitOrder() {
         studentDiscount: studentOn
       })
     });
-    if (r.status === 401 || r.status === 403) { doLogout(); return; }
+    console.log('[ORDER] HTTP', r.status, r.statusText);
+    if (r.status === 401 || r.status === 403) {
+      console.error('[ORDER] Auth error — logging out');
+      doLogout(); return;
+    }
     var data = await r.json();
-    if (!r.ok) throw new Error(data.error || 'Request failed');
+    console.log('[ORDER] response body:', data);
+    if (!r.ok) throw new Error(data.error || 'HTTP ' + r.status);
+    console.log('[ORDER] success — orderNumber:', data.orderNumber);
     showSuccess(data.orderNumber);
   } catch(e) {
+    console.error('[ORDER] failed:', e.message, e);
     showToast('Failed: ' + e.message);
     btn.disabled  = false;
     btn.textContent = 'Place Order';
@@ -1138,8 +1151,13 @@ function showToast(msg) {
 /* ── Respond to display page requesting current cart ─────────────────────── */
 if (displayChannel) {
   displayChannel.onmessage = function(e) {
-    if (e.data && e.data.type === 'request') broadcastCart();
+    console.log('[POS] channel message received:', e.data);
+    if (e.data && e.data.type === 'request') {
+      console.log('[POS] display requested cart — responding with', cart.length, 'item(s)');
+      broadcastCart();
+    }
   };
+  console.log('[POS] onmessage handler registered on wl_customer_display');
 }
 
 /* ── Keyboard ─────────────────────────────────────────────────────────────── */
