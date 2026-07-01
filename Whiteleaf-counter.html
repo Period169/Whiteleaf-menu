@@ -490,6 +490,8 @@ var cart        = [];
 var curCat      = 0;
 var studentOn   = false;
 var payType     = 'cash';
+var displayChannel = typeof BroadcastChannel !== 'undefined'
+  ? new BroadcastChannel('wl_customer_display') : null;
 
 // Modal state
 var mProd       = null;   // product being configured
@@ -885,6 +887,7 @@ function updateTotals() {
   var sb = document.getElementById('student-badge');
   if (studentOn) sb.classList.add('on'); else sb.classList.remove('on');
   document.getElementById('cf-submit').disabled = cart.length === 0;
+  broadcastCart();
 }
 
 function toggleStudent() {
@@ -896,6 +899,33 @@ function setPay(type) {
   payType = type;
   document.getElementById('pay-cash').classList.toggle('on', type === 'cash');
   document.getElementById('pay-card').classList.toggle('on', type === 'card');
+}
+
+/* ── Customer Display Broadcast ───────────────────────────────────────────── */
+function broadcastCart() {
+  if (!displayChannel) return;
+  var sub   = cart.reduce(function(s, it) { return s + (it.unitPrice + it.tpTotal) * it.quantity; }, 0);
+  var disc  = (studentOn && sub > 0) ? 200 : 0;
+  var total = Math.max(0, sub - disc);
+  displayChannel.postMessage({
+    type:     'cart',
+    items:    cart.map(function(it) {
+      return {
+        name:         it.name,
+        size:         it.size,
+        sweetness:    it.sweetness,
+        ice:          it.ice,
+        freeTop:      it.freeTop ? it.freeTop.name : null,
+        paidToppings: it.paidToppings.map(function(t) { return t.name; }),
+        unitPrice:    it.unitPrice,
+        tpTotal:      it.tpTotal,
+        quantity:     it.quantity,
+      };
+    }),
+    subtotal: sub,
+    discount: disc,
+    total:    total,
+  });
 }
 
 /* ── Submit Order ─────────────────────────────────────────────────────────── */
@@ -991,6 +1021,13 @@ function showToast(msg) {
   t.textContent = msg; t.style.opacity = '1';
   clearTimeout(t._t);
   t._t = setTimeout(function() { t.style.opacity = '0'; }, 3200);
+}
+
+/* ── Respond to display page requesting current cart ─────────────────────── */
+if (displayChannel) {
+  displayChannel.onmessage = function(e) {
+    if (e.data && e.data.type === 'request') broadcastCart();
+  };
 }
 
 /* ── Keyboard ─────────────────────────────────────────────────────────────── */

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>White Leaf — Customer Display</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  background: #fff;
+  font-family: 'Jost', system-ui, sans-serif;
+  font-weight: 300;
+  color: #1a1a1a;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+#display {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Empty state ──────────────────────────────────────────────────────────── */
+#empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 44px;
+  font-weight: 200;
+  color: #ccc;
+  letter-spacing: 0.01em;
+}
+
+/* ── Items area ───────────────────────────────────────────────────────────── */
+#items {
+  flex: 1;
+  overflow-y: auto;
+  padding: 44px 72px 24px;
+  display: none;
+}
+
+.item {
+  padding-bottom: 28px;
+  margin-bottom: 28px;
+  border-bottom: 1px solid #f0f0f0;
+}
+.item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.item-name {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 38px;
+  font-weight: 400;
+  color: #1a1a1a;
+  line-height: 1.2;
+  margin-bottom: 6px;
+}
+.item-detail {
+  font-size: 22px;
+  color: #aaa;
+  line-height: 1.7;
+}
+.item-topping {
+  font-size: 22px;
+  color: #2d4a3e;
+  line-height: 1.7;
+}
+.item-price {
+  font-size: 26px;
+  font-weight: 400;
+  color: #1a1a1a;
+  margin-top: 10px;
+}
+
+/* ── Totals footer ────────────────────────────────────────────────────────── */
+#totals {
+  flex-shrink: 0;
+  border-top: 2px solid #f0f0f0;
+  padding: 18px 72px 28px;
+  display: none;
+}
+
+.tot-sub {
+  display: flex;
+  justify-content: space-between;
+  font-size: 18px;
+  color: #bbb;
+  margin-bottom: 3px;
+}
+.tot-disc {
+  display: flex;
+  justify-content: space-between;
+  font-size: 18px;
+  color: #27ae60;
+  margin-bottom: 3px;
+}
+.tot-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+}
+.tot-tlbl {
+  font-size: 13px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: #bbb;
+}
+.tot-tval {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 76px;
+  font-weight: 300;
+  color: #2d4a3e;
+  line-height: 1;
+}
+</style>
+</head>
+<body>
+
+<div id="display">
+  <div id="empty">Please place your order.</div>
+  <div id="items"></div>
+  <div id="totals"></div>
+</div>
+
+<script>
+'use strict';
+
+var ch = typeof BroadcastChannel !== 'undefined'
+  ? new BroadcastChannel('wl_customer_display') : null;
+
+function fmt(n) {
+  try { return Number(n).toLocaleString('hu-HU'); }
+  catch(e) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' '); }
+}
+
+function render(data) {
+  var elEmpty  = document.getElementById('empty');
+  var elItems  = document.getElementById('items');
+  var elTotals = document.getElementById('totals');
+
+  if (!data || !data.items || data.items.length === 0) {
+    elEmpty.style.display  = 'flex';
+    elItems.style.display  = 'none';
+    elTotals.style.display = 'none';
+    return;
+  }
+
+  elEmpty.style.display  = 'none';
+  elItems.style.display  = 'block';
+  elTotals.style.display = 'block';
+
+  elItems.innerHTML = data.items.map(function(it) {
+    var html = '<div class="item">';
+    html += '<div class="item-name">' + it.name + '</div>';
+    if (it.size) {
+      html += '<div class="item-detail">' + it.size + '</div>';
+    }
+    if (it.sweetness) {
+      html += '<div class="item-detail">' + it.sweetness + ' Sugar</div>';
+    }
+    if (it.ice) {
+      var iceLabel = it.ice === 'Normal' ? 'Normal Ice' : it.ice;
+      html += '<div class="item-detail">' + iceLabel + '</div>';
+    }
+    if (it.freeTop) {
+      html += '<div class="item-topping">+ ' + it.freeTop + '</div>';
+    }
+    if (it.paidToppings && it.paidToppings.length) {
+      it.paidToppings.forEach(function(t) {
+        html += '<div class="item-topping">+ ' + t + '</div>';
+      });
+    }
+    var unitTotal = it.unitPrice + it.tpTotal;
+    var priceStr = it.quantity > 1
+      ? it.quantity + ' × ' + fmt(unitTotal) + ' Ft'
+      : '1 × ' + fmt(unitTotal) + ' Ft';
+    html += '<div class="item-price">' + priceStr + '</div>';
+    html += '</div>';
+    return html;
+  }).join('');
+
+  var tHtml = '<div class="tot-sub"><span>Subtotal</span><span>' + fmt(data.subtotal) + ' Ft</span></div>';
+  if (data.discount > 0) {
+    tHtml += '<div class="tot-disc"><span>Student Discount</span><span>−' + fmt(data.discount) + ' Ft</span></div>';
+  }
+  tHtml += '<div class="tot-total">'
+    + '<span class="tot-tlbl">Total</span>'
+    + '<span class="tot-tval">' + fmt(data.total) + ' Ft</span>'
+    + '</div>';
+  elTotals.innerHTML = tHtml;
+}
+
+if (ch) {
+  ch.onmessage = function(e) {
+    if (e.data && e.data.type === 'cart') render(e.data);
+  };
+  ch.postMessage({ type: 'request' });
+}
+</script>
+</body>
+</html>
