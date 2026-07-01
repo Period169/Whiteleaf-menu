@@ -1076,8 +1076,9 @@ async function submitOrder() {
 
   var orderUrl = API + '/api/orders';
   console.log('[ORDER] POST', orderUrl);
-  console.log('[ORDER] token present:', !!token, '| token prefix:', token ? token.slice(0,20) + '…' : 'none');
+  console.log('[ORDER] token present:', !!token);
   try {
+    console.log('[ORDER] request sent');
     var r = await fetch(orderUrl, {
       method:'POST',
       headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer ' + token },
@@ -1092,31 +1093,36 @@ async function submitOrder() {
         studentDiscount: studentOn
       })
     });
-    console.log('[ORDER] HTTP', r.status, r.statusText);
+    console.log('[ORDER] response received — HTTP', r.status, r.statusText, '| r.ok:', r.ok);
     if (r.status === 401 || r.status === 403) {
-      console.error('[ORDER] Auth error — logging out');
+      console.error('[ORDER] auth error — logging out');
       doLogout(); return;
     }
     var data = await r.json();
-    console.log('[ORDER] response body:', data);
+    console.log('[ORDER] response json:', JSON.stringify(data));
     if (!r.ok) throw new Error(data.error || 'HTTP ' + r.status);
-    console.log('[ORDER] success — orderNumber:', data.orderNumber);
+    console.log('[ORDER] success branch entered — orderNumber:', data.orderNumber);
     showSuccess(data.orderNumber);
+    console.log('[ORDER] showSuccess called');
   } catch(e) {
-    console.error('[ORDER] failed:', e.message, e);
+    console.error('[ORDER] catch block — error:', e.message, e);
     showToast('Failed: ' + e.message);
     btn.disabled  = false;
     btn.textContent = 'Place Order';
+  } finally {
+    console.log('[ORDER] finally');
   }
 }
 
 var successTimer = null;
 
 function showSuccess(orderNumber) {
+  console.log('[ORDER] showSuccess running — orderNumber:', orderNumber);
   document.getElementById('s-num').textContent = '#' + orderNumber;
   document.getElementById('s-pay').textContent =
     payType === 'cash' ? '💵 Paid by Cash' : '💳 Paid by Card';
   document.getElementById('success-screen').classList.add('on');
+  console.log('[ORDER] success screen shown');
   // Auto-return progress bar (3 s countdown)
   var bar = document.getElementById('s-prog');
   bar.style.transition = 'none';
@@ -1125,14 +1131,19 @@ function showSuccess(orderNumber) {
   bar.style.transition = 'width 3s linear';
   bar.style.width = '0%';
   clearTimeout(successTimer);
-  successTimer = setTimeout(newOrder, 3000);
+  successTimer = setTimeout(function() {
+    console.log('[ORDER] 3s timer fired — calling newOrder');
+    newOrder();
+  }, 3000);
 }
 
 function newOrder() {
+  console.log('[ORDER] newOrder called — clearing cart');
   clearTimeout(successTimer);
   document.getElementById('success-screen').classList.remove('on');
   resetState();
   renderCart();
+  console.log('[ORDER] cart cleared');
 }
 
 /* ── Utils ────────────────────────────────────────────────────────────────── */
