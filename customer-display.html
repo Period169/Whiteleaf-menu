@@ -201,7 +201,10 @@ function render(data) {
 
 if (ch) {
   ch.onmessage = function(e) {
-    if (e.data && e.data.type === 'cart') render(e.data);
+    if (e.data && e.data.type === 'cart') {
+      console.log('[DISPLAY received]', e.data);
+      render(e.data);
+    }
   };
   ch.postMessage({ type: 'request' });
 }

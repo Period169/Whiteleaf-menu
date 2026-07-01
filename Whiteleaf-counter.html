@@ -317,6 +317,46 @@ button, a, label, .cat-item, .prod-btn, .mtopping, .ci-qb, .ci-edit, .ci-del {
   border-radius:10px; font-size:14px; letter-spacing:.06em;
   opacity:0; transition:opacity .25s; z-index:9000;
   pointer-events:none; white-space:nowrap; max-width:90vw; }
+
+/* ── Payment Confirmation Modal ──────────────────────────────────────────── */
+#confirm-modal { position:fixed; inset:0; background:rgba(0,0,0,.52); z-index:450;
+  display:none; align-items:center; justify-content:center; padding:20px; }
+#confirm-modal.on { display:flex; }
+.confirm-card { background:var(--white); border-radius:20px;
+  max-width:460px; width:100%;
+  box-shadow:0 28px 70px rgba(0,0,0,.28); overflow:hidden; }
+.confirm-hd { background:var(--g-dark); padding:22px 28px 16px; }
+.confirm-pay { font-family:'Cormorant Garamond',serif; font-size:30px;
+  color:var(--cream); letter-spacing:.04em; }
+.confirm-hd-sub { font-size:10px; letter-spacing:.26em; text-transform:uppercase;
+  color:rgba(168,197,160,.55); margin-top:5px; }
+.confirm-items { padding:16px 28px 0; max-height:260px; overflow-y:auto; }
+.ci-conf { display:flex; justify-content:space-between; align-items:baseline;
+  padding:11px 0; border-bottom:1px solid var(--border); }
+.ci-conf:last-child { border-bottom:none; }
+.ci-conf-name { font-family:'Cormorant Garamond',serif; font-size:17px; color:var(--ink);
+  line-height:1.3; }
+.ci-conf-price { font-size:15px; color:var(--g-dark); font-weight:400;
+  white-space:nowrap; margin-left:16px; }
+.confirm-totals { padding:14px 28px 4px; border-top:2px solid rgba(107,143,113,.12);
+  margin-top:8px; }
+.ct-sub  { display:flex; justify-content:space-between; font-size:13px; color:var(--gray); padding:3px 0; }
+.ct-disc { display:flex; justify-content:space-between; font-size:13px; color:var(--green); padding:3px 0; }
+.ct-total { display:flex; justify-content:space-between; align-items:center; padding:10px 0 6px; }
+.ct-tlbl { font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:var(--gray); }
+.ct-tval { font-family:'Cormorant Garamond',serif; font-size:40px;
+  color:var(--g-dark); font-weight:300; line-height:1; }
+.confirm-actions { display:flex; gap:12px; padding:20px 28px 24px; }
+.confirm-back { flex:0 0 auto; padding:18px 22px; border:1.5px solid rgba(107,143,113,.22);
+  border-radius:10px; background:transparent; color:var(--gray); font-size:14px;
+  cursor:pointer; transition:all .15s; min-height:60px; }
+.confirm-back:active { border-color:var(--g-mid); color:var(--ink); }
+.confirm-ok { flex:1; background:var(--g-dark); color:var(--cream); border:none;
+  border-radius:10px; padding:18px; font-family:'Cormorant Garamond',serif;
+  font-size:20px; letter-spacing:.08em; cursor:pointer; transition:all .18s;
+  min-height:60px; }
+.confirm-ok:active { background:#1e3329; transform:scale(.99); }
+.confirm-ok:disabled { opacity:.45; cursor:not-allowed; }
 </style>
 </head>
 <body>
@@ -393,7 +433,7 @@ button, a, label, .cat-item, .prod-btn, .mtopping, .ci-qb, .ci-edit, .ci-del {
           <button class="cf-pbtn on" id="pay-cash" onclick="setPay('cash')">💵 Cash</button>
           <button class="cf-pbtn"    id="pay-card" onclick="setPay('card')">💳 Card</button>
         </div>
-        <button class="cf-submit" id="cf-submit" onclick="submitOrder()" disabled>
+        <button class="cf-submit" id="cf-submit" onclick="showConfirm()" disabled>
           Place Order
         </button>
       </div>
@@ -433,6 +473,22 @@ button, a, label, .cat-item, .prod-btn, .mtopping, .ci-qb, .ci-edit, .ci-del {
     <div class="spay"    id="s-pay"></div>
     <div class="s-prog-wrap"><div id="s-prog" class="s-prog-bar"></div></div>
     <button class="snew" onclick="newOrder()">New Order</button>
+  </div>
+</div>
+
+<!-- ── Payment Confirmation Modal ────────────────────────────────────────── -->
+<div id="confirm-modal">
+  <div class="confirm-card">
+    <div class="confirm-hd">
+      <div class="confirm-pay"    id="confirm-pay-lbl"></div>
+      <div class="confirm-hd-sub">Review order before charging</div>
+    </div>
+    <div class="confirm-items"  id="confirm-items"></div>
+    <div class="confirm-totals" id="confirm-totals"></div>
+    <div class="confirm-actions">
+      <button class="confirm-back" onclick="closeConfirm()">← Back</button>
+      <button class="confirm-ok"   id="confirm-ok-btn" onclick="doSubmit()">Confirm Payment</button>
+    </div>
   </div>
 </div>
 
@@ -904,28 +960,84 @@ function setPay(type) {
 /* ── Customer Display Broadcast ───────────────────────────────────────────── */
 function broadcastCart() {
   if (!displayChannel) return;
+  try {
+    var sub   = cart.reduce(function(s, it) { return s + (it.unitPrice + it.tpTotal) * it.quantity; }, 0);
+    var disc  = (studentOn && sub > 0) ? 200 : 0;
+    var total = Math.max(0, sub - disc);
+    var payload = {
+      type:     'cart',
+      items:    cart.map(function(it) {
+        return {
+          name:         it.name,
+          size:         it.size,
+          sweetness:    it.sweetness,
+          ice:          it.ice,
+          freeTop:      it.freeTop ? it.freeTop.name : null,
+          paidToppings: it.paidToppings.map(function(t) { return t.name; }),
+          unitPrice:    it.unitPrice,
+          tpTotal:      it.tpTotal,
+          quantity:     it.quantity,
+        };
+      }),
+      subtotal: sub,
+      discount: disc,
+      total:    total,
+    };
+    console.log('[POS broadcast]', payload);
+    displayChannel.postMessage(payload);
+  } catch(e) {
+    console.warn('[POS broadcast] error (non-fatal):', e);
+  }
+}
+
+/* ── Payment Confirmation ─────────────────────────────────────────────────── */
+function showConfirm() {
+  if (cart.length === 0) return;
+
+  // Payment label
+  document.getElementById('confirm-pay-lbl').textContent =
+    payType === 'cash' ? '💵 Cash' : '💳 Card';
+
+  // Items list
+  document.getElementById('confirm-items').innerHTML = cart.map(function(it) {
+    var lineTotal = (it.unitPrice + it.tpTotal) * it.quantity;
+    var nameStr   = it.quantity > 1 ? it.quantity + '× ' + it.name : it.name;
+    return '<div class="ci-conf">' +
+      '<span class="ci-conf-name">'  + nameStr            + '</span>' +
+      '<span class="ci-conf-price">' + fmt(lineTotal) + ' Ft</span>' +
+    '</div>';
+  }).join('');
+
+  // Totals
   var sub   = cart.reduce(function(s, it) { return s + (it.unitPrice + it.tpTotal) * it.quantity; }, 0);
   var disc  = (studentOn && sub > 0) ? 200 : 0;
   var total = Math.max(0, sub - disc);
-  displayChannel.postMessage({
-    type:     'cart',
-    items:    cart.map(function(it) {
-      return {
-        name:         it.name,
-        size:         it.size,
-        sweetness:    it.sweetness,
-        ice:          it.ice,
-        freeTop:      it.freeTop ? it.freeTop.name : null,
-        paidToppings: it.paidToppings.map(function(t) { return t.name; }),
-        unitPrice:    it.unitPrice,
-        tpTotal:      it.tpTotal,
-        quantity:     it.quantity,
-      };
-    }),
-    subtotal: sub,
-    discount: disc,
-    total:    total,
-  });
+  var tHtml = '<div class="ct-sub"><span>Subtotal</span><span>' + fmt(sub) + ' Ft</span></div>';
+  if (disc) tHtml += '<div class="ct-disc"><span>Student Discount</span><span>−200 Ft</span></div>';
+  tHtml += '<div class="ct-total">' +
+    '<span class="ct-tlbl">Total</span>' +
+    '<span class="ct-tval">' + fmt(total) + ' Ft</span>' +
+  '</div>';
+  document.getElementById('confirm-totals').innerHTML = tHtml;
+
+  // Reset confirm button
+  var okBtn = document.getElementById('confirm-ok-btn');
+  okBtn.disabled    = false;
+  okBtn.textContent = 'Confirm Payment';
+
+  document.getElementById('confirm-modal').classList.add('on');
+}
+
+function closeConfirm() {
+  document.getElementById('confirm-modal').classList.remove('on');
+}
+
+function doSubmit() {
+  var okBtn = document.getElementById('confirm-ok-btn');
+  okBtn.disabled    = true;
+  okBtn.textContent = 'Processing…';
+  closeConfirm();
+  submitOrder();
 }
 
 /* ── Submit Order ─────────────────────────────────────────────────────────── */
@@ -1035,7 +1147,7 @@ document.getElementById('pin-inp').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') doLogin();
 });
 document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') closeModal();
+  if (e.key === 'Escape') { closeModal(); closeConfirm(); }
 });
 </script>
 </body>
