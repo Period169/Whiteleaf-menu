@@ -655,7 +655,16 @@ function setBar(msg, ok) {
 function syncPrintBtn() {
   var btn = document.getElementById('btn-print');
 
-  /* ── Web Bluetooth available (desktop Chrome / Android / Bluefy on iOS) ── */
+  /* ── iOS (all browsers): hide BT, show app guidance ── */
+  if (IS_IOS) {
+    btn.style.display = 'none';
+    var bar = document.getElementById('bt-bar');
+    bar.innerHTML = '请下载 PNG，然后使用<strong>精臣云打印 App</strong> 导入图片进行打印。';
+    bar.className = '';
+    return;
+  }
+
+  /* ── Desktop Chrome / Android Chrome: enable BT ── */
   if (BT_OK) {
     btn.style.display = '';
     btn.disabled      = false;
@@ -666,17 +675,6 @@ function syncPrintBtn() {
       btn.textContent = 'Print';
       setBar('● ' + (btDev ? btDev.name : 'B21S') + ' connected', true);
     }
-    return;
-  }
-
-  /* ── iOS without Web Bluetooth (Safari / Chrome iOS) ── */
-  if (IS_IOS) {
-    btn.style.display = 'none';   // hide Connect B21S; Download PNG remains
-    var bar = document.getElementById('bt-bar');
-    bar.innerHTML = 'iPhone Safari / Chrome cannot connect to B21S directly.<br>'
-      + 'Please open this page in <strong>Bluefy</strong> or <strong>WebBLE</strong> '
-      + 'browser for Bluetooth printing.';
-    bar.className = '';
     return;
   }
 
