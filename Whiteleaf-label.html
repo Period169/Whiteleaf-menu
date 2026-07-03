@@ -231,6 +231,7 @@ var LW = 400, LH = 240;
    BLE state
 ═══════════════════════════════════════════════════ */
 var BT_OK  = typeof navigator !== 'undefined' && 'bluetooth' in navigator;
+var IS_IOS = /iPhone|iPad|iPod/i.test((typeof navigator !== 'undefined' && navigator.userAgent) || '');
 var BT_SVC = 'e7810a71-73ae-499d-8c15-faa9aef0c3f2';
 var btDev  = null;
 var btConn = false;
@@ -653,21 +654,37 @@ function setBar(msg, ok) {
 
 function syncPrintBtn() {
   var btn = document.getElementById('btn-print');
-  if (!BT_OK) {
-    btn.textContent = 'Connect B21S';
-    btn.disabled    = true;
-    setBar('Web Bluetooth requires Chrome on Android or desktop.');
+
+  /* ── Web Bluetooth available (desktop Chrome / Android / Bluefy on iOS) ── */
+  if (BT_OK) {
+    btn.style.display = '';
+    btn.disabled      = false;
+    if (!btConn) {
+      btn.textContent = 'Connect B21S';
+      setBar('');
+    } else {
+      btn.textContent = 'Print';
+      setBar('● ' + (btDev ? btDev.name : 'B21S') + ' connected', true);
+    }
     return;
   }
-  if (!btConn) {
-    btn.textContent = 'Connect B21S';
-    btn.disabled    = false;
-    setBar('');
-  } else {
-    btn.textContent = 'Print';
-    btn.disabled    = false;
-    setBar('● ' + (btDev ? btDev.name : 'B21S') + ' connected', true);
+
+  /* ── iOS without Web Bluetooth (Safari / Chrome iOS) ── */
+  if (IS_IOS) {
+    btn.style.display = 'none';   // hide Connect B21S; Download PNG remains
+    var bar = document.getElementById('bt-bar');
+    bar.innerHTML = 'iPhone Safari / Chrome cannot connect to B21S directly.<br>'
+      + 'Please open this page in <strong>Bluefy</strong> or <strong>WebBLE</strong> '
+      + 'browser for Bluetooth printing.';
+    bar.className = '';
+    return;
   }
+
+  /* ── Other browser without Web Bluetooth ── */
+  btn.style.display = '';
+  btn.textContent   = 'Connect B21S';
+  btn.disabled      = true;
+  setBar('Web Bluetooth requires Chrome on Android or desktop.');
 }
 
 async function connectBT() {
