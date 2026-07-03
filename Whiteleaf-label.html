@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>White Leaf — Label Center</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+
+:root{
+  --ink:#1a1a1a;
+  --white:#ffffff;
+  --bg:#f4f4f2;
+  --border:#d8d8d4;
+  --mid:#999;
+  --hover:#f0f0ee;
+  --r:6px;
+}
+
+body{
+  font-family:'Jost',system-ui,sans-serif;
+  font-weight:300;
+  background:var(--bg);
+  color:var(--ink);
+  min-height:100vh;
+}
+
+/* ── Header ──────────────────────────────────────── */
+.hdr{
+  background:var(--ink);color:#fff;
+  padding:14px 20px;
+  display:flex;align-items:baseline;gap:12px;
+}
+.hdr-name{
+  font-family:'Cormorant Garamond',Georgia,serif;
+  font-size:20px;letter-spacing:.08em;
+}
+.hdr-sub{
+  font-size:10px;letter-spacing:.24em;
+  text-transform:uppercase;color:rgba(255,255,255,.42);
+}
+
+/* ── Content ─────────────────────────────────────── */
+.wrap{max-width:520px;margin:0 auto;padding:24px 16px 72px}
+
+.sec{
+  font-size:9px;letter-spacing:.26em;text-transform:uppercase;
+  color:var(--mid);margin-bottom:10px;
+}
+
+/* ── Product grid ────────────────────────────────── */
+.pgrid{
+  display:grid;grid-template-columns:repeat(2,1fr);
+  gap:8px;margin-bottom:28px;
+}
+.pbtn{
+  padding:11px 14px;
+  border:1.5px solid var(--border);
+  border-radius:var(--r);
+  background:var(--white);
+  color:var(--ink);
+  font-family:'Jost',sans-serif;font-size:13px;font-weight:300;
+  cursor:pointer;text-align:left;line-height:1.3;
+  transition:background .12s,border-color .12s;
+}
+.pbtn:hover{background:var(--hover);border-color:#aaa}
+.pbtn.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.pbtn:active{opacity:.75}
+
+/* ── Preview ─────────────────────────────────────── */
+.prev-box{
+  background:#fff;border:1.5px solid #000;
+  border-radius:4px;
+  padding:16px;
+  margin-bottom:24px;
+  overflow-x:auto;
+  display:flex;align-items:center;justify-content:center;
+}
+#lc{display:block;image-rendering:crisp-edges}
+
+/* ── Fields ──────────────────────────────────────── */
+.fields{border-top:1px solid var(--border);margin-bottom:24px}
+.frow{display:flex;align-items:center;border-bottom:1px solid var(--border)}
+.fl{
+  font-size:10px;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--mid);width:70px;flex-shrink:0;padding:12px 0;
+}
+.fi{
+  flex:1;border:none;outline:none;
+  font-family:'Courier New',Courier,monospace;
+  font-size:13.5px;color:var(--ink);background:transparent;
+  padding:12px 0;
+}
+
+/* ── Actions ─────────────────────────────────────── */
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.btn{
+  flex:1;min-width:96px;padding:13px 10px;
+  border-radius:var(--r);
+  font-family:'Jost',sans-serif;font-size:13px;font-weight:400;
+  cursor:pointer;text-align:center;
+  transition:background .12s,opacity .12s;
+  border:1.5px solid var(--ink);
+}
+.btn-p{background:var(--ink);color:#fff}
+.btn-p:hover{background:#333}
+.btn-s{background:#fff;color:var(--ink)}
+.btn-s:hover{background:var(--hover)}
+.btn:active{opacity:.7}
+.btn:disabled{opacity:.35;cursor:default;pointer-events:none}
+
+/* ── BT status bar ───────────────────────────────── */
+#bt-bar{
+  font-size:11.5px;color:var(--mid);min-height:16px;
+  text-align:center;margin-bottom:10px;
+}
+#bt-bar.ok{color:#27ae60}
+
+/* ── Print notice ────────────────────────────────── */
+#pnotice{
+  display:none;
+  background:#f9f9f6;
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  padding:14px 16px;font-size:13px;line-height:1.7;
+}
+#pnotice.on{display:block}
+#pnotice b{display:block;margin-bottom:2px}
+#pnotice a{color:var(--ink);text-decoration:underline;cursor:pointer}
+
+/* ── Toast ───────────────────────────────────────── */
+#toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+  background:var(--ink);color:#fff;
+  padding:8px 18px;border-radius:20px;font-size:13px;
+  opacity:0;transition:opacity .22s;
+  pointer-events:none;white-space:nowrap;z-index:99;
+}
+
+@media(max-width:380px){
+  .pgrid{grid-template-columns:1fr}
+  .btn{font-size:12px;padding:11px 8px}
+}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <span class="hdr-name">White Leaf</span>
+  <span class="hdr-sub">Label Center</span>
+</div>
+
+<div class="wrap">
+
+  <div class="sec">Select Product</div>
+  <div class="pgrid" id="pgrid"></div>
+
+  <div class="sec">Preview  <span style="font-size:9px;color:#bbb;letter-spacing:0;text-transform:none">50 × 30 mm · 203 dpi</span></div>
+  <div class="prev-box">
+    <canvas id="lc"></canvas>
+  </div>
+
+  <div class="sec">Edit Label</div>
+  <div class="fields">
+    <div class="frow">
+      <span class="fl">Product</span>
+      <input id="f-name" class="fi" type="text" placeholder="Product name" oninput="draw()">
+    </div>
+    <div class="frow">
+      <span class="fl">Made</span>
+      <input id="f-made" class="fi" type="text" placeholder="YYYY-MM-DD HH:mm" oninput="draw()">
+    </div>
+    <div class="frow">
+      <span class="fl">Use By</span>
+      <input id="f-useby" class="fi" type="text" placeholder="YYYY-MM-DD HH:mm" oninput="draw()">
+    </div>
+    <div class="frow">
+      <span class="fl">Storage</span>
+      <input id="f-storage" class="fi" type="text" placeholder="Refrigerated / Room Temperature" oninput="draw()">
+    </div>
+    <div class="frow">
+      <span class="fl">By</span>
+      <input id="f-by" class="fi" type="text" placeholder="Name" oninput="saveBy();draw()">
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="btn btn-s" onclick="doCopy()">Copy</button>
+    <button class="btn btn-s" onclick="doPNG()">Download PNG</button>
+    <button class="btn btn-p" id="btn-print" onclick="onPrint()">Connect B21S</button>
+  </div>
+  <div id="bt-bar"></div>
+
+  <div id="pnotice">
+    <b>Direct B21S printing is not available yet.</b>
+    Please <a onclick="doPNG()">Download PNG</a> and print it from the NIIMBOT app.
+  </div>
+
+</div>
+
+<div id="toast"></div>
+
+<script>
+'use strict';
+
+/* ═══════════════════════════════════════════════════
+   Products
+═══════════════════════════════════════════════════ */
+var H = 3600000;
+var PRODS = [
+  { id:'jasmine', name:'Jasmine Green Tea',  ms: 24*H,    st:'Refrigerated'     },
+  { id:'assam',   name:'Assam Black Tea',    ms: 24*H,    st:'Refrigerated'     },
+  { id:'oolong',  name:'Oolong Tea',         ms: 24*H,    st:'Refrigerated'     },
+  { id:'milk',    name:'Milk Base',          ms: 24*H,    st:'Refrigerated'     },
+  { id:'pearl',   name:'Black Tapioca Pearl',ms:  4*H,    st:'Room Temperature' },
+  { id:'boba',    name:'Popping Boba',       ms: 21*24*H, st:'Refrigerated'     },
+  { id:'jam',     name:'Fruit Jam',          ms:  7*24*H, st:'Refrigerated'     },
+  { id:'syrup',   name:'Syrup',              ms: 30*24*H, st:'Room Temperature' },
+  { id:'cake',    name:'Basque Cheesecake',  ms:  3*24*H, st:'Refrigerated'     },
+  { id:'custom',  name:'Custom',             ms: 24*H,    st:'Refrigerated'     },
+];
+
+/* ═══════════════════════════════════════════════════
+   Canvas dimensions: 50 × 30 mm at 203 DPI
+═══════════════════════════════════════════════════ */
+var LW = 400, LH = 240;
+
+/* ═══════════════════════════════════════════════════
+   BLE state
+═══════════════════════════════════════════════════ */
+var BT_OK  = typeof navigator !== 'undefined' && 'bluetooth' in navigator;
+var BT_SVC = 'e7810a71-73ae-499d-8c15-faa9aef0c3f2';
+var btDev  = null;
+var btConn = false;
+
+/* ═══════════════════════════════════════════════════
+   Date helpers
+═══════════════════════════════════════════════════ */
+function pad(n) { return String(n).padStart(2, '0'); }
+
+function fmt(d) {
+  return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate())
+    + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+}
+
+/* ═══════════════════════════════════════════════════
+   Build product buttons
+═══════════════════════════════════════════════════ */
+(function() {
+  var g = document.getElementById('pgrid');
+  g.innerHTML = PRODS.map(function(p) {
+    return '<button class="pbtn" id="pb-'+p.id+'" onclick="pick(\''+p.id+'\')">'+p.name+'</button>';
+  }).join('');
+}());
+
+function pick(id) {
+  var p = PRODS.find(function(x) { return x.id === id; });
+  if (!p) return;
+
+  PRODS.forEach(function(x) {
+    var b = document.getElementById('pb-'+x.id);
+    if (b) b.classList.toggle('on', x.id === id);
+  });
+
+  var now   = new Date();
+  var useBy = new Date(now.getTime() + p.ms);
+
+  document.getElementById('f-name').value    = p.name;
+  document.getElementById('f-made').value    = fmt(now);
+  document.getElementById('f-useby').value   = fmt(useBy);
+  document.getElementById('f-storage').value = p.st;
+  document.getElementById('pnotice').classList.remove('on');
+
+  draw();
+}
+
+/* ═══════════════════════════════════════════════════
+   Persist "By" field
+═══════════════════════════════════════════════════ */
+(function() {
+  try {
+    var v = localStorage.getItem('wl_lb_by');
+    document.getElementById('f-by').value = (v !== null) ? v : 'Miki';
+  } catch(e) {
+    document.getElementById('f-by').value = 'Miki';
+  }
+}());
+
+function saveBy() {
+  try { localStorage.setItem('wl_lb_by', document.getElementById('f-by').value); } catch(e) {}
+}
+
+/* ═══════════════════════════════════════════════════
+   Get current field values
+═══════════════════════════════════════════════════ */
+function getF() {
+  return {
+    name:    document.getElementById('f-name').value    || '',
+    made:    document.getElementById('f-made').value    || '',
+    useby:   document.getElementById('f-useby').value   || '',
+    storage: document.getElementById('f-storage').value || '',
+    by:      document.getElementById('f-by').value      || '',
+  };
+}
+
+/* ═══════════════════════════════════════════════════
+   Label renderer — shared for screen and PNG export
+   Draws in a w × h coordinate space (not pre-scaled).
+═══════════════════════════════════════════════════ */
+function drawLabel(ctx, f, w, h) {
+  var s  = w / LW;          // scale factor relative to 400px baseline
+  var px = Math.round(10*s);// horizontal padding
+
+  /* Background */
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(0, 0, w, h);
+
+  /* Outer border */
+  ctx.strokeStyle = '#000';
+  ctx.lineWidth   = Math.max(1, s);
+  ctx.strokeRect(s*0.5, s*0.5, w-s, h-s);
+
+  /* ── Header strip ───────────────────────────── */
+  var hdH = Math.round(24*s);
+  ctx.fillStyle = '#000';
+  ctx.fillRect(0, 0, w, hdH);
+
+  ctx.fillStyle    = '#fff';
+  ctx.textAlign    = 'left';
+  ctx.textBaseline = 'middle';
+  ctx.font = 'bold '+Math.round(10*s)+'px "Courier New",Courier,monospace';
+  ctx.fillText('WHITE LEAF', px, hdH*0.5);
+
+  /* ── Product name ───────────────────────────── */
+  /* Auto-fit font; vertically centered in the 106px name band */
+  var nmH   = Math.round(106*s);
+  var label = f.name || 'Product Name';
+  var fmax  = Math.round(28*s);
+  var fmin  = Math.round(11*s);
+  var fsize = fmax;
+  var maxTW = w - px*2;
+
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillStyle    = '#000';
+  while (fsize > fmin) {
+    ctx.font = 'bold '+fsize+'px Arial,Helvetica,sans-serif';
+    if (ctx.measureText(label).width <= maxTW) break;
+    fsize--;
+  }
+  /* baseline position: cap-height center ≈ 0.72 of font-size above baseline */
+  var nmY = hdH + Math.round((nmH + fsize*0.72) / 2);
+  ctx.fillText(label, px, nmY);
+
+  /* ── Divider ────────────────────────────────── */
+  var divY = hdH + nmH;
+  ctx.fillStyle = '#000';
+  ctx.fillRect(0, divY, w, Math.max(1, Math.round(1.5*s)));
+
+  /* ── Detail rows ─────────────────────────────── */
+  var dFont = Math.round(11*s);
+  ctx.font         = dFont+'px "Courier New",Courier,monospace';
+  ctx.textBaseline = 'alphabetic';
+
+  /* Measure label column width from the widest label string */
+  var lblW = ctx.measureText('Storage: ').width;
+  var rowH  = Math.round(22*s);
+  var rowY0 = divY + Math.round(14*s);
+
+  var rows = [
+    ['Made:    ', f.made],
+    ['Use By:  ', f.useby],
+    ['Storage: ', f.storage],
+    ['By:      ', f.by],
+  ];
+
+  rows.forEach(function(r, i) {
+    var y = rowY0 + i*rowH;
+    ctx.fillStyle = '#777';
+    ctx.fillText(r[0], px, y);
+    ctx.fillStyle = '#000';
+    ctx.fillText(r[1], px+lblW, y);
+  });
+}
+
+/* ═══════════════════════════════════════════════════
+   Screen rendering (DPR-aware for sharp display)
+═══════════════════════════════════════════════════ */
+function draw() {
+  var c   = document.getElementById('lc');
+  var dpr = window.devicePixelRatio || 1;
+
+  c.width  = LW * dpr;
+  c.height = LH * dpr;
+  c.style.width  = LW + 'px';
+  c.style.height = LH + 'px';
+
+  var ctx = c.getContext('2d');
+  ctx.scale(dpr, dpr);
+  drawLabel(ctx, getF(), LW, LH);
+}
+
+/* ═══════════════════════════════════════════════════
+   Copy text
+═══════════════════════════════════════════════════ */
+function doCopy() {
+  var f = getF();
+  var t = [
+    f.name, '',
+    'Made:     ' + f.made,
+    'Use By:   ' + f.useby,
+    'Storage:  ' + f.storage,
+    'By:       ' + f.by,
+  ].join('\n');
+  navigator.clipboard.writeText(t)
+    .then(function() { toast('Copied'); })
+    .catch(function() { toast('Copy failed'); });
+}
+
+/* ═══════════════════════════════════════════════════
+   Download PNG  (exact 400 × 240, no DPR scaling)
+═══════════════════════════════════════════════════ */
+function doPNG() {
+  var c = document.createElement('canvas');
+  c.width  = LW;
+  c.height = LH;
+  drawLabel(c.getContext('2d'), getF(), LW, LH);
+
+  var a      = document.createElement('a');
+  var slug   = (document.getElementById('f-name').value || 'label').replace(/\s+/g, '-');
+  a.download = 'WL-' + slug + '.png';
+  a.href     = c.toDataURL('image/png');
+  a.click();
+  toast('PNG saved');
+}
+
+/* ═══════════════════════════════════════════════════
+   Web Bluetooth — connect to NIIMBOT B21S
+═══════════════════════════════════════════════════ */
+function setBar(msg, ok) {
+  var el    = document.getElementById('bt-bar');
+  el.textContent = msg;
+  el.className   = ok ? 'ok' : '';
+}
+
+function syncPrintBtn() {
+  var btn = document.getElementById('btn-print');
+  if (!BT_OK) {
+    btn.textContent = 'Connect B21S';
+    btn.disabled    = true;
+    setBar('Web Bluetooth requires Chrome on Android or desktop.');
+    return;
+  }
+  if (!btConn) {
+    btn.textContent = 'Connect B21S';
+    btn.disabled    = false;
+    setBar('');
+  } else {
+    btn.textContent = 'Print';
+    btn.disabled    = false;
+    setBar('● ' + (btDev ? btDev.name : 'B21S') + ' connected', true);
+  }
+}
+
+async function connectBT() {
+  try {
+    setBar('Requesting device…');
+    btDev = await navigator.bluetooth.requestDevice({
+      filters: [
+        { namePrefix: 'B21' },
+        { services: [BT_SVC] },
+      ],
+      optionalServices: [BT_SVC],
+    });
+    setBar('Connecting…');
+    await btDev.gatt.connect();
+    btConn = true;
+    btDev.addEventListener('gattserverdisconnected', function() {
+      btConn = false;
+      btDev  = null;
+      document.getElementById('pnotice').classList.remove('on');
+      syncPrintBtn();
+    });
+    syncPrintBtn();
+    toast('B21S connected');
+  } catch(e) {
+    btConn = false;
+    btDev  = null;
+    /* NotFoundError = user dismissed the picker — silently reset */
+    if (e.name !== 'NotFoundError' && e.name !== 'NotAllowedError') {
+      setBar('Connection failed: ' + e.message);
+    } else {
+      setBar('');
+    }
+    syncPrintBtn();
+  }
+}
+
+function onPrint() {
+  if (!BT_OK) return;
+
+  if (!btConn) {
+    connectBT();
+    return;
+  }
+
+  /* ── BLE printing: NIIMBOT packet protocol not yet implemented ──
+     Protocol reference: https://github.com/MultiMote/niimblue
+     When ready, implement here:
+       1. Build 400×240 1-bit bitmap from canvas
+       2. Send: Connect(0xC1) → SetDensity(0x21) → SetLabelType(0x23)
+                → PrintStart(0x01) → PageStart(0x03) → SetPageSize(0x13)
+                → PrintBitmapRow(0x85) × 240 → PageEnd(0xE3) → PrintEnd(0xF3)
+     Packet format: [0x55,0x55, CMD, LEN, DATA..., XOR-checksum, 0xAA,0xAA]
+     ────────────────────────────────────────────────────────────── */
+  document.getElementById('pnotice').classList.add('on');
+}
+
+/* ═══════════════════════════════════════════════════
+   Toast
+═══════════════════════════════════════════════════ */
+function toast(msg) {
+  var el = document.getElementById('toast');
+  el.textContent   = msg;
+  el.style.opacity = '1';
+  clearTimeout(el._t);
+  el._t = setTimeout(function() { el.style.opacity = '0'; }, 2200);
+}
+
+/* ═══════════════════════════════════════════════════
+   Init
+═══════════════════════════════════════════════════ */
+syncPrintBtn();
+draw();
+</script>
+</body>
+</html>
