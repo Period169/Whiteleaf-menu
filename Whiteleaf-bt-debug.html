@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>White Leaf — BT Debug</title>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+
+body{
+  font-family:'Courier New',Courier,monospace;
+  font-size:13px;
+  background:#0e0e0e;
+  color:#d0d0d0;
+  min-height:100vh;
+}
+
+/* Header */
+.hdr{
+  background:#181818;
+  border-bottom:1px solid #2a2a2a;
+  padding:14px 20px;
+  display:flex;align-items:baseline;gap:10px;
+}
+.hdr-name{font-size:16px;color:#fff;letter-spacing:.05em}
+.hdr-sub{font-size:10px;color:#555;letter-spacing:.22em;text-transform:uppercase}
+
+/* Controls */
+.ctrl{
+  padding:16px 20px;
+  display:flex;gap:10px;flex-wrap:wrap;align-items:center;
+  border-bottom:1px solid #1e1e1e;
+}
+.btn{
+  padding:9px 20px;
+  font-family:'Courier New',monospace;font-size:13px;
+  cursor:pointer;border-radius:3px;transition:background .1s;
+}
+.btn-scan{background:#fff;color:#000;border:1px solid #fff}
+.btn-scan:hover{background:#ddd}
+.btn-scan:disabled{background:#2a2a2a;color:#555;border-color:#2a2a2a;cursor:default}
+.btn-clear{background:transparent;color:#555;border:1px solid #333}
+.btn-clear:hover{color:#aaa;border-color:#666}
+
+/* iOS hint */
+.ios-hint{
+  margin:14px 20px 0;
+  padding:12px 16px;
+  background:#1a180a;border:1px solid #443;border-radius:3px;
+  color:#bba;line-height:1.7;font-size:12px;
+}
+
+/* Log area */
+#log{
+  padding:20px;
+  white-space:pre-wrap;
+  word-break:break-all;
+  line-height:1.8;
+  color:#c0c0c0;
+  min-height:400px;
+}
+
+/* Color tokens */
+.dim  {color:#444}
+.sec  {color:#fff;font-weight:bold}
+.key  {color:#7aadff}
+.val  {color:#e0e0e0}
+.uuid {color:#f0c070}
+.known{color:#6de89a}
+.prop {color:#d09060}
+.ok   {color:#5de05d}
+.err  {color:#f06060}
+.warn {color:#f0b040}
+.note {color:#666;font-style:italic}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <span class="hdr-name">White Leaf</span>
+  <span class="hdr-sub">BT Debug</span>
+</div>
+
+<div class="ctrl">
+  <button class="btn btn-scan" id="scan-btn" onclick="doScan()">▶  Scan BLE Device</button>
+  <button class="btn btn-clear" onclick="clearLog()">Clear</button>
+</div>
+
+<div id="ios-hint" style="display:none" class="ios-hint">
+  ⚠  iPhone / iPad detected. Safari and Chrome iOS do not support Web Bluetooth.<br>
+  Open this page in <strong>Bluefy</strong> (App Store) to scan BLE devices on iPhone.
+</div>
+
+<pre id="log"><span class="dim">Press "Scan BLE Device" to start.
+Chrome will show a BLE device picker — select B21S from the list.</span>
+</pre>
+
+<script>
+'use strict';
+
+var IS_IOS = /iPhone|iPad|iPod/i.test(navigator.userAgent || '');
+var BT_OK  = 'bluetooth' in navigator;
+
+/* ─────────────────────────────────────────────────────────
+   UUID annotation table
+   Green  = this UUID is recognised (known NIIMBOT or standard)
+   Yellow = custom UUID, not in lookup
+───────────────────────────────────────────────────────── */
+var NAMES = {
+  /* ★ NIIMBOT / Hprt suspected */
+  'e7810a71-73ae-499d-8c15-faa9aef0c3f2': '★ NIIMBOT service (from niimblue)',
+  'bef8d6c9-9c21-4c9e-b632-bd58c1009f9f': '★ NIIMBOT characteristic (from niimblue)',
+  /* Nordic UART */
+  '6e400001-b5a3-f393-e0a9-e50e24dcca9e': 'Nordic UART Service',
+  '6e400002-b5a3-f393-e0a9-e50e24dcca9e': 'Nordic UART TX (Write)',
+  '6e400003-b5a3-f393-e0a9-e50e24dcca9e': 'Nordic UART RX (Notify)',
+  /* ISSC transparent serial */
+  '49535343-fe7d-4ae5-8fa9-9fafd205e455': 'ISSC Transparent Service',
+  '49535343-8841-43f4-a8d4-ecbe34729bb3': 'ISSC TX (Write)',
+  '49535343-1e4d-4bd9-ba61-23c647249616': 'ISSC RX (Notify)',
+  '49535343-4c8a-39b3-2f49-511cff073b7e': 'ISSC Flow Control',
+  /* Standard 16-bit services */
+  '00001800-0000-1000-8000-00805f9b34fb': 'Generic Access',
+  '00001801-0000-1000-8000-00805f9b34fb': 'Generic Attribute',
+  '0000180a-0000-1000-8000-00805f9b34fb': 'Device Information',
+  '0000180f-0000-1000-8000-00805f9b34fb': 'Battery Service',
+  '0000180d-0000-1000-8000-00805f9b34fb': 'Heart Rate',
+  /* Standard 16-bit characteristics */
+  '00002a00-0000-1000-8000-00805f9b34fb': 'Device Name',
+  '00002a01-0000-1000-8000-00805f9b34fb': 'Appearance',
+  '00002a04-0000-1000-8000-00805f9b34fb': 'Peripheral Preferred Connection Parameters',
+  '00002a05-0000-1000-8000-00805f9b34fb': 'Service Changed',
+  '00002a19-0000-1000-8000-00805f9b34fb': 'Battery Level',
+  '00002a24-0000-1000-8000-00805f9b34fb': 'Model Number String',
+  '00002a25-0000-1000-8000-00805f9b34fb': 'Serial Number String',
+  '00002a26-0000-1000-8000-00805f9b34fb': 'Firmware Revision String',
+  '00002a27-0000-1000-8000-00805f9b34fb': 'Hardware Revision String',
+  '00002a28-0000-1000-8000-00805f9b34fb': 'Software Revision String',
+  '00002a29-0000-1000-8000-00805f9b34fb': 'Manufacturer Name String',
+};
+
+/* optionalServices must list custom 128-bit UUIDs or Chrome won't expose them */
+var OPT_SERVICES = [
+  'e7810a71-73ae-499d-8c15-faa9aef0c3f2',  // NIIMBOT (niimblue)
+  '6e400001-b5a3-f393-e0a9-e50e24dcca9e',  // Nordic UART
+  '49535343-fe7d-4ae5-8fa9-9fafd205e455',  // ISSC transparent
+  'battery_service',
+  'device_information',
+  'generic_access',
+  'generic_attribute',
+];
+
+/* ─────────────────────────────────────────────────────────
+   Output helpers
+───────────────────────────────────────────────────────── */
+var logEl = document.getElementById('log');
+
+function w(html) { logEl.innerHTML += html + '\n'; }
+
+function sec(title) {
+  w('\n<span class="sec">── ' + esc(title) + ' ──</span>');
+}
+
+function kv(k, vHtml, indent) {
+  var pad = indent || '  ';
+  w(pad + '<span class="key">' + esc(k) + '</span>  ' + vHtml);
+}
+
+function esc(s) {
+  return String(s)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;');
+}
+
+function uuidHtml(uuid) {
+  var u   = uuid.toLowerCase();
+  var ann = NAMES[u];
+  if (ann) {
+    return '<span class="known">' + esc(uuid) + '</span>'
+      + '  <span class="note">← ' + esc(ann) + '</span>';
+  }
+  return '<span class="uuid">' + esc(uuid) + '</span>';
+}
+
+function propsHtml(p) {
+  var all = ['broadcast','read','writeWithoutResponse','write',
+             'notify','indicate','authenticatedSignedWrites',
+             'reliableWrite','writableAuxiliaries'];
+  var active = all.filter(function(k){ return p[k]; });
+  if (!active.length) return '<span class="dim">(none)</span>';
+  return active.map(function(k){
+    var hi = (k === 'writeWithoutResponse' || k === 'write' || k === 'notify' || k === 'indicate');
+    return hi
+      ? '<span class="ok">' + k + '</span>'
+      : '<span class="prop">' + k + '</span>';
+  }).join('  ');
+}
+
+function clearLog() {
+  logEl.innerHTML = '<span class="dim">Cleared.</span>\n';
+}
+
+/* ─────────────────────────────────────────────────────────
+   Main scan
+───────────────────────────────────────────────────────── */
+async function doScan() {
+  if (!BT_OK) {
+    sec('ERROR');
+    w('<span class="err">navigator.bluetooth not available.</span>');
+    if (IS_IOS) {
+      w('<span class="err">Open this page in Bluefy (App Store) on iPhone/iPad.</span>');
+    } else {
+      w('<span class="err">Use Chrome on desktop or Android.</span>');
+    }
+    return;
+  }
+
+  var btn = document.getElementById('scan-btn');
+  btn.disabled    = true;
+  btn.textContent = '… waiting for picker';
+
+  try {
+    sec('PICKER');
+    w('<span class="dim">  Showing BLE device picker…</span>');
+
+    var device = await navigator.bluetooth.requestDevice({
+      acceptAllDevices: true,
+      optionalServices: OPT_SERVICES,
+    });
+
+    /* ── Device info ── */
+    sec('DEVICE');
+    kv('name', '<span class="val">' + esc(device.name || '(no name)') + '</span>');
+    kv('id  ', '<span class="dim">' + esc(device.id)  + '</span>');
+
+    /* ── GATT connect ── */
+    sec('GATT');
+    w('<span class="dim">  Connecting…</span>');
+    var server = await device.gatt.connect();
+    kv('connected', '<span class="ok">true ✓</span>');
+
+    /* ── Services ── */
+    sec('PRIMARY SERVICES');
+    w('<span class="note">  Chrome only returns services declared in optionalServices.');
+    w('  If a NIIMBOT service UUID is missing below, it is not in the list yet.</span>');
+
+    var services;
+    try {
+      services = await server.getPrimaryServices();
+    } catch(e) {
+      w('\n<span class="err">  getPrimaryServices() threw: ' + esc(e.message) + '</span>');
+      services = [];
+    }
+
+    if (services.length === 0) {
+      w('\n<span class="warn">  0 services returned.');
+      w('  Either the device has none of the UUIDs in optionalServices,');
+      w('  or the GATT server returned an error.</span>');
+    }
+
+    for (var si = 0; si < services.length; si++) {
+      var svc = services[si];
+      w('\n<b>[service ' + si + ']</b>  ' + uuidHtml(svc.uuid));
+
+      var chars;
+      try {
+        chars = await svc.getCharacteristics();
+      } catch(e) {
+        w('  <span class="err">  getCharacteristics() threw: ' + esc(e.message) + '</span>');
+        continue;
+      }
+
+      for (var ci = 0; ci < chars.length; ci++) {
+        var ch = chars[ci];
+        w('    <b>[char ' + ci + ']</b>  ' + uuidHtml(ch.uuid));
+        w('             props: ' + propsHtml(ch.properties));
+      }
+
+      if (chars.length === 0) {
+        w('    <span class="dim">(no characteristics)</span>');
+      }
+    }
+
+    /* ── Summary ── */
+    sec('SUMMARY');
+    w('  Services found : <span class="ok">' + services.length + '</span>');
+    w('  <span class="dim">──────────────────────────────────────</span>');
+    w('  <span class="dim">★ = NIIMBOT suspected UUID (from niimblue source)</span>');
+    w('  <span class="known">green</span>  = UUID identified in lookup table');
+    w('  <span class="uuid">yellow</span> = unrecognised custom UUID');
+    w('  <span class="dim">──────────────────────────────────────</span>');
+    w('<span class="ok">  Done.</span>');
+
+  } catch(e) {
+    sec('ERROR');
+    if (e.name === 'NotFoundError') {
+      w('<span class="dim">  User closed picker — no device selected.</span>');
+    } else {
+      w('<span class="err">  ' + esc(e.name) + ': ' + esc(e.message) + '</span>');
+    }
+  } finally {
+    btn.disabled    = false;
+    btn.textContent = '▶  Scan BLE Device';
+  }
+}
+
+/* ─────────────────────────────────────────────────────────
+   Init
+───────────────────────────────────────────────────────── */
+if (IS_IOS && !BT_OK) {
+  document.getElementById('ios-hint').style.display = 'block';
+  document.getElementById('scan-btn').disabled = true;
+}
+</script>
+</body>
+</html>
