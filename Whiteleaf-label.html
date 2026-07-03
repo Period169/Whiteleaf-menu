@@ -136,8 +136,15 @@ body{
   background:var(--ink);color:#fff;
   padding:8px 18px;border-radius:20px;font-size:13px;
   opacity:0;transition:opacity .22s;
-  pointer-events:none;white-space:nowrap;z-index:99;
+  pointer-events:none;white-space:pre-line;text-align:center;max-width:82vw;z-index:99;
 }
+
+/* ── Product grid separator (after top-5) ─────────── */
+.pgrid-sep{grid-column:1/-1;height:0;border-top:1px dashed var(--border);margin:4px 0}
+
+/* ── Download PNG — prominent variant (iOS) ───────── */
+.btn-dl{background:var(--ink);color:#fff;border-color:var(--ink);font-size:15px}
+.btn-dl:hover{background:#333}
 
 @media(max-width:380px){
   .pgrid{grid-template-columns:1fr}
@@ -188,7 +195,7 @@ body{
 
   <div class="actions">
     <button class="btn btn-s" onclick="doCopy()">Copy</button>
-    <button class="btn btn-s" onclick="doPNG()">Download PNG</button>
+    <button class="btn btn-s" id="btn-png" onclick="doPNG()">Download PNG</button>
     <button class="btn btn-p" id="btn-print" onclick="onPrint()">Connect B21S</button>
   </div>
   <div id="bt-bar"></div>
@@ -251,8 +258,10 @@ function fmt(d) {
 ═══════════════════════════════════════════════════ */
 (function() {
   var g = document.getElementById('pgrid');
-  g.innerHTML = PRODS.map(function(p) {
-    return '<button class="pbtn" id="pb-'+p.id+'" onclick="pick(\''+p.id+'\')">'+p.name+'</button>';
+  g.innerHTML = PRODS.map(function(p, i) {
+    var btn = '<button class="pbtn" id="pb-'+p.id+'" onclick="pick(\''+p.id+'\')">'+p.name+'</button>';
+    /* Separator after the top-5 common products */
+    return i === 4 ? btn + '<div class="pgrid-sep"></div>' : btn;
   }).join('');
 }());
 
@@ -275,6 +284,7 @@ function pick(id) {
   document.getElementById('pnotice').classList.remove('on');
 
   draw();
+  try { localStorage.setItem('wl_lb_prod', id); } catch(e) {}
 }
 
 /* ═══════════════════════════════════════════════════
@@ -433,7 +443,9 @@ function doPNG() {
   a.download = 'WL-' + slug + '.png';
   a.href     = c.toDataURL('image/png');
   a.click();
-  toast('PNG saved');
+  toast(IS_IOS
+    ? '已生成标签图片\n请打开精臣云打印 App → 图片打印。'
+    : 'PNG saved');
 }
 
 /* ═══════════════════════════════════════════════════
@@ -655,9 +667,11 @@ function setBar(msg, ok) {
 function syncPrintBtn() {
   var btn = document.getElementById('btn-print');
 
-  /* ── iOS (all browsers): hide BT, show app guidance ── */
+  /* ── iOS (all browsers): hide BT, promote Download PNG ── */
   if (IS_IOS) {
     btn.style.display = 'none';
+    var pngBtn = document.getElementById('btn-png');
+    if (pngBtn) pngBtn.className = 'btn btn-dl';
     var bar = document.getElementById('bt-bar');
     bar.innerHTML = '请下载 PNG，然后使用<strong>精臣云打印 App</strong> 导入图片进行打印。';
     bar.className = '';
@@ -773,7 +787,15 @@ function toast(msg) {
    Init
 ═══════════════════════════════════════════════════ */
 syncPrintBtn();
-draw();
+
+/* Restore last selected product (times refresh to now) */
+(function() {
+  try {
+    var id = localStorage.getItem('wl_lb_prod');
+    if (id && PRODS.some(function(p){ return p.id === id; })) pick(id);
+    else draw();
+  } catch(e) { draw(); }
+}());
 </script>
 </body>
 </html>
