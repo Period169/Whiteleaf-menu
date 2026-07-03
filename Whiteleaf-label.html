@@ -194,8 +194,8 @@ body{
   <div id="bt-bar"></div>
 
   <div id="pnotice">
-    <b>Direct B21S printing is not available yet.</b>
-    Please <a onclick="doPNG()">Download PNG</a> and print it from the NIIMBOT app.
+    <b>Print failed.</b>
+    As a backup, <a onclick="doPNG()">Download PNG</a> and print from the NIIMBOT app.
   </div>
 
 </div>
@@ -436,6 +436,213 @@ function doPNG() {
 }
 
 /* ═══════════════════════════════════════════════════
+   NIIMBOT B21S — Protocol constants
+   Packet: [0x55,0x55, CMD, LEN, DATA..., XOR-CS, 0xAA,0xAA]
+   Checksum = CMD ^ LEN ^ DATA[0] ^ ... ^ DATA[n-1]
+═══════════════════════════════════════════════════ */
+var PRINT_W = 384;          // B21S printhead width in dots
+var CMD_DENSITY   = 0x21;
+var CMD_LABELTYPE = 0x23;
+var CMD_START     = 0x01;
+var CMD_STARTPAGE = 0x03;
+var CMD_PAGESIZE  = 0x13;
+var CMD_ROW       = 0x85;
+var CMD_EMPTYROW  = 0x84;
+var CMD_ENDPAGE   = 0xE3;
+var CMD_ENDPRINT  = 0xF3;
+var CMD_STATUS    = 0xA3;
+
+/* Notification queue — populated by _onNotify, drained by _waitCmd */
+var _nQueue   = [];   // buffered packets
+var _nWaiters = [];   // {cmd, resolve, reject, timer}
+
+function _onNotify(ev) {
+  var raw = new Uint8Array(ev.target.value.buffer);
+  var s = (raw[0] === 0x03) ? 1 : 0;   // skip optional 0x03 prefix
+  if (raw.length < s + 7) return;
+  if (raw[s] !== 0x55 || raw[s+1] !== 0x55) return;
+  var cmd  = raw[s+2];
+  var len  = raw[s+3];
+  var data = raw.slice(s+4, s+4+len);
+  var pkt  = { cmd: cmd, data: data };
+
+  /* Find first waiter that accepts this cmd (or accepts any) */
+  for (var i = 0; i < _nWaiters.length; i++) {
+    var w = _nWaiters[i];
+    if (!w.cmd || w.cmd === cmd) {
+      _nWaiters.splice(i, 1);
+      clearTimeout(w.timer);
+      w.resolve(pkt);
+      return;
+    }
+  }
+  _nQueue.push(pkt);
+}
+
+/* Wait for a response packet matching expectedCmd (0 = any) */
+function _waitCmd(expectedCmd, ms) {
+  ms = ms || 3000;
+  return new Promise(function(resolve, reject) {
+    /* Check buffer for already-arrived matching packet */
+    for (var i = 0; i < _nQueue.length; i++) {
+      if (!expectedCmd || _nQueue[i].cmd === expectedCmd) {
+        resolve(_nQueue.splice(i, 1)[0]);
+        return;
+      }
+    }
+    var w = { cmd: expectedCmd };
+    w.timer = setTimeout(function() {
+      var idx = _nWaiters.indexOf(w);
+      if (idx !== -1) _nWaiters.splice(idx, 1);
+      reject(new Error('No response from printer (cmd=0x'
+        + (expectedCmd || 0).toString(16) + ', ' + ms + 'ms)'));
+    }, ms);
+    w.resolve = resolve;
+    w.reject  = reject;
+    _nWaiters.push(w);
+  });
+}
+
+/* Build a NIIMBOT packet */
+function _pkt(cmd, data) {
+  data = data || [];
+  var len = data.length;
+  var cs  = cmd ^ len;
+  for (var i = 0; i < len; i++) cs ^= data[i];
+  cs &= 0xFF;
+  var buf = new Uint8Array(4 + len + 3);
+  buf[0]=0x55; buf[1]=0x55; buf[2]=cmd; buf[3]=len;
+  for (var i = 0; i < len; i++) buf[4+i] = data[i];
+  buf[4+len]=cs; buf[4+len+1]=0xAA; buf[4+len+2]=0xAA;
+  return buf;
+}
+
+/* Write to BLE characteristic */
+var btChar = null;
+async function _wr(data) {
+  if (!btChar) throw new Error('Printer not connected');
+  try {
+    if (btChar.properties.writeWithoutResponse) {
+      await btChar.writeValueWithoutResponse(data);
+    } else {
+      await btChar.writeValue(data);
+    }
+  } catch(e) {
+    if (e.name === 'NetworkError') throw new Error('BLE write failed — printer disconnected?');
+    throw e;
+  }
+}
+
+function _ms(n) { return new Promise(function(r){ setTimeout(r,n); }); }
+
+/* ═══════════════════════════════════════════════════
+   Image conversion: label canvas → B21S 1-bit rows
+   Output: array of 240 Uint8Array(48) rows
+   Pixel encoding: MSB-first, 1=ink(black), 0=paper(white)
+═══════════════════════════════════════════════════ */
+function _canvasToRows(src) {
+  var c   = document.createElement('canvas');
+  c.width = PRINT_W; c.height = LH;       // 384 × 240
+  var ctx = c.getContext('2d');
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(0, 0, PRINT_W, LH);
+  ctx.drawImage(src, 0, 0, PRINT_W, LH);  // scale 400→384
+  var px = ctx.getImageData(0, 0, PRINT_W, LH).data;
+  var out = [];
+  for (var y = 0; y < LH; y++) {
+    var row = new Uint8Array(48);
+    for (var x = 0; x < PRINT_W; x++) {
+      var i   = (y * PRINT_W + x) * 4;
+      var lum = px[i]*0.299 + px[i+1]*0.587 + px[i+2]*0.114;
+      if (lum < 128) row[x >> 3] |= (0x80 >> (x & 7));
+    }
+    out.push(row);
+  }
+  return out;
+}
+
+function _bits(row, a, b) {
+  var n=0;
+  for (var i=a;i<b;i++){var v=row[i];while(v){n+=v&1;v>>>=1;}}
+  return n;
+}
+function _emptyRow(row) {
+  for (var i=0;i<row.length;i++) if(row[i]!==0) return false;
+  return true;
+}
+function _rowPkt(y, row) {
+  var d = new Array(6 + 48);
+  d[0]=(y>>8)&0xFF; d[1]=y&0xFF;
+  d[2]=_bits(row,0,16); d[3]=_bits(row,16,32); d[4]=_bits(row,32,48);
+  d[5]=1;  // repeat count
+  for (var i=0;i<48;i++) d[6+i]=row[i];
+  return _pkt(CMD_ROW, d);
+}
+function _emptyRowPkt(y) {
+  return _pkt(CMD_EMPTYROW, [(y>>8)&0xFF, y&0xFF, 1]);
+}
+
+/* ═══════════════════════════════════════════════════
+   Full B21S print job
+═══════════════════════════════════════════════════ */
+async function printB21S(labelCanvas) {
+  var rows = _canvasToRows(labelCanvas);
+
+  _pbar('Setting up…');
+
+  /* 1–5: job preamble */
+  await _wr(_pkt(CMD_DENSITY,   [3]));           await _ms(40);
+  await _wr(_pkt(CMD_LABELTYPE, [1]));           await _ms(40);
+  await _wr(_pkt(CMD_START,     [0x00, 0x01]));  await _ms(40);
+  await _wr(_pkt(CMD_STARTPAGE, []));             await _ms(40);
+  /* SetPageSize: rows=240(0x00F0), cols=384(0x0180) */
+  await _wr(_pkt(CMD_PAGESIZE,  [0x00, 0xF0, 0x01, 0x80]));  await _ms(40);
+
+  /* 6: image rows */
+  _pbar('Sending image (0%)…');
+  for (var y = 0; y < LH; y++) {
+    var p = _emptyRow(rows[y]) ? _emptyRowPkt(y) : _rowPkt(y, rows[y]);
+    await _wr(p);
+    if (y % 40 === 39) {
+      _pbar('Sending image (' + Math.round(y/LH*100) + '%)…');
+      await _ms(15);   // let BLE queue breathe
+    }
+  }
+
+  /* 7–8: end job */
+  await _wr(_pkt(CMD_ENDPAGE,  []));  await _ms(60);
+  await _wr(_pkt(CMD_ENDPRINT, []));
+
+  /* 9: wait for printer to finish */
+  _pbar('Waiting for printer…');
+  await _pollDone();
+}
+
+async function _pollDone() {
+  var deadline = Date.now() + 20000;
+  while (Date.now() < deadline) {
+    await _ms(600);
+    _nQueue = [];   // discard stale notifications
+    await _wr(_pkt(CMD_STATUS, []));
+    try {
+      var r = await _waitCmd(CMD_STATUS, 2500);
+      var st = (r.data && r.data.length > 0) ? r.data[0] : -1;
+      if (st === 0) return;                         // idle = done ✓
+      if (st >= 0x40 && st !== 0x01)               // error codes
+        throw new Error('Printer error (status 0x' + st.toString(16).toUpperCase() + ')');
+      /* st=1 = still printing — keep polling */
+      _pbar('Printing… (' + Math.ceil((deadline - Date.now())/1000) + 's)');
+    } catch(e) {
+      if (e.message && e.message.startsWith('Printer error')) throw e;
+      /* status query timed out — printer may not support polling; keep trying */
+    }
+  }
+  throw new Error('Print timeout (20 s) — check paper and printer status');
+}
+
+function _pbar(msg) { setBar(msg, false); }
+
+/* ═══════════════════════════════════════════════════
    Web Bluetooth — connect to NIIMBOT B21S
 ═══════════════════════════════════════════════════ */
 function setBar(msg, ok) {
@@ -467,27 +674,38 @@ async function connectBT() {
   try {
     setBar('Requesting device…');
     btDev = await navigator.bluetooth.requestDevice({
-      filters: [
-        { namePrefix: 'B21' },
-        { services: [BT_SVC] },
-      ],
+      filters: [{ namePrefix: 'B21' }, { services: [BT_SVC] }],
       optionalServices: [BT_SVC],
     });
-    setBar('Connecting…');
-    await btDev.gatt.connect();
+
+    setBar('Connecting to GATT…');
+    var server = await btDev.gatt.connect();
+
+    setBar('Getting service…');
+    var svc = await server.getPrimaryService(BT_SVC);
+
+    setBar('Getting characteristic…');
+    var chars = await svc.getCharacteristics();
+    /* Find characteristic that supports both notify and write */
+    btChar = chars.find(function(c) {
+      return c.properties.notify && (c.properties.writeWithoutResponse || c.properties.write);
+    }) || chars[0];
+    if (!btChar) throw new Error('No writable characteristic found on service');
+
+    await btChar.startNotifications();
+    btChar.addEventListener('characteristicvaluechanged', _onNotify);
+
     btConn = true;
     btDev.addEventListener('gattserverdisconnected', function() {
-      btConn = false;
-      btDev  = null;
+      btConn = false; btDev = null; btChar = null;
+      _nQueue = []; _nWaiters = [];
       document.getElementById('pnotice').classList.remove('on');
       syncPrintBtn();
     });
     syncPrintBtn();
     toast('B21S connected');
   } catch(e) {
-    btConn = false;
-    btDev  = null;
-    /* NotFoundError = user dismissed the picker — silently reset */
+    btConn = false; btDev = null; btChar = null;
     if (e.name !== 'NotFoundError' && e.name !== 'NotAllowedError') {
       setBar('Connection failed: ' + e.message);
     } else {
@@ -497,24 +715,32 @@ async function connectBT() {
   }
 }
 
-function onPrint() {
+async function onPrint() {
   if (!BT_OK) return;
+  if (!btConn || !btChar) { connectBT(); return; }
 
-  if (!btConn) {
-    connectBT();
-    return;
+  /* Build export canvas at exact printer resolution (400×240, no DPR) */
+  var ec  = document.createElement('canvas');
+  ec.width = LW; ec.height = LH;
+  drawLabel(ec.getContext('2d'), getF(), LW, LH);
+
+  var btn = document.getElementById('btn-print');
+  btn.disabled    = true;
+  btn.textContent = 'Printing…';
+  document.getElementById('pnotice').classList.remove('on');
+
+  try {
+    await printB21S(ec);
+    setBar('● Printed successfully', true);
+    toast('Printed successfully');
+  } catch(e) {
+    setBar('Print failed: ' + e.message, false);
+    toast('Failed — ' + e.message);
+    document.getElementById('pnotice').classList.add('on');
+  } finally {
+    btn.textContent = 'Print';
+    btn.disabled    = false;
   }
-
-  /* ── BLE printing: NIIMBOT packet protocol not yet implemented ──
-     Protocol reference: https://github.com/MultiMote/niimblue
-     When ready, implement here:
-       1. Build 400×240 1-bit bitmap from canvas
-       2. Send: Connect(0xC1) → SetDensity(0x21) → SetLabelType(0x23)
-                → PrintStart(0x01) → PageStart(0x03) → SetPageSize(0x13)
-                → PrintBitmapRow(0x85) × 240 → PageEnd(0xE3) → PrintEnd(0xF3)
-     Packet format: [0x55,0x55, CMD, LEN, DATA..., XOR-checksum, 0xAA,0xAA]
-     ────────────────────────────────────────────────────────────── */
-  document.getElementById('pnotice').classList.add('on');
 }
 
 /* ═══════════════════════════════════════════════════
