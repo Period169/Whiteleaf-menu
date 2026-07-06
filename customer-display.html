@@ -225,23 +225,45 @@ function dbgStatus(msg, live) {
   el.className = live ? 'live' : '';
 }
 
+var _gotCart = false;
+var _lastFP  = null;
+
+function _onCartData(data) {
+  var fp = JSON.stringify(data.items) + ':' + data.total;
+  _gotCart = true;
+  if (fp === _lastFP) return;          /* skip re-render if cart unchanged */
+  _lastFP = fp;
+  var ts = new Date().toLocaleTimeString('en-GB', { hour12: false });
+  var n  = data.items ? data.items.length : 0;
+  console.log('[DISPLAY received]', n, 'item(s) at', ts, data);
+  dbgStatus('● LIVE — ' + n + ' item(s) — ' + ts, true);
+  render(data);
+}
+
 if (ch) {
   ch.onmessage = function(e) {
     console.log('[DISPLAY] channel message:', e.data);
-    if (e.data && e.data.type === 'cart') {
-      var ts = new Date().toLocaleTimeString('en-GB', { hour12: false });
-      var n  = e.data.items ? e.data.items.length : 0;
-      console.log('[DISPLAY received]', n, 'item(s) at', ts, e.data);
-      dbgStatus('● LIVE — ' + n + ' item(s) — ' + ts, true);
-      render(e.data);
-    }
+    if (e.data && e.data.type === 'cart') _onCartData(e.data);
   };
-  console.log('[DISPLAY] sending request to POS…');
-  dbgStatus('⚪ requesting from POS…', false);
-  ch.postMessage({ type: 'request' });
-} else {
-  dbgStatus('✗ BroadcastChannel not supported', false);
 }
+
+/* 每秒：localStorage 备用读取 + BroadcastChannel 重试（直到收到为止） */
+function _syncLoop() {
+  try {
+    var raw = localStorage.getItem('wl_cd_cart');
+    if (raw) { var d = JSON.parse(raw); if (d && d.type === 'cart') _onCartData(d); }
+  } catch(_) {}
+
+  if (ch && !_gotCart) {
+    dbgStatus('⚪ requesting from POS…', false);
+    console.log('[DISPLAY] sending request to POS…');
+    ch.postMessage({ type: 'request' });
+  }
+  setTimeout(_syncLoop, 1000);
+}
+
+if (!ch) dbgStatus('⚪ BroadcastChannel not supported — localStorage only', false);
+_syncLoop();
 </script>
 </body>
 </html>

@@ -988,6 +988,7 @@ function broadcastCart() {
     };
     console.log('[POS broadcast]', payload);
     displayChannel.postMessage(payload);
+    try { localStorage.setItem('wl_cd_cart', JSON.stringify(payload)); } catch(_) {}
   } catch(e) {
     console.warn('[POS broadcast] error (non-fatal):', e);
   }
@@ -1169,6 +1170,7 @@ if (displayChannel) {
     }
   };
   console.log('[POS] onmessage handler registered on wl_customer_display');
+  setTimeout(broadcastCart, 300); /* broadcast current cart on load */
 }
 
 /* ── Keyboard ─────────────────────────────────────────────────────────────── */
