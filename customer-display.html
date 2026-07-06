@@ -37,91 +37,118 @@ html, body {
   letter-spacing: 0.01em;
 }
 
-/* ── Items area ───────────────────────────────────────────────────────────── */
+/* ── Items scroll container ───────────────────────────────────────────────── */
 #items {
   flex: 1;
-  overflow-y: auto;
-  padding: 44px 72px 24px;
+  overflow: hidden;
+  padding: 28px 60px 140px;   /* bottom pad keeps content above fixed totals */
   display: none;
 }
 
-.item {
-  padding-bottom: 28px;
-  margin-bottom: 28px;
-  border-bottom: 1px solid #f0f0f0;
-}
-.item:last-child {
-  border-bottom: none;
-  margin-bottom: 0;
+/* Animatable inner wrapper — duplicated for seamless scroll loop */
+#scroll-inner { will-change: transform; }
+
+@keyframes scroll-up {
+  0%   { transform: translateY(0); }
+  100% { transform: translateY(-50%); }
 }
 
+/* ── Item card ────────────────────────────────────────────────────────────── */
+.item {
+  padding: 13px 0;
+  border-bottom: 1px solid #efefef;
+}
+.item:last-child { border-bottom: none; }
+
+/* Row 1 — name (left) + price (right) */
+.item-row1 {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  margin-bottom: 3px;
+}
 .item-name {
   font-family: 'Cormorant Garamond', Georgia, serif;
-  font-size: 38px;
-  font-weight: 400;
+  font-size: 28px;
+  font-weight: 700;
   color: #1a1a1a;
-  line-height: 1.2;
-  margin-bottom: 6px;
-}
-.item-detail {
-  font-size: 22px;
-  color: #aaa;
-  line-height: 1.7;
-}
-.item-topping {
-  font-size: 22px;
-  color: #2d4a3e;
-  line-height: 1.7;
+  line-height: 1.15;
 }
 .item-price {
-  font-size: 26px;
-  font-weight: 400;
+  font-size: 24px;
+  font-weight: 700;
   color: #1a1a1a;
-  margin-top: 10px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
-/* ── Debug status bar ────────────────────────────────────────────────────── */
+/* Row 2 — Size · Sugar · Ice */
+.item-row2 {
+  font-size: 14px;
+  color: #bbb;
+  line-height: 1.5;
+}
+
+/* Row 3 — Toppings × Qty */
+.item-row3 {
+  font-size: 14px;
+  color: #2d4a3e;
+  line-height: 1.5;
+}
+
+/* ── Debug bar (bottom-left, unobtrusive) ─────────────────────────────────── */
 #dbg-bar {
   position: fixed;
-  bottom: 0; right: 0;
-  padding: 6px 14px;
+  bottom: 0; left: 0;
+  padding: 5px 12px;
   font-size: 11px;
   font-family: monospace;
-  color: #aaa;
-  background: rgba(255,255,255,.85);
-  border-top-left-radius: 6px;
+  color: #ccc;
+  background: rgba(255,255,255,.8);
+  border-top-right-radius: 6px;
   pointer-events: none;
   z-index: 999;
 }
 #dbg-bar.live { color: #27ae60; }
 
-/* ── Totals footer ────────────────────────────────────────────────────────── */
+/* ── Totals — fixed bottom-right ─────────────────────────────────────────── */
 #totals {
-  flex-shrink: 0;
-  border-top: 2px solid #f0f0f0;
-  padding: 18px 72px 28px;
+  position: fixed;
+  bottom: 0; right: 0;
+  padding: 14px 40px 20px 32px;
+  background: #fff;
+  border-top: 1px solid #eee;
+  border-left: 1px solid #eee;
+  border-top-left-radius: 10px;
+  text-align: right;
   display: none;
+  z-index: 100;
+  min-width: 260px;
 }
 
 .tot-sub {
   display: flex;
   justify-content: space-between;
-  font-size: 18px;
+  gap: 28px;
+  font-size: 15px;
   color: #bbb;
-  margin-bottom: 3px;
+  margin-bottom: 2px;
 }
 .tot-disc {
   display: flex;
   justify-content: space-between;
-  font-size: 18px;
+  gap: 28px;
+  font-size: 15px;
   color: #27ae60;
-  margin-bottom: 3px;
+  margin-bottom: 2px;
 }
 .tot-total {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 10px;
+  gap: 28px;
+  margin-top: 6px;
 }
 .tot-tlbl {
   font-size: 13px;
@@ -131,8 +158,8 @@ html, body {
 }
 .tot-tval {
   font-family: 'Cormorant Garamond', Georgia, serif;
-  font-size: 76px;
-  font-weight: 300;
+  font-size: 58px;
+  font-weight: 400;
   color: #2d4a3e;
   line-height: 1;
 }
@@ -142,7 +169,7 @@ html, body {
 
 <div id="display">
   <div id="empty">Please place your order.</div>
-  <div id="items"></div>
+  <div id="items"><div id="scroll-inner"></div></div>
   <div id="totals"></div>
 </div>
 <div id="dbg-bar">⚪ waiting for POS…</div>
@@ -161,12 +188,15 @@ function fmt(n) {
 function render(data) {
   var elEmpty  = document.getElementById('empty');
   var elItems  = document.getElementById('items');
+  var elInner  = document.getElementById('scroll-inner');
   var elTotals = document.getElementById('totals');
 
   if (!data || !data.items || data.items.length === 0) {
     elEmpty.style.display  = 'flex';
     elItems.style.display  = 'none';
     elTotals.style.display = 'none';
+    elInner.style.animation = 'none';
+    elInner.innerHTML = '';
     return;
   }
 
@@ -174,36 +204,53 @@ function render(data) {
   elItems.style.display  = 'block';
   elTotals.style.display = 'block';
 
-  elItems.innerHTML = data.items.map(function(it) {
-    var html = '<div class="item">';
-    html += '<div class="item-name">' + it.name + '</div>';
-    if (it.size) {
-      html += '<div class="item-detail">' + it.size + '</div>';
-    }
-    if (it.sweetness) {
-      html += '<div class="item-detail">' + it.sweetness + ' Sugar</div>';
-    }
-    if (it.ice) {
-      var iceLabel = it.ice === 'Normal' ? 'Normal Ice' : it.ice;
-      html += '<div class="item-detail">' + iceLabel + '</div>';
-    }
-    if (it.freeTop) {
-      html += '<div class="item-topping">+ ' + it.freeTop + '</div>';
-    }
-    if (it.paidToppings && it.paidToppings.length) {
-      it.paidToppings.forEach(function(t) {
-        html += '<div class="item-topping">+ ' + t + '</div>';
-      });
-    }
+  var itemsHtml = data.items.map(function(it) {
     var unitTotal = it.unitPrice + it.tpTotal;
-    var priceStr = it.quantity > 1
-      ? it.quantity + ' × ' + fmt(unitTotal) + ' Ft'
-      : '1 × ' + fmt(unitTotal) + ' Ft';
-    html += '<div class="item-price">' + priceStr + '</div>';
+
+    /* Row 1: name + per-item price */
+    var html = '<div class="item">'
+      + '<div class="item-row1">'
+      + '<span class="item-name">' + it.name + '</span>'
+      + '<span class="item-price">' + fmt(unitTotal) + ' Ft</span>'
+      + '</div>';
+
+    /* Row 2: Size · Sugar · Ice (only non-empty fields) */
+    var details = [];
+    if (it.size)      details.push(it.size);
+    if (it.sweetness) details.push(it.sweetness + ' Sugar');
+    if (it.ice)       details.push(it.ice === 'Normal' ? 'Normal Ice' : it.ice);
+    if (details.length) {
+      html += '<div class="item-row2">' + details.join(' · ') + '</div>';
+    }
+
+    /* Row 3: Toppings × Qty */
+    var tops = [];
+    if (it.freeTop)                                tops.push(it.freeTop);
+    if (it.paidToppings && it.paidToppings.length) tops = tops.concat(it.paidToppings);
+    var row3 = tops.map(function(t){ return '+ ' + t; }).join(' · ');
+    if (it.quantity > 1) row3 += (row3 ? ' ' : '') + '×' + it.quantity;
+    if (row3) html += '<div class="item-row3">' + row3 + '</div>';
+
     html += '</div>';
     return html;
   }).join('');
 
+  /* Stop any running animation, render one set first */
+  elInner.style.animation = 'none';
+  elInner.innerHTML = itemsHtml;
+
+  /* After paint: check if scroll is needed */
+  setTimeout(function() {
+    var viewH    = elItems.clientHeight;
+    var contentH = elInner.scrollHeight;
+    if (contentH > viewH) {
+      elInner.innerHTML = itemsHtml + itemsHtml;          /* duplicate for seamless loop */
+      var dur = (elInner.scrollHeight / 2) / 50 + 's';   /* 50 px/s — slow scroll */
+      elInner.style.animation = 'scroll-up ' + dur + ' linear infinite';
+    }
+  }, 80);
+
+  /* Totals */
   var tHtml = '<div class="tot-sub"><span>Subtotal</span><span>' + fmt(data.subtotal) + ' Ft</span></div>';
   if (data.discount > 0) {
     tHtml += '<div class="tot-disc"><span>Student Discount</span><span>−' + fmt(data.discount) + ' Ft</span></div>';
