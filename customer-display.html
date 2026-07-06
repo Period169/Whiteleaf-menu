@@ -25,7 +25,7 @@ html, body {
   flex-direction: column;
 }
 
-/* ── Empty state ──────────────────────────────────────────────────────────── */
+/* Empty state */
 #empty {
   flex: 1;
   display: flex;
@@ -37,30 +37,35 @@ html, body {
   letter-spacing: 0.01em;
 }
 
-/* ── Items scroll container ───────────────────────────────────────────────── */
+/* Items scroll container */
 #items {
   flex: 1;
   overflow: hidden;
-  padding: 28px 60px 140px;   /* bottom pad keeps content above fixed totals */
+  padding: 28px 60px 140px;
   display: none;
 }
 
-/* Animatable inner wrapper — duplicated for seamless scroll loop */
+/* Animatable inner wrapper */
 #scroll-inner { will-change: transform; }
 
-@keyframes scroll-up {
-  0%   { transform: translateY(0); }
-  100% { transform: translateY(-50%); }
+/* End-of-order marker */
+.end-of-order {
+  text-align: center;
+  padding: 22px 0 10px;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #ccc;
 }
 
-/* ── Item card ────────────────────────────────────────────────────────────── */
+/* Item card */
 .item {
   padding: 13px 0;
   border-bottom: 1px solid #efefef;
 }
 .item:last-child { border-bottom: none; }
 
-/* Row 1 — name (left) + price (right) */
+/* Row 1: name (left) + price (right) */
 .item-row1 {
   display: flex;
   justify-content: space-between;
@@ -83,21 +88,21 @@ html, body {
   flex-shrink: 0;
 }
 
-/* Row 2 — Size · Sugar · Ice */
+/* Row 2: Size / Sugar / Ice */
 .item-row2 {
   font-size: 14px;
   color: #bbb;
   line-height: 1.5;
 }
 
-/* Row 3 — Toppings × Qty */
+/* Row 3: Toppings x Qty */
 .item-row3 {
   font-size: 14px;
   color: #2d4a3e;
   line-height: 1.5;
 }
 
-/* ── Debug bar (bottom-left, unobtrusive) ─────────────────────────────────── */
+/* Debug bar (bottom-left) */
 #dbg-bar {
   position: fixed;
   bottom: 0; left: 0;
@@ -112,7 +117,7 @@ html, body {
 }
 #dbg-bar.live { color: #27ae60; }
 
-/* ── Totals — fixed bottom-right ─────────────────────────────────────────── */
+/* Totals: fixed bottom-right */
 #totals {
   position: fixed;
   bottom: 0; right: 0;
@@ -172,7 +177,7 @@ html, body {
   <div id="items"><div id="scroll-inner"></div></div>
   <div id="totals"></div>
 </div>
-<div id="dbg-bar">⚪ waiting for POS…</div>
+<div id="dbg-bar">&#9898; waiting for POS&#8230;</div>
 
 <script>
 'use strict';
@@ -182,20 +187,62 @@ var ch = typeof BroadcastChannel !== 'undefined'
 
 function fmt(n) {
   try { return Number(n).toLocaleString('hu-HU'); }
-  catch(e) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' '); }
+  catch(e) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' '); }
 }
 
+/* ── Auto-scroll: top pause → slow scroll down → bottom pause → instant reset ── */
+var _sRAF = null;
+
+function _stopScroll() {
+  if (_sRAF) { cancelAnimationFrame(_sRAF); _sRAF = null; }
+  var el = document.getElementById('scroll-inner');
+  if (el) el.style.transform = '';
+}
+
+function _startScroll(el, maxPx) {
+  _stopScroll();
+  var SPEED     = 50;    /* px / second — slow */
+  var PAUSE_TOP = 2000;  /* ms: hold at top before starting */
+  var PAUSE_BOT = 3000;  /* ms: hold at bottom before instant reset */
+  var phase = 'pause_top', phaseStart = null, offset = 0;
+
+  function step(now) {
+    if (phaseStart === null) phaseStart = now;
+    var elapsed = now - phaseStart;
+
+    if (phase === 'pause_top') {
+      if (elapsed >= PAUSE_TOP) { phase = 'scrolling'; phaseStart = now; }
+
+    } else if (phase === 'scrolling') {
+      offset = Math.min(elapsed / 1000 * SPEED, maxPx);
+      el.style.transform = 'translateY(-' + offset.toFixed(1) + 'px)';
+      if (offset >= maxPx) { phase = 'pause_bottom'; phaseStart = now; }
+
+    } else if (phase === 'pause_bottom') {
+      if (elapsed >= PAUSE_BOT) {
+        offset = 0;
+        el.style.transform = '';    /* instant jump to top */
+        phase = 'pause_top';
+        phaseStart = now;
+      }
+    }
+    _sRAF = requestAnimationFrame(step);
+  }
+  _sRAF = requestAnimationFrame(step);
+}
+
+/* ── Render ─────────────────────────────────────────────────────────────────── */
 function render(data) {
   var elEmpty  = document.getElementById('empty');
   var elItems  = document.getElementById('items');
   var elInner  = document.getElementById('scroll-inner');
   var elTotals = document.getElementById('totals');
+  _stopScroll();
 
   if (!data || !data.items || data.items.length === 0) {
     elEmpty.style.display  = 'flex';
     elItems.style.display  = 'none';
     elTotals.style.display = 'none';
-    elInner.style.animation = 'none';
     elInner.innerHTML = '';
     return;
   }
@@ -207,47 +254,40 @@ function render(data) {
   var itemsHtml = data.items.map(function(it) {
     var unitTotal = it.unitPrice + it.tpTotal;
 
-    /* Row 1: name + per-item price */
+    /* Row 1: name + unit price */
     var html = '<div class="item">'
       + '<div class="item-row1">'
       + '<span class="item-name">' + it.name + '</span>'
       + '<span class="item-price">' + fmt(unitTotal) + ' Ft</span>'
       + '</div>';
 
-    /* Row 2: Size · Sugar · Ice (only non-empty fields) */
+    /* Row 2: Size / Sugar / Ice */
     var details = [];
     if (it.size)      details.push(it.size);
     if (it.sweetness) details.push(it.sweetness + ' Sugar');
     if (it.ice)       details.push(it.ice === 'Normal' ? 'Normal Ice' : it.ice);
-    if (details.length) {
-      html += '<div class="item-row2">' + details.join(' · ') + '</div>';
-    }
+    if (details.length) html += '<div class="item-row2">' + details.join(' · ') + '</div>';
 
-    /* Row 3: Toppings × Qty */
+    /* Row 3: Toppings x Qty */
     var tops = [];
     if (it.freeTop)                                tops.push(it.freeTop);
     if (it.paidToppings && it.paidToppings.length) tops = tops.concat(it.paidToppings);
-    var row3 = tops.map(function(t){ return '+ ' + t; }).join(' · ');
-    if (it.quantity > 1) row3 += (row3 ? ' ' : '') + '×' + it.quantity;
+    var row3 = tops.map(function(t) { return '+ ' + t; }).join(' · ');
+    if (it.quantity > 1) row3 += (row3 ? '  ' : '') + '×' + it.quantity;
     if (row3) html += '<div class="item-row3">' + row3 + '</div>';
 
     html += '</div>';
     return html;
-  }).join('');
+  }).join('') + '<div class="end-of-order">— End of order —</div>';
 
-  /* Stop any running animation, render one set first */
-  elInner.style.animation = 'none';
   elInner.innerHTML = itemsHtml;
 
-  /* After paint: check if scroll is needed */
+  /* After paint: scroll only when content exceeds visible area */
   setTimeout(function() {
-    var viewH    = elItems.clientHeight;
-    var contentH = elInner.scrollHeight;
-    if (contentH > viewH) {
-      elInner.innerHTML = itemsHtml + itemsHtml;          /* duplicate for seamless loop */
-      var dur = (elInner.scrollHeight / 2) / 50 + 's';   /* 50 px/s — slow scroll */
-      elInner.style.animation = 'scroll-up ' + dur + ' linear infinite';
-    }
+    var PAD_TOP = 28, PAD_BOT = 140;
+    var viewH    = elItems.clientHeight - PAD_TOP - PAD_BOT;
+    var maxScroll = elInner.offsetHeight - viewH;
+    if (maxScroll > 4) _startScroll(elInner, maxScroll);
   }, 80);
 
   /* Totals */
@@ -263,7 +303,7 @@ function render(data) {
 }
 
 console.log('[DISPLAY] origin:', window.location.origin);
-console.log('[DISPLAY] BroadcastChannel:', ch ? 'OK — wl_customer_display' : 'NOT SUPPORTED');
+console.log('[DISPLAY] BroadcastChannel:', ch ? 'OK -- wl_customer_display' : 'NOT SUPPORTED');
 
 function dbgStatus(msg, live) {
   var el = document.getElementById('dbg-bar');
@@ -272,13 +312,14 @@ function dbgStatus(msg, live) {
   el.className = live ? 'live' : '';
 }
 
+/* ── Sync state ─────────────────────────────────────────────────────────────── */
 var _gotCart = false;
 var _lastFP  = null;
 
 function _onCartData(data) {
   var fp = JSON.stringify(data.items) + ':' + data.total;
   _gotCart = true;
-  if (fp === _lastFP) return;          /* skip re-render if cart unchanged */
+  if (fp === _lastFP) return;
   _lastFP = fp;
   var ts = new Date().toLocaleTimeString('en-GB', { hour12: false });
   var n  = data.items ? data.items.length : 0;
@@ -294,22 +335,22 @@ if (ch) {
   };
 }
 
-/* 每秒：localStorage 备用读取 + BroadcastChannel 重试（直到收到为止） */
+/* Every 1s: localStorage fallback + BroadcastChannel retry until answered */
 function _syncLoop() {
   try {
     var raw = localStorage.getItem('wl_cd_cart');
     if (raw) { var d = JSON.parse(raw); if (d && d.type === 'cart') _onCartData(d); }
-  } catch(_) {}
+  } catch(e) {}
 
   if (ch && !_gotCart) {
     dbgStatus('⚪ requesting from POS…', false);
-    console.log('[DISPLAY] sending request to POS…');
+    console.log('[DISPLAY] sending request to POS...');
     ch.postMessage({ type: 'request' });
   }
   setTimeout(_syncLoop, 1000);
 }
 
-if (!ch) dbgStatus('⚪ BroadcastChannel not supported — localStorage only', false);
+if (!ch) dbgStatus('⚪ BroadcastChannel not supported -- localStorage only', false);
 _syncLoop();
 </script>
 </body>
